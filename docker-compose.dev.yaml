@@ -1,0 +1,96 @@
+services:
+  pgdb:
+    image: postgres:16-alpine
+    container_name: pgdb
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: TestDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d TestDb"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  install:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: turbo-install
+    working_dir: /repo
+    environment:
+      CI: "true"
+      PNPM_HOME: "/pnpm-store"
+    volumes:
+      - .:/repo
+      - pnpm_store:/pnpm-store
+      - root_node_modules:/repo/node_modules
+      - api_node_modules:/repo/apps/api/node_modules
+      - web_node_modules:/repo/apps/web/node_modules
+    # ใช้ --unsafe-perm ถ้าเจอปัญหาเรื่องสิทธิ์ตอนติดตั้งบน Linux
+    command: pnpm install --no-frozen-lockfile
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: turbo-api
+    working_dir: /repo
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/repo
+      - pnpm_store:/pnpm-store #cahce ของ pnpm ทำให้ build เร็วขึ้น
+      - root_node_modules:/repo/node_modules #node_module กลาง
+      - api_node_modules:/repo/apps/api/node_modules #เอาไว้เก็บ deps ของ api
+    depends_on:
+      pgdb:
+        condition: service_healthy
+      install:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://postgres:123456@pgdb:5432/TestDb
+      CHOKIDAR_USEPOLLING: "true"
+      CI: "true"
+      PNPM_HOME: "/pnpm-store"
+    # รัน prisma generate ใน container เสมอ
+    command: >
+      sh -c "
+      pnpm --filter=api exec prisma generate &&
+        pnpm turbo dev --filter=api...
+      "
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: turbo-web
+    working_dir: /repo
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/repo
+      - pnpm_store:/pnpm-store
+      - root_node_modules:/repo/node_modules
+      - web_node_modules:/repo/apps/web/node_modules
+    depends_on:
+      install:
+        condition: service_completed_successfully
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      CI: "true"
+      PNPM_HOME: "/pnpm-store"
+    command: pnpm turbo dev --filter=web...
+
+volumes:
+  pg_data:
+  pnpm_store:
+  root_node_modules:
+  api_node_modules:
+  web_node_modules:
