@@ -43,7 +43,7 @@ services:
     container_name: turbo-api
     working_dir: /repo
     ports:
-      - "4000:4000"
+      - "3001:3001"
     volumes:
       - .:/repo
       - pnpm_store:/pnpm-store #cahce ของ pnpm ทำให้ build เร็วขึ้น
@@ -62,7 +62,6 @@ services:
     # รัน prisma generate ใน container เสมอ
     command: >
       sh -c "
-      pnpm --filter=api exec prisma generate &&
         pnpm turbo dev --filter=api...
       "
 
