@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { runSeeds } from './seed/index';
-import * as dotenv from 'dotenv';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const adapter = new PrismaPg({

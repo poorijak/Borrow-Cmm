@@ -1,3 +1,7 @@
+networks:
+  borrow-networks:
+    driver: bridge
+
 services:
   pgdb:
     image: postgres:16-alpine
@@ -16,6 +20,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 20
+    networks:
+      - borrow-networks
 
   install:
     build:
@@ -35,6 +41,8 @@ services:
     # ใช้ --unsafe-perm ถ้าเจอปัญหาเรื่องสิทธิ์ตอนติดตั้งบน Linux
     command: pnpm install --no-frozen-lockfile
     restart: "no"
+    networks:
+      - borrow-networks
 
   api:
     build:
@@ -44,6 +52,7 @@ services:
     working_dir: /repo
     ports:
       - "3001:3001"
+      - "5555:5555"
     volumes:
       - .:/repo
       - pnpm_store:/pnpm-store #cahce ของ pnpm ทำให้ build เร็วขึ้น
@@ -55,15 +64,24 @@ services:
       install:
         condition: service_completed_successfully
     environment:
-      DATABASE_URL: postgresql://postgres:123456@pgdb:5432/TestDb
+      DATABASE_URL: "postgresql://postgres:123456@pgdb:5432/TestDb"
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${CALLBACK_URL}
+      JWT_SECRET: ${JWT_SECRET}
       CHOKIDAR_USEPOLLING: "true"
       CI: "true"
       PNPM_HOME: "/pnpm-store"
     # รัน prisma generate ใน container เสมอ
     command: >
       sh -c "
-        pnpm turbo dev --filter=api...
+        cd apps/api &&
+        pnpm exec prisma generate &&
+        pnpm run dev
       "
+
+    networks:
+      - borrow-networks
 
   web:
     build:
@@ -86,6 +104,8 @@ services:
       CI: "true"
       PNPM_HOME: "/pnpm-store"
     command: pnpm turbo dev --filter=web...
+    networks:
+      - borrow-networks
 
 volumes:
   pg_data:
