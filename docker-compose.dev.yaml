@@ -70,6 +70,7 @@ services:
       GOOGLE_CALLBACK_URL: ${CALLBACK_URL}
       JWT_SECRET: ${JWT_SECRET}
       CHOKIDAR_USEPOLLING: "true"
+      NODE_ENV : development
       CI: "true"
       PNPM_HOME: "/pnpm-store"
     # รัน prisma generate ใน container เสมอ

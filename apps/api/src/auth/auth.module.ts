@@ -5,10 +5,11 @@ import { GoogleStrategy } from './strategies/google.strategies';
 import { PassportModule } from '@nestjs/passport';
 import { PrismaModule } from 'prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [PassportModule, PrismaModule, ConfigModule],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy],
+  providers: [AuthService, GoogleStrategy, JwtStrategy],
 })
 export class AuthModule {}

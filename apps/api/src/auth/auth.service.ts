@@ -5,6 +5,17 @@ import { PrismaService } from 'prisma/prisma.service';
 import { googleUser } from './types/auth';
 import { JwtService } from '@nestjs/jwt';
 
+type loginToken = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+type jwtRefreshToken = {
+  sub: string;
+  iat: number;
+  exp: number;
+};
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -12,7 +23,7 @@ export class AuthService {
     private readonly jwt: JwtService,
   ) {}
 
-  async loginWithGoogle(googleUser: googleUser) {
+  async loginWithGoogle(googleUser: googleUser): Promise<loginToken> {
     if (!googleUser.email)
       throw new UnauthorizedException('จะพบอีเมลล์ที่เชื่อมกับ Google');
 
@@ -72,16 +83,41 @@ export class AuthService {
       await this.prisma.account.create({
         data: {
           userId,
-          provider: 'google',
+          provider: googleUser.provider,
           providerAccountId: googleUser.providerAccountId,
         },
       });
+    }
+    const accessToken = await this.jwt.signAsync(
+      { sub: userId },
+      { expiresIn: '15m' },
+    );
+    const refreshToken = await this.jwt.signAsync(
+      { sub: userId },
+      { expiresIn: '30d' },
+    );
 
-      const payload = { sub: userId };
-      const accessToken = await this.jwt.signAsync(payload);
-      console.log('accessToken', accessToken);
+    return { accessToken, refreshToken };
+  }
 
-      return { accessToken };
+  async findUser(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    return user;
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<string> {
+    try {
+      const payload: jwtRefreshToken = await this.jwt.verifyAsync(refreshToken);
+
+      const newAccessToken = await this.jwt.signAsync(
+        { sub: payload.sub },
+        { expiresIn: '15m' },
+      );
+
+      return newAccessToken;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh Token');
     }
   }
 

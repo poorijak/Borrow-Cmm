@@ -19,7 +19,6 @@ import { JwtModule } from '@nestjs/jwt';
       inject: [ConfigService], // ทำการ inject ConfigService เข้ามาใช้ใน factory ของ jwt
       useFactory: (ConfigService: ConfigService) => ({
         secret: ConfigService.get('JWT_SECRET'), // get secret
-        signOptions: { expiresIn: '15' }, // วันหมดอายุ
       }),
     }),
   ],
