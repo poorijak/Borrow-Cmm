@@ -15,6 +15,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       req: Request,
     ): string | null => {
       const token = req?.cookies?.accessToken;
+      console.log('Token', token);
+
       return typeof token === 'string' ? token : null;
     };
 

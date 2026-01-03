@@ -1,3 +1,5 @@
+import { AuthProvider } from "@/feature/auth/client/authProvider";
+import { redirect } from "next/navigation";
 import React from "react";
 
 interface MainLayoutProps {
@@ -7,7 +9,7 @@ interface MainLayoutProps {
 const MainLayout = async ({ children }: MainLayoutProps) => {
   return (
     <div>
-      <div>{children}</div>
+      <AuthProvider>{children}</AuthProvider>
     </div>
   );
 };

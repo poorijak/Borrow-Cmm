@@ -40,23 +40,18 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.authService.loginWithGoogle(req.user);
 
-    const isProd = process.env.NODE_ENV === 'production';
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-      path: '/',
-      maxAge: 1000 * 60 * 15,
-    });
+    res.cookie(
+      'accessToken',
+      accessToken,
+      this.authService.getCookieOptions('access'),
+    );
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-      path: '/',
-      maxAge: 1000 * 60 * 60 * 24 * 30,
-    });
+    res.cookie(
+      'refreshToken',
+      refreshToken,
+      this.authService.getCookieOptions('refresh'),
+    );
 
     const redirectUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     return res.redirect(`${redirectUrl}`);
@@ -69,23 +64,24 @@ export class AuthController {
   }
 
   @Get('refresh')
-  refreshToken(
+  async refreshToken(
     @Req() req: ExpressRequest,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken : string = req.cookies?.refreshToken;
+    const refreshToken: string = req.cookies?.refreshToken;
 
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh Token');
     }
 
-    const newAccessToken = this.authService.refreshAccessToken(refreshToken);
+    const newAccessToken =
+      await this.authService.refreshAccessToken(refreshToken);
 
-    res.cookie('accessToken', newAccessToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: false,
-    });
+    res.cookie(
+      'accessToken',
+      newAccessToken,
+      this.authService.getCookieOptions('access'),
+    );
 
     return { ok: true };
   }

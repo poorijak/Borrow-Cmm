@@ -1,5 +1,3 @@
-import { getUser } from "@/feature/auth/server/auth";
-import { redirect } from "next/navigation";
 import React from "react";
 
 type AuthLayoutProps = {

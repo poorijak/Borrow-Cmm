@@ -90,7 +90,7 @@ export class AuthService {
     }
     const accessToken = await this.jwt.signAsync(
       { sub: userId },
-      { expiresIn: '15m' },
+      { expiresIn: '1m' },
     );
     const refreshToken = await this.jwt.signAsync(
       { sub: userId },
@@ -106,7 +106,7 @@ export class AuthService {
     return user;
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<string> {
+  async refreshAccessToken(refreshToken: string) {
     try {
       const payload: jwtRefreshToken = await this.jwt.verifyAsync(refreshToken);
 
@@ -119,6 +119,17 @@ export class AuthService {
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh Token');
     }
+  }
+
+  getCookieOptions(type: 'access' | 'refresh') {
+    const isProd = process.env.NODE_ENV === 'production';
+    return {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? ('none' as const) : ('lax' as const),
+      path: '/',
+      maxAge: type === 'access' ? 1000 * 60 : 1000 * 60 * 60 * 24 * 30,
+    };
   }
 
   create(createAuthDto: CreateAuthDto) {

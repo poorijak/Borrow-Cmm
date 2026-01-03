@@ -1,23 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("accessToken")?.value;
+  const { pathname } = req.nextUrl;
 
-  if (!token && req.nextUrl.pathname === "/") {
-    const url = req.nextUrl.clone();
-    url.pathname = "/auth/signin";
-    return NextResponse.redirect(url);
+  const accessToken = req.cookies.get("accessToken")?.value;
+  const refreshToken = req.cookies.get("refreshToken")?.value;
+
+  const isAuthPage = pathname.startsWith("/auth");
+
+  if (!accessToken && !refreshToken && !isAuthPage) {
+    const loginUrl = new URL("/auth/signin", req.url);
+    return NextResponse.redirect(loginUrl);
   }
 
-  if (token && req.nextUrl.pathname === "/auth/signin") {
-    const url = req.nextUrl.clone();
-    url.pathname = "/";
-    return NextResponse.redirect(url);
+  if (!accessToken && refreshToken && !isAuthPage) return NextResponse.next();
+
+  if (accessToken && isAuthPage) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/" , "/auth/:path*"],
+  matcher: ["/", "/auth/:path*"],
 };
