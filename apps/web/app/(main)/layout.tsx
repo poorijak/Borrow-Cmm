@@ -1,4 +1,4 @@
-import { AuthProvider } from "@/feature/auth/client/authProvider";
+import { getUser } from "@/feature/users/server/user";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -7,11 +7,11 @@ interface MainLayoutProps {
 }
 
 const MainLayout = async ({ children }: MainLayoutProps) => {
-  return (
-    <div>
-      <AuthProvider>{children}</AuthProvider>
-    </div>
-  );
+
+    const user = await getUser()
+    if (!user) redirect("/auth/signin")
+
+  return <div>{children}</div>;
 };
 
 export default MainLayout;
