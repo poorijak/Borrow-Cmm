@@ -1,22 +1,17 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
   UseGuards,
   Request,
   Req,
   Res,
   UnauthorizedException,
+  Post,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GoogleAuthGurad } from './guards/google-auth.guard';
 import type { Request as ExpressRequest, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { PrismaService } from 'prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
@@ -84,5 +79,15 @@ export class AuthController {
     );
 
     return { ok: true };
+  }
+
+  @Post('signout')
+  signout(@Res({ passthrough: true }) res: Response) {
+    const options = this.authService.getCookieOptions('access');
+
+    res.clearCookie('accessToken', { ...options, maxAge: 0 });
+    res.clearCookie('refreshToken', { ...options, maxAge: 0 });
+
+    return { success: true };
   }
 }

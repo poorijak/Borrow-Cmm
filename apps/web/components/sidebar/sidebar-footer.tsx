@@ -1,19 +1,23 @@
+"use client";
+
 import React from "react";
 import { SidebarFooter, SidebarMenu, SidebarMenuItem } from "../ui/sidebar";
-import { Avatar, AvatarImage } from "../ui/avatar";
 import { User } from "@repo/types";
 import { Button } from "../ui/button";
 import { Home, LogOut } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import Link from "next/link";
+import { useSignout } from "@/feature/auth/hooks/useAuth";
 
 interface SideFooterProps {
   user: User | undefined;
 }
 
 const SideFooter = ({ user }: SideFooterProps) => {
+  const { mutate, isPending } = useSignout();
+
   return (
-    <SidebarFooter className="p-5">
+    <SidebarFooter className="p-5 group-data-[collapsible=icon]:hidden">
       <SidebarMenu>
         <SidebarMenuItem>
           <div className="flex justify-between items-center">
@@ -38,7 +42,11 @@ const SideFooter = ({ user }: SideFooterProps) => {
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" >
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => mutate()}
+                  >
                     <LogOut />
                   </Button>
                 </TooltipTrigger>

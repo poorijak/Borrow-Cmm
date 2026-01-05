@@ -2,6 +2,8 @@ import "@repo/ui/styles.css";
 import "./globals.css";
 import type { Metadata } from "next";
 import { lineSeed } from "@/fonts/font";
+import Providers from "@/provider/query-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create Turborepo",
@@ -15,7 +17,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={lineSeed.className}>{children}</body>
+      <Providers>
+        <body className={lineSeed.className}>
+          <Toaster />
+          {children}
+        </body>
+      </Providers>
     </html>
   );
 }

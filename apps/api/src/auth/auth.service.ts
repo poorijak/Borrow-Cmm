@@ -36,10 +36,14 @@ export class AuthService {
       },
     });
 
+    let userRole: string;
+    let userEmail: string;
     let userId: string;
 
     if (existingAccount) {
       userId = existingAccount.userId;
+      userRole = existingAccount.user.role;
+      userEmail = existingAccount.user.email;
 
       await this.userService.update(userId, {
         name: googleUser.name || existingAccount.user.name,
@@ -51,7 +55,9 @@ export class AuthService {
       });
 
       if (existingUserByEmail) {
+        userRole = existingUserByEmail.role;
         userId = existingUserByEmail.id;
+        userEmail = existingUserByEmail.email;
       } else {
         const newUser = await this.userService.create({
           email: googleUser.email,
@@ -60,6 +66,8 @@ export class AuthService {
           role: 'Student',
         });
         userId = newUser.id;
+        userEmail = newUser.email;
+        userRole = newUser.role;
       }
 
       await this.accountService.create({
@@ -70,14 +78,17 @@ export class AuthService {
         providerAccountId: googleUser.providerAccountId,
       });
     }
-    const accessToken = await this.jwt.signAsync(
-      { sub: userId },
-      { expiresIn: '30m' },
-    );
-    const refreshToken = await this.jwt.signAsync(
-      { sub: userId },
-      { expiresIn: '30d' },
-    );
+
+    const payload = {
+      sub: userId,
+      role: userRole,
+      email: userEmail,
+    };
+
+    const accessToken = await this.jwt.signAsync(payload, { expiresIn: '30m' });
+    const refreshToken = await this.jwt.signAsync(payload, {
+      expiresIn: '30d',
+    });
 
     return { accessToken, refreshToken };
   }

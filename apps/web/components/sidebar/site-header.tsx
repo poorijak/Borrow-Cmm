@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { SidebarTrigger } from "../ui/sidebar";
 import { Avatar, AvatarImage } from "../ui/avatar";
@@ -10,6 +12,7 @@ import {
 } from "../ui/dropdown-menu";
 import { User } from "@repo/types";
 import { cn } from "@/lib/utils";
+import { useSignout } from "@/feature/auth/hooks/useAuth";
 
 interface SiteHeaderProps {
   className?: string;
@@ -18,30 +21,36 @@ interface SiteHeaderProps {
 }
 
 const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
+  const { mutate: signOut } = useSignout();
+
   return (
     <header
       className={cn(
-        "sticky top-0 z-10 w-full",
-        type === "Admin" ? "border-none bg-transparent" : "border-b bg-white"
+        "sticky top-0 z-10 border-b w-full",
+        type === "Admin" ? " md:border-none  bg-transparent" : " bg-white"
       )}
     >
       <div className="flex h-16 items-center justify-between px-4">
         <SidebarTrigger />
-        <div
-          className={cn(
-            "items-center gap-4",
-            type === "Admin" ? "hidden" : "flex"
+        <div className="flex items-center gap-4">
+          {type === "Student" && (
+            <ShoppingBag className="size-5 text-muted-foreground" />
           )}
-        >
-          <ShoppingBag className="size-5 text-muted-foreground" />
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Avatar className="size-8" asChild>
-                <AvatarImage src={user.profileImage} alt="@shadcn" />
-              </Avatar>
+            <DropdownMenuTrigger className="block md:hidden">
+              <div className="cursor-pointer">
+                <Avatar className="size-8">
+                  <AvatarImage src={user.profileImage} alt={user.name} />
+                </Avatar>
+              </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-red-500 cursor-pointer"
+                onClick={() => signOut()}
+              >
+                Sign Out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
