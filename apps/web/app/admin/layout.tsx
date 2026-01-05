@@ -1,27 +1,29 @@
 import SiteHeader from "@/components/sidebar/site-header";
 import { AppSidebar } from "@/components/ui/appSidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { hasRole } from "@/feature/users/permission/user";
 import { getUser } from "@/feature/users/server/user";
-import { User } from "@repo/types";
+import { ROLES, User } from "@repo/types";
 import { redirect } from "next/navigation";
 import React from "react";
 
-interface MainLayoutProps {
+interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-const MainLayout = async ({ children }: MainLayoutProps) => {
+const AdminLayout = async ({ children }: AdminLayoutProps) => {
   const user: User = await getUser();
 
   if (!user) redirect("/auth/signin")
-  console.log(user);
-  console.log(user.role);
+
+  const isAdmin = hasRole(user, ROLES.ADMIN);
+  if (!isAdmin) redirect("/");
 
   return (
     <SidebarProvider>
-      <AppSidebar type="Student" />
+      <AppSidebar type="Admin" user={user} />
       <div className="flex w-full flex-col">
-        <SiteHeader user={user} type="Student" />
+        <SiteHeader user={user}  type="Admin"/>
         <div className="p-5">
           <main>{children}</main>
         </div>
@@ -30,4 +32,4 @@ const MainLayout = async ({ children }: MainLayoutProps) => {
   );
 };
 
-export default MainLayout;
+export default AdminLayout;

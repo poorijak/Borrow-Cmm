@@ -1,16 +1,25 @@
+// feature/users/server/user.ts
 import api from "@/lib/axios";
 import { cookies } from "next/headers";
 
-export const getUser = async () => {
+export async function getUser() {
   try {
-    const allCookie = (await cookies()).toString();
+    const cookieStore = await cookies();
+    const allCookie = cookieStore.toString();
+
+    if (!allCookie) return null;
+
     const { data } = await api.get("/auth/me", {
       headers: {
         Cookie: allCookie,
       },
     });
     return data;
-  } catch (error) {
-    console.error("Get user failed :", error);
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      console.error("Unauthorized: Access token might be expired.");
+      return null; // คืนค่า null เพื่อให้ Layout ตัดสินใจทำ redirect
+    }
+    throw error;
   }
-};
+}

@@ -61,22 +61,14 @@ export class AuthService {
       if (existingUserByEmail) {
         userId = existingUserByEmail.id;
       } else {
-        const role = await this.prisma.role.findUnique({
-          where: { slug: 'student' },
-        });
-
-        if (!role)
-          throw new Error('Role "student" not found. Seed roles first');
-
         const newUser = await this.prisma.user.create({
           data: {
             email: googleUser.email,
             name: googleUser.name,
             profileImage: googleUser.picture,
-            roleId: role.id,
+            role: 'Student',
           },
         });
-
         userId = newUser.id;
       }
 
@@ -90,7 +82,7 @@ export class AuthService {
     }
     const accessToken = await this.jwt.signAsync(
       { sub: userId },
-      { expiresIn: '1m' },
+      { expiresIn: '30m' },
     );
     const refreshToken = await this.jwt.signAsync(
       { sub: userId },
@@ -112,7 +104,7 @@ export class AuthService {
 
       const newAccessToken = await this.jwt.signAsync(
         { sub: payload.sub },
-        { expiresIn: '15m' },
+        { expiresIn: '30m' },
       );
 
       return newAccessToken;
@@ -128,7 +120,7 @@ export class AuthService {
       secure: isProd,
       sameSite: isProd ? ('none' as const) : ('lax' as const),
       path: '/',
-      maxAge: type === 'access' ? 1000 * 60 : 1000 * 60 * 60 * 24 * 30,
+      maxAge: type === 'access' ? 1000 * 60 * 30 : 1000 * 60 * 60 * 24 * 30,
     };
   }
 

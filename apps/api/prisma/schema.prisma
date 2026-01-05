@@ -6,6 +6,13 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  Administrater
+  Moderater
+  Student
+  Instructor
+}
+
 model User {
   id           String   @id @default(uuid())
   name         String
@@ -14,20 +21,8 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  roleId   String
-  role     Role      @relation(fields: [roleId], references: [id])
+  role     UserRole  @default(Student)
   accounts Account[]
-
-  @@index([roleId])
-}
-
-model Role {
-  id        String   @id @default(uuid())
-  title     String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  users     User[]
 }
 
 model Account {
