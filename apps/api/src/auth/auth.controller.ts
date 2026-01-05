@@ -13,18 +13,17 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { GoogleAuthGurad } from './guards/google-auth.guard';
 import type { Request as ExpressRequest, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { PrismaService } from 'prisma/prisma.service';
+import { UserService } from 'src/user/user.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly prismaService: PrismaService,
+    private readonly userService: UserService,
   ) {}
 
   @Get('google')
@@ -39,7 +38,6 @@ export class AuthController {
   ) {
     const { accessToken, refreshToken } =
       await this.authService.loginWithGoogle(req.user);
-
 
     res.cookie(
       'accessToken',
@@ -60,7 +58,9 @@ export class AuthController {
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
   getMe(@Req() req) {
-    return this.authService.findUser(req.user.id);
+    return this.userService.findUser({
+      id: req.user.id,
+    });
   }
 
   @Get('refresh')
@@ -84,30 +84,5 @@ export class AuthController {
     );
 
     return { ok: true };
-  }
-
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
   }
 }
