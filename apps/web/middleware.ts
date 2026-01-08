@@ -45,7 +45,6 @@ export async function middleware(request: NextRequest) {
   if (accessToken && refreshToken && isAuthPage)
     return NextResponse.redirect(new URL("/", request.url));
 
-  // 5. ถ้ามี Access Token อยู่แล้ว หรืออยู่ในหน้า Auth อยู่แล้ว
   return NextResponse.next();
 }
 

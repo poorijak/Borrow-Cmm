@@ -13,6 +13,7 @@ import {
 import { User } from "@repo/types";
 import { cn } from "@/lib/utils";
 import { useSignout } from "@/feature/auth/hooks/useAuth";
+import Link from "next/link";
 
 interface SiteHeaderProps {
   className?: string;
@@ -23,6 +24,7 @@ interface SiteHeaderProps {
 const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
   const { mutate: signOut } = useSignout();
 
+
   return (
     <header
       className={cn(
@@ -32,15 +34,22 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
     >
       <div className="flex h-16 items-center justify-between px-4">
         <SidebarTrigger />
+
         <div className="flex items-center gap-4">
+
           {type === "Student" && (
-            <ShoppingBag className="size-5 text-muted-foreground" />
+            <Link href="/bag">
+              <ShoppingBag className="size-5 text-muted-foreground" />
+            </Link>
           )}
+          
           <DropdownMenu>
-            <DropdownMenuTrigger className="block md:hidden">
+            <DropdownMenuTrigger
+              className={cn(type === "Admin" ? "md:hidden" : "block")}
+            >
               <div className="cursor-pointer">
-                <Avatar className="size-8">
-                  <AvatarImage src={user.profileImage} alt={user.name} />
+                <Avatar>
+                  <AvatarImage src={user.profileImage} />
                 </Avatar>
               </div>
             </DropdownMenuTrigger>
@@ -49,8 +58,13 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
                 className="text-red-500 cursor-pointer"
                 onClick={() => signOut()}
               >
-                Sign Out
+                <span>Sign Out</span>
               </DropdownMenuItem>
+              {user.role === "Administrater" && (
+                <DropdownMenuItem asChild>
+                  <Link href="/admin">หลังบ้าน</Link>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -1,6 +1,6 @@
 import SiteHeader from "@/components/sidebar/site-header";
 import { AppSidebar } from "@/components/ui/appSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { getUser } from "@/feature/users/server/user";
 import { User } from "@repo/types";
 import { redirect } from "next/navigation";
@@ -13,9 +13,9 @@ interface MainLayoutProps {
 const MainLayout = async ({ children }: MainLayoutProps) => {
   const user: User = await getUser();
 
-  if (!user) redirect("/auth/signin")
-  console.log(user);
-  console.log(user.role);
+  if (!user) redirect("/auth/signin");
+  
+  console.log(user.profileImage);
 
   return (
     <SidebarProvider>

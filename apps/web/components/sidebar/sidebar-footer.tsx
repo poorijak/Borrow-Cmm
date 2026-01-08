@@ -14,7 +14,7 @@ interface SideFooterProps {
 }
 
 const SideFooter = ({ user }: SideFooterProps) => {
-  const { mutate, isPending } = useSignout();
+  const { mutate } = useSignout();
 
   return (
     <SidebarFooter className="p-5 group-data-[collapsible=icon]:hidden">

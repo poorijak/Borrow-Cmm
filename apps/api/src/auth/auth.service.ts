@@ -12,6 +12,8 @@ type loginToken = {
 
 type jwtRefreshToken = {
   sub: string;
+  role: string;
+  email: string;
   iat: number;
   exp: number;
 };
@@ -98,7 +100,7 @@ export class AuthService {
       const payload: jwtRefreshToken = await this.jwt.verifyAsync(refreshToken);
 
       const newAccessToken = await this.jwt.signAsync(
-        { sub: payload.sub },
+        { sub: payload.sub, role: payload.role, email: payload.email },
         { expiresIn: '30m' },
       );
 
