@@ -15,6 +15,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserService } from 'src/user/user.service';
 import { Roles } from 'src/decorators/role.decorator';
 
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -55,7 +56,7 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   getMe(@Req() req) {
     return this.userService.findUser({
-      id: req.user.id,
+      id: req.user.userId,
     });
   }
 

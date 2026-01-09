@@ -10,7 +10,7 @@ export type googleUser = {
   refreshToken?: string;
 };
 
-export type jwtPayload = {
+export type jwtGuardPayload = {
   user: {
     userId: string;
     role: Role;

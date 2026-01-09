@@ -4,18 +4,11 @@ import { googleUser } from './types/auth';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { AccountService } from 'src/user/account.service';
+import { jwtPayload } from '@repo/types';
 
 type loginToken = {
   accessToken: string;
   refreshToken: string;
-};
-
-type jwtRefreshToken = {
-  sub: string;
-  role: string;
-  email: string;
-  iat: number;
-  exp: number;
 };
 
 @Injectable()
@@ -97,7 +90,7 @@ export class AuthService {
 
   async refreshAccessToken(refreshToken: string) {
     try {
-      const payload: jwtRefreshToken = await this.jwt.verifyAsync(refreshToken);
+      const payload: jwtPayload = await this.jwt.verifyAsync(refreshToken);
 
       const newAccessToken = await this.jwt.signAsync(
         { sub: payload.sub, role: payload.role, email: payload.email },
