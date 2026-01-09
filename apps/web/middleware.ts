@@ -57,7 +57,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/auth/signin", request.url));
       }
 
-      if (payload.role !== ROLES.ADMIN || ROLES.MODERATOR)
+      if (payload.role !== ROLES.ADMIN && payload.role !== ROLES.MODERATOR)
         return NextResponse.redirect(new URL("/", request.url));
     } catch (error) {
       return NextResponse.redirect(new URL("/auth/signin", request.url));
