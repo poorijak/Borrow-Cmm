@@ -13,6 +13,7 @@ import { GoogleAuthGurad } from './guards/google-auth.guard';
 import type { Request as ExpressRequest, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from 'src/user/user.service';
+import { Roles } from 'src/decorators/role.decorator';
 
 @Controller('auth')
 export class AuthController {

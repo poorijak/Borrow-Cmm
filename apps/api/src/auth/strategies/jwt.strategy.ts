@@ -15,7 +15,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       req: Request,
     ): string | null => {
       const token = req?.cookies?.accessToken;
-      console.log('Token', token);
 
       return typeof token === 'string' ? token : null;
     };
@@ -29,6 +28,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     // This payload will be the decrypted token payload you provided when signing the token
-    return { id: payload.sub };
+    return { userId: payload.sub, role: payload.role, email: payload.email };
   }
 }

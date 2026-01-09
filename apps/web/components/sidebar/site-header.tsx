@@ -24,7 +24,6 @@ interface SiteHeaderProps {
 const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
   const { mutate: signOut } = useSignout();
 
-
   return (
     <header
       className={cn(
@@ -36,13 +35,12 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
         <SidebarTrigger />
 
         <div className="flex items-center gap-4">
-
           {type === "Student" && (
             <Link href="/bag">
               <ShoppingBag className="size-5 text-muted-foreground" />
             </Link>
           )}
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger
               className={cn(type === "Admin" ? "md:hidden" : "block")}

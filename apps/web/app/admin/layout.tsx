@@ -16,6 +16,7 @@ const AdminLayout = async ({ children }: AdminLayoutProps) => {
 
   if (!user) redirect("/auth/signin")
 
+    
   const isAdmin = hasRole(user, ROLES.ADMIN);
   if (!isAdmin) redirect("/");
 
