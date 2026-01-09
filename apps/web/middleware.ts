@@ -48,7 +48,6 @@ export async function middleware(request: NextRequest) {
   if (accessToken && refreshToken && isAuthPage)
     return NextResponse.redirect(new URL("/", request.url));
 
-
   if (accessToken && isAdminPage) {
     try {
       const payload = decodeJwt(accessToken) as jwtPayload;
@@ -58,9 +57,8 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/auth/signin", request.url));
       }
 
-      if (payload.role === ROLES.STUDENT)
+      if (payload.role !== ROLES.ADMIN || ROLES.MODERATOR)
         return NextResponse.redirect(new URL("/", request.url));
-      
     } catch (error) {
       return NextResponse.redirect(new URL("/auth/signin", request.url));
     }

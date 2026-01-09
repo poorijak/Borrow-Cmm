@@ -14,7 +14,6 @@ type loginToken = {
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly userService: UserService,
     private readonly accountService: AccountService,
