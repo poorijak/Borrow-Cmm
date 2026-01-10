@@ -58,9 +58,18 @@ const SidebarMain = ({ currentPath, label, items }: SidebarMainProps) => {
           <SidebarMenuItem>
             <CollapsibleTrigger asChild>
               {isSub ? (
-                <SidebarMenuSubButton className="cursor-pointer">
-                  <span>{item.title}</span>
-                  <ChevronRightIcon className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                <SidebarMenuSubButton
+                  className={cn(
+                    "cursor-pointer",
+                    isActive &&
+                      "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground  min-w-8 "
+                  )}
+                  asChild
+                >
+                  <Link href={item.href}>
+                    <span>{item.title}</span>
+                    <ChevronRightIcon className="ml-auto  transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                  </Link>
                 </SidebarMenuSubButton>
               ) : (
                 <SidebarMenuButton tooltip={item.title}>
@@ -84,7 +93,13 @@ const SidebarMain = ({ currentPath, label, items }: SidebarMainProps) => {
     return (
       <SidebarMenuItem key={item.href}>
         {isSub ? (
-          <SidebarMenuSubButton asChild isActive={isActive}>
+          <SidebarMenuSubButton
+            asChild
+            className={cn(
+              isActive &&
+                "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground  min-w-8 "
+            )}
+          >
             <Link href={item.href}>{item.title}</Link>
           </SidebarMenuSubButton>
         ) : (

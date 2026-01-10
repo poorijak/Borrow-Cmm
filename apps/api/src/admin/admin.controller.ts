@@ -12,8 +12,8 @@ import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { RoleGuard } from './guard/role.guard';
-import { Roles } from 'src/decorators/role.decorator';
+import { RoleGuard } from '../common/guards/role.guard';
+import { Roles } from 'src/common/decorators/role.decorator';
 import { Role } from './role.enum';
 
 @Controller('admin')

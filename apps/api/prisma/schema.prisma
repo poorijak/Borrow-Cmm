@@ -6,6 +6,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ActiveStatus {
+  Active
+  Inactvie
+}
+
 enum UserRole {
   Administrater
   Moderater
@@ -46,3 +51,25 @@ model Account {
   @@unique([provider, providerAccountId])
   @@index([userId, provider])
 }
+
+model EquipmentCategory {
+  id                     String                 @id @default(uuid())
+  title                  String
+  mainImage              String
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  status                 ActiveStatus
+  equipmentSubCategories EquipmentSubCategory[]
+}
+
+model EquipmentSubCategory {
+  id             String            @id @default(uuid())
+  title          String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  mainCategoryId String
+  mainCategory   EquipmentCategory @relation(fields: [mainCategoryId], references: [id], onDelete: Cascade)
+  status         ActiveStatus
+}
+
+

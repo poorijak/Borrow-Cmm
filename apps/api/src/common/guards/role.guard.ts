@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { Role } from '../role.enum';
-import { ROLE_KEY } from 'src/decorators/role.decorator';
+import { Role } from '../../admin/role.enum';
+import { ROLE_KEY } from 'src/common/decorators/role.decorator';
 import { jwtGuardPayload } from 'src/auth/types/auth';
 
 @Injectable()
