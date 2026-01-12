@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
+import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 
 @Injectable()
 export class CategoryService {
@@ -18,5 +19,26 @@ export class CategoryService {
     });
 
     return cate;
+  }
+
+  async getCategories(params: { where?: Prisma.EquipmentCategoryWhereInput }) {
+    try {
+      const { where } = params;
+      const cate = await this.prisma.equipmentCategory.findMany({
+        where,
+      });
+
+      return cate.map(({ id, title, status, updatedAt, mainImage }) => ({
+        id,
+        title,
+        status,
+        updatedAt: formatDateToDDMMYY(updatedAt),
+        mainImage,
+      }));
+    } catch (error) {
+      console.error(error);
+
+      throw error;
+    }
   }
 }

@@ -13,10 +13,10 @@ export async function middleware(request: NextRequest) {
   const isAdminPage = pathname.startsWith("/admin");
 
   if (!accessToken && !refreshToken) {
-    if (!isAuthPage) {
-      return NextResponse.redirect(new URL("/auth/signin", request.url));
+    if (isAuthPage) {
+      return NextResponse.next();
     }
-    return NextResponse.next();
+    return NextResponse.redirect(new URL("/auth/signin", request.url));
   }
 
   if (!accessToken && refreshToken) {

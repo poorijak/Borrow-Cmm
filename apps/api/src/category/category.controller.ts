@@ -1,6 +1,14 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  BadRequestException,
+  Get,
+  Query,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CategoryRequest, categorySchema } from '@repo/schemas';
+import { ActiveStatus } from '@prisma/client';
 
 @Controller('categories')
 export class CategoryController {
@@ -18,7 +26,18 @@ export class CategoryController {
     return this.categoryService.createMain({
       title: data.title,
       mainImage: data.imageKey,
-      status: 'Active',
+      status: 'active',
     });
+  }
+
+  @Get()
+  findAll(@Query('status') status: ActiveStatus) {
+    const cate = this.categoryService.getCategories({
+      where: {
+        status,
+      },
+    });
+
+    return cate;
   }
 }

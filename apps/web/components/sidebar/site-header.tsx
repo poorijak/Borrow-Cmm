@@ -58,7 +58,7 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
               >
                 <span>Sign Out</span>
               </DropdownMenuItem>
-              {user.role === "Administrater" && (
+              {user.role === "administrater" && (
                 <DropdownMenuItem asChild>
                   <Link href="/admin">หลังบ้าน</Link>
                 </DropdownMenuItem>

@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import type { CategoryFormValue, CategoryRequest } from "@repo/schemas";
-import { uploadImageResponse } from "@repo/types";
+import { ActiveStatus, Categories, uploadImageResponse } from "@repo/types";
 
 export const createCategory = async (categoryData: CategoryFormValue) => {
   const formData = new FormData();
@@ -22,6 +22,18 @@ export const createCategory = async (categoryData: CategoryFormValue) => {
   };
 
   const { data } = await api.post("/categories", payload);
-  
+
   return data;
+};
+
+export const getCategories = async (status?: ActiveStatus) => {
+  try {
+    const { data } = await api.get<Categories[]>("/categories", {
+      params: { status },
+    });
+    return data;
+  } catch (error) {
+    console.error("Error to fetch categories : ", error);
+    throw error;
+  }
 };

@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCategory } from "../server/category";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createCategory, getCategories } from "../server/category";
 import { toast } from "sonner";
 import { CategoryFormValue } from "@repo/schemas";
+import { ActiveStatus } from "@repo/types";
 
 export const useMutationCategory = () => {
   const queryClient = useQueryClient();
@@ -18,4 +19,13 @@ export const useMutationCategory = () => {
   });
 
   return mutate;
+};
+
+export const useGetCategories = (status: ActiveStatus) => {
+  const query = useQuery({
+    queryKey: ["categories", status],
+    queryFn: () => getCategories(status),
+  });
+
+  return query;
 };

@@ -1,6 +1,15 @@
+import { ActiveStatus } from "./status";
+
 export type CreateCategoryFormInput = {
   file: File;
   title: string;
-  type : "main" | "sub"
+  type: "main" | "sub";
 };
 
+export type Categories = {
+  id: string;
+  title: string;
+  status: ActiveStatus;
+  updatedAt: string;
+  mainImage: string;
+};

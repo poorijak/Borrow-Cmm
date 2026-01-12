@@ -37,7 +37,7 @@ export function AppSidebar({ type , user }: AppSidebar) {
   const currentPath = usePathname();
 
   return (
-    <Sidebar variant="sidebar" collapsible="icon">
+    <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader className="p-5">
         <SidebarMenu>
           <SidebarMenuItem>
