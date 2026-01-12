@@ -7,7 +7,6 @@ export const ROLES = {
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
-// 3. นิยาม User Type
 export type User = {
   id: string;
   name: string;

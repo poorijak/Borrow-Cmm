@@ -1,7 +1,7 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import sharp from 'sharp';
 
 @Injectable()
 export class R2Service {
@@ -20,25 +20,30 @@ export class R2Service {
     });
   }
 
-  async createPresignedPut(input: { contentType: string; ext?: string }) {
-    const ext = (input.ext || 'jpg').toLowerCase();
-    const key = `image/${randomUUID()}.${ext}`;
+  async uploadProcessedImage(file: Express.Multer.File) {
+    const key = `image/${randomUUID()}.webp`;
+
+    const optimizedBuffer = await sharp(file.buffer)
+      .resize(1280, 720, {
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({ quality: 80 })
+      .toBuffer();
 
     const cmd = new PutObjectCommand({
       Bucket: this.bucket,
       Key: key,
-      ContentType: input.contentType,
+      ContentType: 'image/webp',
+      Body: optimizedBuffer,
       CacheControl: 'public  , max-age=3156000 , immutable',
     });
 
-    const uploadUrl = await getSignedUrl(this.s3, cmd, { expiresIn: 60 });
+    await this.s3.send(cmd);
 
-    const baseUrl = process.env.R2_PUBLIC_BASE_URL;
     return {
       key,
-      uploadUrl,
-      publicUrl: baseUrl ? `${baseUrl}/${key}` : undefined,
-      expiresIn: 60,
+      publicUrl: `${process.env.R2_PUBLIC_BASE_URL}/${key}`,
     };
   }
 }

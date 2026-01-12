@@ -35,7 +35,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
-    "@repo/schema": "workspace:*",
+    "@repo/schemas": "workspace:*",
     "@repo/types": "workspace:*",
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/passport-jwt": "^4.0.1",
@@ -47,6 +47,7 @@
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "sharp": "^0.34.5",
     "zod": "^4.2.1"
   },
   "devDependencies": {
