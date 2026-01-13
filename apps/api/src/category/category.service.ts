@@ -21,10 +21,16 @@ export class CategoryService {
     return cate;
   }
 
-  async getCategories(params: { where?: Prisma.EquipmentCategoryWhereInput }) {
+  async getCategories(params: {
+    where?: Prisma.EquipmentCategoryWhereInput;
+    skip?: number;
+    limit?: number;
+  }) {
     try {
-      const { where } = params;
+      const { where, skip = 0, limit = 1 } = params;
       const cate = await this.prisma.equipmentCategory.findMany({
+        skip,
+        take: limit,
         where,
       });
 
@@ -34,11 +40,19 @@ export class CategoryService {
         status,
         updatedAt: formatDateToDDMMYY(updatedAt),
         mainImage,
+        equipmentCount: 1,
       }));
     } catch (error) {
       console.error(error);
 
       throw error;
     }
+  }
+
+  async countCategories(params: {
+    where?: Prisma.EquipmentCategoryWhereInput;
+  }) {
+    const { where } = params;
+    return await this.prisma.equipmentCategory.count({ where });
   }
 }

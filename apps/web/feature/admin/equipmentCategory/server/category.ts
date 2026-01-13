@@ -1,6 +1,11 @@
 import api from "@/lib/axios";
 import type { CategoryFormValue, CategoryRequest } from "@repo/schemas";
-import { ActiveStatus, Categories, uploadImageResponse } from "@repo/types";
+import {
+  ActiveStatus,
+  Categories,
+  CategoriesResponse,
+  uploadImageResponse,
+} from "@repo/types";
 
 export const createCategory = async (categoryData: CategoryFormValue) => {
   const formData = new FormData();
@@ -26,11 +31,15 @@ export const createCategory = async (categoryData: CategoryFormValue) => {
   return data;
 };
 
-export const getCategories = async (status?: ActiveStatus) => {
+export const getCategories = async (
+  status?: ActiveStatus,
+  page: number = 1
+) => {
   try {
-    const { data } = await api.get<Categories[]>("/categories", {
-      params: { status },
+    const { data } = await api.get<CategoriesResponse>("/categories", {
+      params: { status, page },
     });
+
     return data;
   } catch (error) {
     console.error("Error to fetch categories : ", error);

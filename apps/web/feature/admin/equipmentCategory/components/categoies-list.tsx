@@ -1,44 +1,58 @@
 "use client";
 
 import TabsMenu from "@/components/shared/tabsMenu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import React from "react";
 import { useGetCategories } from "../hooks/useCategory";
-import { useSearchParams } from "next/navigation";
-import { ActiveStatus } from "@repo/types";
+import { ActiveStatus, Categories } from "@repo/types";
 import Image from "next/image";
-import { cn, getPublicUrl } from "@/lib/utils";
+import { getPublicUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  CircleCheck,
-  CircleX,
+  ArrowUpDown,
+  ChevronDown,
+  ChevronRight,
+  ChevronsUpDown,
   EllipsisVertical,
-  FlipHorizontal,
+  Eye,
+  Pencil,
+  Trash2,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Icon } from "@iconify/react";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import StatsuDropdown from "@/components/shared/status-dropdown";
-import { Badge } from "@/components/ui/badge";
-import { Icon } from "@iconify/react";
+import Pagination from "@/components/shared/pagination";
+import { useRouter, useSearchParams } from "next/navigation";
+import DataTable from "@/components/shared/data-table";
+import Link from "next/link";
 
-const CategoriesList = () => {
-  const status = useSearchParams().get("status") as ActiveStatus;
+interface CategoriesListProps {
+  status: ActiveStatus;
+  page: number;
+}
 
-  console.log(status);
-
-  const { data, isPending } = useGetCategories(status);
+const CategoriesList = ({ status, page }: CategoriesListProps) => {
+  const { data } = useGetCategories(status, page);
 
   console.log(data);
+  [];
+  const sp = useSearchParams();
+  const router = useRouter();
+
+  const categories = data?.data ?? [];
+  const meta = data?.meta;
+  const totalPages = meta?.totalPages ?? 1;
+
+  const onPageChange = (newPage: number) => {
+    const newParams = new URLSearchParams(sp);
+    newParams.set("page", newPage.toString());
+    router.push(`?${newParams.toString()}`);
+  };
 
   const tabs = [
     {
@@ -62,74 +76,133 @@ const CategoriesList = () => {
     },
   ];
 
+  const columns: ColumnDef<Categories>[] = [
+    {
+      accessorKey: "preview",
+      header: "Preview",
+      size: 250,
+      minSize: 100,
+      maxSize: 160,
+      cell: ({ row }) => (
+        <div className="relative size-10 ">
+          <Image
+            className="rounded-sm border object-cover"
+            alt="preview image"
+            fill
+            src={getPublicUrl(row.original.mainImage)}
+          />
+        </div>
+      ),
+    },
+    {
+      accessorKey: "title",
+      header: "หมวดหมู่",
+      size: 320,
+      cell: ({ row }) => {
+        const id = row.original.id;
+        const title = row.original.title;
+        return (
+          <Link
+            href={`equipmentCategory/${id}`}
+            className="font- hover:underline hover:text-primary transition-colors duration-75 hover:underline-offset-4"
+          >
+            {title}
+          </Link>
+        );
+      },
+    },
+    {
+      accessorKey: "equipmentCount",
+      header: "จำนวนอุปกรณ์",
+      size: 140,
+    },
+    {
+      accessorKey: "status",
+      header: "สถานะ",
+      size: 170,
+      cell: ({ row }) => (
+        <Badge className="py-1 " variant="outline">
+          {row.original.status === "active" ? (
+            <div className="flex items-center gap-1">
+              <Icon
+                icon="icon-park-solid:check-one"
+                className="text-green-600"
+              />
+              <span>เปิดใช้งาน</span>
+              <ChevronDown className="size-3" />
+            </div>
+          ) : (
+            <div className="flex items-center gap-1">
+              <Icon
+                icon="icon-park-solid:close-one"
+                className="text-destructive"
+              />
+              <span>ปิดใช้งาน</span>
+              <ChevronDown className="size-3" />
+            </div>
+          )}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="hover:cursor-pointer"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          วันที่แก้ไข
+          <ChevronsUpDown className="text-sm" />
+        </Button>
+      ),
+    },
+    {
+      id: "actions",
+      size: 60,
+      cell: ({ row }) => (
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Action Button">
+                <EllipsisVertical />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Link
+                  href={`equipmentCategory/${row.original.id}`}
+                  className="flex items-center gap-2"
+                >
+                  <Eye />
+                  ดูเพิ่มเติม
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Pencil />
+                แก้ไข
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive">
+                <Trash2 className="text-destructive" />
+                ลบ
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-5">
       <TabsMenu tabItems={tabs} />
-
-      <div className="rounded-lg border overflow-hidden">
-        <Table>
-          <TableHeader className="bg-muted sticky top-0 z-10">
-            <TableRow className="border-0 ">
-              <TableHead className="px-10 w-52 font-bold">Preview</TableHead>
-              <TableHead className="font-bold w-40">หมวดหมู่</TableHead>
-              <TableHead className="font-bold w-32">จำนวนอุปกรณ์</TableHead>
-              <TableHead className="font-bold w-44 text-center">
-                สถานะ
-              </TableHead>
-              <TableHead className="font-bold w-30">
-                วันที่แก้ไขล่าสุด
-              </TableHead>
-              <TableHead className="font-bold w-20"></TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {data?.map((item) => (
-              <TableRow key={item.id} className="border-b">
-                <TableCell className="px-10 py-4">
-                  <div className="relative size-8  object-cover">
-                    <Image
-                      src={getPublicUrl(item.mainImage)}
-                      alt="cateogory-main-image"
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                </TableCell>
-                <TableCell>{item.title}</TableCell>
-                <TableCell>{item.title}</TableCell>
-                <TableCell align="center">
-                  <Badge className="py-1 " variant="outline">
-                    {item.status === "active" ? (
-                      <div className="flex items-center gap-1">
-                        <Icon
-                          icon="icon-park-solid:check-one"
-                          className="text-green-600"
-                        />
-                        <span>เปิดใช้งาน</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1">
-                        <Icon
-                          icon="icon-park-solid:close-one"
-                          className="text-destructive"
-                        />
-                        <span>ปิดใช้งาน</span>
-                      </div>
-                    )}
-                  </Badge>
-                </TableCell>
-                <TableCell>{item.updatedAt}</TableCell>
-                <TableCell align="center">
-                  <Button variant="ghost" size="icon">
-                    <EllipsisVertical />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable columns={columns} data={categories} searchbar={false} />
+      <Pagination
+        page={page}
+        total={meta?.total}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 };

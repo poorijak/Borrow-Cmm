@@ -21,10 +21,10 @@ export const useMutationCategory = () => {
   return mutate;
 };
 
-export const useGetCategories = (status: ActiveStatus) => {
+export const useGetCategories = (status: ActiveStatus, page: number) => {
   const query = useQuery({
-    queryKey: ["categories", status],
-    queryFn: () => getCategories(status),
+    queryKey: ["categories", status , page],
+    queryFn: () => getCategories(status, page),
   });
 
   return query;

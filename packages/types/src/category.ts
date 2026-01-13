@@ -12,4 +12,14 @@ export type Categories = {
   status: ActiveStatus;
   updatedAt: string;
   mainImage: string;
+  equipmentCount: number;
 };
+
+export interface CategoriesResponse {
+  data: Categories[];
+  meta: {
+    page: number;
+    total: number;
+    totalPages: number;
+  };
+}

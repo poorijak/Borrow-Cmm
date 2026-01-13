@@ -5,6 +5,8 @@ import {
   BadRequestException,
   Get,
   Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CategoryRequest, categorySchema } from '@repo/schemas';
@@ -31,13 +33,27 @@ export class CategoryController {
   }
 
   @Get()
-  findAll(@Query('status') status: ActiveStatus) {
-    const cate = this.categoryService.getCategories({
-      where: {
-        status,
-      },
-    });
+  async findAll(
+    @Query('status') status: ActiveStatus,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    const limit = 10;
+    const skip = (page - 1) * limit;
 
-    return cate;
+    const where = status ? { status } : undefined;
+
+    const [data, total] = await Promise.all([
+      this.categoryService.getCategories({ skip, limit, where }),
+      this.categoryService.countCategories({ where }),
+    ]);
+
+    return {
+      data: data,
+      meta: {
+        page,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }
