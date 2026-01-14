@@ -2,7 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createCategory, getCategories } from "../server/category";
 import { toast } from "sonner";
 import { CategoryFormValue } from "@repo/schemas";
-import { ActiveStatus } from "@repo/types";
+import { ActiveStatus, CategoriesResponse } from "@repo/types";
+import api from "@/lib/axios";
 
 export const useMutationCategory = () => {
   const queryClient = useQueryClient();
@@ -23,9 +24,16 @@ export const useMutationCategory = () => {
 
 export const useGetCategories = (status: ActiveStatus, page: number) => {
   const query = useQuery({
-    queryKey: ["categories", status , page],
-    queryFn: () => getCategories(status, page),
-  });
+    queryKey: ["categories", status, page],
+    queryFn: async ({ queryKey }) => {
+      const [, status, page] = queryKey as ["categories", ActiveStatus, number];
 
+      const { data } = await api.get<CategoriesResponse>("/categories", {
+        params: { status, page },
+      });
+
+      return data;
+    },
+  });
   return query;
 };

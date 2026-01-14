@@ -39,8 +39,6 @@ interface CategoriesListProps {
 const CategoriesList = ({ status, page }: CategoriesListProps) => {
   const { data } = useGetCategories(status, page);
 
-  console.log(data);
-  [];
   const sp = useSearchParams();
   const router = useRouter();
 
