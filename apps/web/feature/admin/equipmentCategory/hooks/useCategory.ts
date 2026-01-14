@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createCategory, getCategories } from "../server/category";
+import { upsertCategory } from "../server/category";
 import { toast } from "sonner";
 import { CategoryFormValue } from "@repo/schemas";
 import { ActiveStatus, CategoriesResponse } from "@repo/types";
@@ -9,7 +9,7 @@ export const useMutationCategory = () => {
   const queryClient = useQueryClient();
 
   const mutate = useMutation({
-    mutationFn: (data: CategoryFormValue) => createCategory(data),
+    mutationFn: (data: CategoryFormValue) => upsertCategory(data),
     onSuccess: () => {
       toast.success("สร้างหมวดหมู่สำเร็จ");
       queryClient.invalidateQueries({ queryKey: ["categories"] });

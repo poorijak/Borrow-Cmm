@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
@@ -11,6 +11,19 @@ export class CategoryService {
       data,
     });
     return cate;
+  }
+
+  async updateMain(id: string, data: Prisma.EquipmentCategoryUpdateInput) {
+    const cate = await this.getCategory(id);
+
+    if (!cate) {
+      throw new BadRequestException('Category not found');
+    }
+
+    return await this.prisma.equipmentCategory.update({
+      where: { id: cate.id },
+      data,
+    });
   }
 
   async createSub(data: Prisma.EquipmentSubCategoryCreateInput) {
@@ -47,6 +60,14 @@ export class CategoryService {
 
       throw error;
     }
+  }
+
+  async getCategory(id: string) {
+    const cate = await this.prisma.equipmentCategory.findUnique({
+      where: { id },
+    });
+
+    return cate;
   }
 
   async countCategories(params: {

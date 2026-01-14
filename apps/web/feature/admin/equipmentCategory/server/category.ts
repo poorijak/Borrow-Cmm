@@ -2,31 +2,41 @@ import api from "@/lib/axios";
 import type { CategoryFormValue, CategoryRequest } from "@repo/schemas";
 import {
   ActiveStatus,
-  Categories,
   CategoriesResponse,
   uploadImageResponse,
 } from "@repo/types";
 
-export const createCategory = async (categoryData: CategoryFormValue) => {
-  const formData = new FormData();
-  formData.append("file", categoryData.imageFile);
+export const upsertCategory = async (categoryData: CategoryFormValue) => {
+  let imageKey = categoryData.imageKey;
 
-  const { data: uploadRes } = await api.post<uploadImageResponse>(
-    "/upload/image",
-    formData,
-    {
-      headers: {
-        "Content-type": "multipart/form-data",
-      },
-    }
-  );
+  if (categoryData.imageFile) {
+    const formData = new FormData();
+    formData.append("file", categoryData.imageFile);
 
+    const { data: uploadRes } = await api.post<uploadImageResponse>(
+      "/upload/image",
+      formData,
+      {
+        headers: {
+          "Content-type": "multipart/form-data",
+        },
+      }
+    );
+
+    imageKey = uploadRes.key;
+  }
+
+  if (!imageKey) {
+    throw new Error("Image key is require");
+  }
   const payload: CategoryRequest = {
     title: categoryData.title,
-    imageKey: uploadRes.key,
+    imageKey,
   };
 
-  const { data } = await api.post("/categories", payload);
+  const { data } = categoryData.categoryId
+    ? await api.patch(`/categories/${categoryData.categoryId}`, payload, {})
+    : await api.post("categories", payload);
 
   return data;
 };

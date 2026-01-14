@@ -1,7 +1,7 @@
 "use client";
 
 import TabsMenu from "@/components/shared/tabsMenu";
-import React from "react";
+import React, { useState } from "react";
 import { useGetCategories } from "../hooks/useCategory";
 import { ActiveStatus, Categories } from "@repo/types";
 import Image from "next/image";
@@ -30,6 +30,7 @@ import Pagination from "@/components/shared/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
 import DataTable from "@/components/shared/data-table";
 import Link from "next/link";
+import AddCategoryModal from "./add-category-modal";
 
 interface CategoriesListProps {
   status: ActiveStatus;
@@ -38,6 +39,12 @@ interface CategoriesListProps {
 
 const CategoriesList = ({ status, page }: CategoriesListProps) => {
   const { data } = useGetCategories(status, page);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSelected, setIsSelected] = useState<Categories | undefined>(
+    undefined
+  );
+
+  console.log(data);
 
   const sp = useSearchParams();
   const router = useRouter();
@@ -176,7 +183,12 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
                   ดูเพิ่มเติม
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setIsModalOpen(true);
+                  setIsSelected(row.original);
+                }}
+              >
                 <Pencil />
                 แก้ไข
               </DropdownMenuItem>
@@ -200,6 +212,11 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
         total={meta?.total}
         totalPages={totalPages}
         onPageChange={onPageChange}
+      />
+      <AddCategoryModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        data={isSelected}
       />
     </div>
   );

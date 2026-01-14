@@ -2,7 +2,7 @@ import InputForm from "@/components/shared/input-form";
 import Modal from "@/components/shared/modal";
 import { Form } from "@/components/ui/form";
 import { Save, Trash2, X } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 // import { categorySchema, CategoryValue } from "@repo/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,24 +11,70 @@ import Image from "next/image";
 import { Icon } from "@iconify/react";
 import { useMutationCategory } from "../hooks/useCategory";
 import { categoryFormSchema, CategoryFormValue } from "@repo/schemas";
+import { Categories } from "@repo/types";
+import { getPublicUrl } from "@/lib/utils";
 
 type AddCategoryModal = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  data?: Categories;
 };
 
-const AddCategoryModal = ({ open, onOpenChange }: AddCategoryModal) => {
+const AddCategoryModal = ({
+  open,
+  onOpenChange,
+  data: category,
+}: AddCategoryModal) => {
+  console.log(category);
+
   const { mutate, isPending } = useMutationCategory();
-  const [perview, setPreview] = useState<string | null>(null);
+
+  const [existingRemove, setExistingRemove] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  console.log(preview);
 
   const form = useForm<CategoryFormValue>({
     resolver: zodResolver(categoryFormSchema),
-    defaultValues: {
-      title: "",
-      imageFile: undefined,
-    },
+    defaultValues: category
+      ? {
+          title: category.title,
+          imageKey: category.mainImage,
+        }
+      : {
+          title: "",
+          imageFile: undefined,
+        },
     mode: "onSubmit",
   });
+
+  useEffect(() => {
+    setExistingRemove(false);
+
+    if (category) {
+      form.reset({
+        title: category.title ?? "",
+        imageKey: category.mainImage ?? "",
+        imageFile: undefined,
+      });
+    } else {
+      form.reset({
+        title: "",
+        imageFile: undefined,
+        imageKey: "",
+      });
+    }
+
+    setPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, [category, form]);
+
+  const imageSrc: string | undefined = preview
+    ? preview
+    : !existingRemove && category?.mainImage
+      ? getPublicUrl(category.mainImage)
+      : undefined;
+
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -41,46 +87,62 @@ const AddCategoryModal = ({ open, onOpenChange }: AddCategoryModal) => {
     setPreview(url);
   };
 
-  const handleSubmit = (data: CategoryFormValue) => {
-    console.log(data);
 
-    mutate(data, {
-      onSuccess: () => {
-        handleRemoveImage();
-        form.reset({
-          title: "",
-          imageFile: undefined,
-        });
-        onOpenChange(false);
+  const handleSubmit = (data: CategoryFormValue) => {
+    mutate(
+      {
+        title: data.title,
+        imageFile: data.imageFile,
+        imageKey: data.imageKey,
+        categoryId: category?.id,
       },
-    });
+      {
+        onSuccess: () => {
+          handleRemoveImage();
+          form.reset({
+            title: "",
+            imageFile: undefined,
+          });
+          onOpenChange(false);
+        },
+      }
+    );
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
   const triggerFileInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
 
+
+  // note
+
   const handleRemoveImage = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
 
-    if (!perview) return;
+    if (preview) {
+      URL.revokeObjectURL(preview);
+      setPreview(null);
+      form.setValue("imageFile", undefined as any, { shouldValidate: true });
+      return;
+    }
 
-    form.setValue("imageFile", undefined as any, { shouldValidate: true });
-
-    URL.revokeObjectURL(perview);
-    setPreview(null);
+    setExistingRemove(true);
+    form.setValue("imageKey", undefined as any, { shouldDirty: true });
   };
 
   return (
     <Modal title="เพิ่มหมวดหมู่อุปกรณ์" open={open} onOpenChange={onOpenChange}>
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(handleSubmit)}
+          onSubmit={form.handleSubmit(handleSubmit, (e) => {
+            console.log(e);
+          })}
           onChange={() => form.clearErrors()}
           className="flex flex-col gap-5"
         >
@@ -91,12 +153,13 @@ const AddCategoryModal = ({ open, onOpenChange }: AddCategoryModal) => {
             ref={fileInputRef}
             onChange={handleImageChange}
           />
-          {perview ? (
-            <div className="relative  w-full h-48 border rounded-lg overflow-hidden cursor-pointer">
+          {imageSrc ? (
+            <div className="relative size-48 border rounded-lg overflow-hidden cursor-pointer">
               <Image
                 alt="Preview-category"
-                src={perview}
+                src={imageSrc}
                 fill
+                unoptimized
                 className="object-contain"
               />
               <div
