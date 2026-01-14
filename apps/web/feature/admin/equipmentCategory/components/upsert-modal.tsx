@@ -14,17 +14,17 @@ import { categoryFormSchema, CategoryFormValue } from "@repo/schemas";
 import { Categories } from "@repo/types";
 import { getPublicUrl } from "@/lib/utils";
 
-type AddCategoryModal = {
+type UpsertCategoryProsp = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data?: Categories;
 };
 
-const AddCategoryModal = ({
+const UpsertCategory = ({
   open,
   onOpenChange,
   data: category,
-}: AddCategoryModal) => {
+}: UpsertCategoryProsp) => {
   console.log(category);
 
   const { mutate, isPending } = useMutationCategory();
@@ -75,7 +75,6 @@ const AddCategoryModal = ({
       ? getPublicUrl(category.mainImage)
       : undefined;
 
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
@@ -86,7 +85,6 @@ const AddCategoryModal = ({
     const url = URL.createObjectURL(file);
     setPreview(url);
   };
-
 
   const handleSubmit = (data: CategoryFormValue) => {
     mutate(
@@ -116,7 +114,6 @@ const AddCategoryModal = ({
       fileInputRef.current.click();
     }
   };
-
 
   // note
 
@@ -154,7 +151,7 @@ const AddCategoryModal = ({
             onChange={handleImageChange}
           />
           {imageSrc ? (
-            <div className="relative size-48 border rounded-lg overflow-hidden cursor-pointer">
+            <div className="relative  w-full h-48 border rounded-lg overflow-hidden cursor-pointer">
               <Image
                 alt="Preview-category"
                 src={imageSrc}
@@ -204,4 +201,4 @@ const AddCategoryModal = ({
   );
 };
 
-export default AddCategoryModal;
+export default UpsertCategory;

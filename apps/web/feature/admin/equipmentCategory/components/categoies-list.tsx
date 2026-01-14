@@ -8,9 +8,7 @@ import Image from "next/image";
 import { getPublicUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowUpDown,
   ChevronDown,
-  ChevronRight,
   ChevronsUpDown,
   EllipsisVertical,
   Eye,
@@ -30,7 +28,8 @@ import Pagination from "@/components/shared/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
 import DataTable from "@/components/shared/data-table";
 import Link from "next/link";
-import AddCategoryModal from "./add-category-modal";
+import UpsertCategory from "./upsert-modal";
+import DeleleCategoryModal from "./delete-modal";
 
 interface CategoriesListProps {
   status: ActiveStatus;
@@ -39,10 +38,18 @@ interface CategoriesListProps {
 
 const CategoriesList = ({ status, page }: CategoriesListProps) => {
   const { data } = useGetCategories(status, page);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalUpsertOpen, setIsModalUpsertOpen] = useState(false);
+  const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [isSelected, setIsSelected] = useState<Categories | undefined>(
     undefined
   );
+  const [isDeleteSelected, setIsDeleteSelected] = useState<{
+    id: string;
+    title: string;
+  }>({
+    id: "",
+    title: "",
+  });
 
   console.log(data);
 
@@ -185,14 +192,23 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setIsModalOpen(true);
+                  setIsModalUpsertOpen(true);
                   setIsSelected(row.original);
                 }}
               >
                 <Pencil />
                 แก้ไข
               </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive">
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => {
+                  setIsDeleteModal(true);
+                  setIsDeleteSelected({
+                    id: row.original.id,
+                    title: row.original.title,
+                  });
+                }}
+              >
                 <Trash2 className="text-destructive" />
                 ลบ
               </DropdownMenuItem>
@@ -213,10 +229,16 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
         totalPages={totalPages}
         onPageChange={onPageChange}
       />
-      <AddCategoryModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
+      <UpsertCategory
+        open={isModalUpsertOpen}
+        onOpenChange={setIsModalUpsertOpen}
         data={isSelected}
+      />
+
+      <DeleleCategoryModal
+        open={isDeleteModal}
+        onOpenChange={setIsDeleteModal}
+        data={isDeleteSelected}
       />
     </div>
   );

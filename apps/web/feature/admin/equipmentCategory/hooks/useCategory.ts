@@ -22,6 +22,25 @@ export const useMutationCategory = () => {
   return mutate;
 };
 
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+
+  const mutate = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/categories/${id}`);
+    },
+    onSuccess: () => {
+      toast.success("ลบหมวดหมุ่สำเสร็จ");
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+    onError: (err) => {
+      toast.error(err.message || "เกิดข้อผิดพลาด");
+    },
+  });
+
+  return mutate;
+};
+
 export const useGetCategories = (status: ActiveStatus, page: number) => {
   const query = useQuery({
     queryKey: ["categories", status, page],

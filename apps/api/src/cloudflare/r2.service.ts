@@ -1,4 +1,8 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import sharp from 'sharp';
@@ -43,7 +47,16 @@ export class R2Service {
 
     return {
       key,
-      publicUrl: `${process.env.R2_PUBLIC_BASE_URL}/${key}`,
     };
+  }
+
+  async deleteImage(key: string) {
+    await this.s3.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      }),
+    );
+    return { success: true };
   }
 }

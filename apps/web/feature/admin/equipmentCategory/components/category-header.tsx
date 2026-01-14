@@ -1,10 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Plus } from "lucide-react";
 import React, { useState } from "react";
-import AddCategoryModal from "./add-category-modal";
+import AddCategoryModal from "./upsert-modal";
 
 const CategoryHeader = () => {
   const [isOpen, setIsOpen] = useState(false);

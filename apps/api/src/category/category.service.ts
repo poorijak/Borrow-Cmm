@@ -1,11 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
+import { R2Service } from 'src/cloudflare/r2.service';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private r2: R2Service,
+  ) {}
   async createMain(data: Prisma.EquipmentCategoryCreateInput) {
     const cate = await this.prisma.equipmentCategory.create({
       data,
@@ -75,5 +83,25 @@ export class CategoryService {
   }) {
     const { where } = params;
     return await this.prisma.equipmentCategory.count({ where });
+  }
+
+  async deleteCategory(id: string) {
+    const cate = await this.getCategory(id);
+
+    if (!cate) {
+      throw new NotFoundException('Cateogory not found');
+    }
+
+    if (cate.mainImage) {
+      try {
+        await this.r2.deleteImage(cate.mainImage);
+      } catch (err) {
+        console.warn('R2 delete failed:', err);
+      }
+    }
+
+    await this.prisma.equipmentCategory.delete({ where: { id } });
+
+    return { sucess: true };
   }
 }

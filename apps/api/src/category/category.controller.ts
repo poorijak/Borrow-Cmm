@@ -7,9 +7,10 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
-  Put,
   Patch,
   Param,
+  Delete,
+  NotFoundException,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CategoryRequest, categorySchema } from '@repo/schemas';
@@ -49,6 +50,11 @@ export class CategoryController {
       title: data.title,
       mainImage: data.imageKey,
     });
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.categoryService.deleteCategory(id);
   }
 
   @Get()

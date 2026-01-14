@@ -12,7 +12,8 @@ import { Separator } from "../ui/separator";
 interface DialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title: string | undefined;
+  size?: "sm" | "md" | "lg";
+  title?: string | undefined;
   desc?: string | null | undefined;
   children: React.ReactNode;
   className?: string;
@@ -23,13 +24,20 @@ const Modal = ({
   onOpenChange,
   title,
   desc,
+  size = "lg",
   children,
   className,
 }: DialogProps) => {
   return (
     <div>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent>
+        <DialogContent
+          className={cn(
+            size === "sm" && "w-[445px]",
+            size === "md" && "w-[500px]",
+            size === "lg" && "w-[600px]"
+          )}
+        >
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{desc}</DialogDescription>
