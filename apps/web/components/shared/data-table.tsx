@@ -24,7 +24,6 @@ import {
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { Columns2 } from "lucide-react";
-import { Separator } from "../ui/separator";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
 

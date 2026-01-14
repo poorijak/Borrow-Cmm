@@ -10,7 +10,6 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CategoryRequest, categorySchema } from '@repo/schemas';

@@ -1,6 +1,6 @@
 import Modal from "@/components/shared/modal";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, TriangleAlert } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import React, { useEffect } from "react";
 import { useDeleteCategory } from "../hooks/useCategory";
 import SubmitBtn from "@/components/shared/submit-btn";

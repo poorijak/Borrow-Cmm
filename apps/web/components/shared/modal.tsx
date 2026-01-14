@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { cn } from "@/lib/utils";
-import { Separator } from "../ui/separator";
 
 interface DialogProps {
   open: boolean;
@@ -26,7 +25,6 @@ const Modal = ({
   desc,
   size = "lg",
   children,
-  className,
 }: DialogProps) => {
   return (
     <div>

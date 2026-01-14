@@ -1,10 +1,9 @@
 import InputForm from "@/components/shared/input-form";
 import Modal from "@/components/shared/modal";
 import { Form } from "@/components/ui/form";
-import { Save, Trash2, X } from "lucide-react";
+import { Save, Trash2 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-// import { categorySchema, CategoryValue } from "@repo/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import SubmitBtn from "@/components/shared/submit-btn";
 import Image from "next/image";
@@ -32,7 +31,6 @@ const UpsertCategory = ({
   const [existingRemove, setExistingRemove] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
-  console.log(preview);
 
   const form = useForm<CategoryFormValue>({
     resolver: zodResolver(categoryFormSchema),

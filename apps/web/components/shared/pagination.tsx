@@ -1,8 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
 import {
-  ArrowLeft,
-  ArrowRight,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
