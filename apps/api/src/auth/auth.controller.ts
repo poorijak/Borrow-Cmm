@@ -9,11 +9,11 @@ import {
   Post,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { GoogleAuthGurad } from './guards/google-auth.guard';
+import { GoogleAuthGurad } from '../common/guards/google-auth.guard';
 import type { Request as ExpressRequest, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from 'src/user/user.service';
-import { Roles } from 'src/decorators/role.decorator';
+import { Roles } from 'src/common/decorators/role.decorator';
 
 
 @Controller('auth')

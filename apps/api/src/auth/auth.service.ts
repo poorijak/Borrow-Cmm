@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
 import { googleUser } from './types/auth';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
@@ -57,7 +56,7 @@ export class AuthService {
           email: googleUser.email,
           name: googleUser.name,
           profileImage: googleUser.picture,
-          role: 'Student',
+          role: 'student',
         });
         userId = newUser.id;
         userEmail = newUser.email;

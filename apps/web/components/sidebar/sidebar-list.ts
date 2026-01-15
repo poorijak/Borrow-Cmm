@@ -42,19 +42,19 @@ export const adminServices = [
         subItems: [
           {
             title: "หมวดหมู่อุปกรณ์",
-            href: "/admin/equipmentCategory",
-            subItems: [
-              { title: "กล้อง", href: "/admin/equipmentCategory/camera" },
-              { title: "เลนส์", href: "/admin/equipmentCategory/lens" },
-              { title: "ไฟ", href: "/admin/equipmentCategory/light" },
-              {
-                title: "ไมโครโฟน",
-                href: "/admin/equipmentCategory/microphone",
-              },
-              { title: "ขาตั้งกล้อง", href: "/admin/equipmentCategory/tripod" },
-              { title: "ชุดพร้อมใช้", href: "/admin/equipmentCategory/sets" },
-              { title: "อื่นๆ", href: "/admin/equipmentCategory/others" },
-            ],
+            href: "/admin/category",
+            // subItems: [
+            //   { title: "กล้อง", href: "/admin/equipmentCategory/camera" },
+            //   { title: "เลนส์", href: "/admin/equipmentCategory/lens" },
+            //   { title: "ไฟ", href: "/admin/equipmentCategory/light" },
+            //   {
+            //     title: "ไมโครโฟน",
+            //     href: "/admin/equipmentCategory/microphone",
+            //   },
+            //   { title: "ขาตั้งกล้อง", href: "/admin/equipmentCategory/tripod" },
+            //   { title: "ชุดพร้อมใช้", href: "/admin/equipmentCategory/sets" },
+            //   { title: "อื่นๆ", href: "/admin/equipmentCategory/others" },
+            // ],
           },
           {
             title: "อุปกรณ์",

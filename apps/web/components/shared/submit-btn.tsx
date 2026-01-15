@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
-import { Loader2 } from "lucide-react";
+import { Icon, Loader2, LucideIcon } from "lucide-react";
 
 interface SubmitBtnProp extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   title: string;
@@ -15,6 +15,7 @@ interface SubmitBtnProp extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     | null
     | undefined;
   size?: "default" | "sm" | "lg" | "icon" | null | undefined;
+  icon?: LucideIcon;
 }
 
 const SubmitBtn = ({
@@ -22,6 +23,7 @@ const SubmitBtn = ({
   pending,
   variant,
   size,
+  icon: Icon,
   ...props
 }: SubmitBtnProp) => {
   return (
@@ -38,7 +40,10 @@ const SubmitBtn = ({
           Please wait...
         </>
       ) : (
-        <>{title}</>
+        <>
+          {Icon ? <Icon className="size-4" /> : null}
+          {title}
+        </>
       )}
     </Button>
   );

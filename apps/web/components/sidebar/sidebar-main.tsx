@@ -42,9 +42,19 @@ const SidebarMain = ({ currentPath, label, items }: SidebarMainProps) => {
     return false;
   };
 
+  const isPathActive = (itemHref: string): boolean => {
+    if (!itemHref) return false;
+
+    if (itemHref === "/" || itemHref === "/admin") {
+      return currentPath === itemHref;
+    }
+
+    return currentPath.startsWith(itemHref);
+  };
+
   const renderMenuItems = (item: SidebarItem, isSub: boolean = false) => {
     const hasSub = item.subItems && item.subItems.length > 0;
-    const isActive = currentPath === item.href;
+    const isActive = isPathActive(item.href);
     const childActive = isChildActive(item);
 
     if (hasSub) {
@@ -58,9 +68,18 @@ const SidebarMain = ({ currentPath, label, items }: SidebarMainProps) => {
           <SidebarMenuItem>
             <CollapsibleTrigger asChild>
               {isSub ? (
-                <SidebarMenuSubButton className="cursor-pointer">
-                  <span>{item.title}</span>
-                  <ChevronRightIcon className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                <SidebarMenuSubButton
+                  className={cn(
+                    "cursor-pointer",
+                    isActive &&
+                      "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground  min-w-8 "
+                  )}
+                  
+                >
+                  <Link href={item.href}>
+                    <span>{item.title}</span>
+                    <ChevronRightIcon className="ml-auto  transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                  </Link>
                 </SidebarMenuSubButton>
               ) : (
                 <SidebarMenuButton tooltip={item.title}>
@@ -84,7 +103,13 @@ const SidebarMain = ({ currentPath, label, items }: SidebarMainProps) => {
     return (
       <SidebarMenuItem key={item.href}>
         {isSub ? (
-          <SidebarMenuSubButton asChild isActive={isActive}>
+          <SidebarMenuSubButton
+            asChild
+            className={cn(
+              isActive &&
+                "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground  min-w-8 "
+            )}
+          >
             <Link href={item.href}>{item.title}</Link>
           </SidebarMenuSubButton>
         ) : (

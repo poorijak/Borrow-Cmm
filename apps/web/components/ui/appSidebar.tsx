@@ -20,29 +20,23 @@ import { cn } from "@/lib/utils";
 import SidebarMain from "../sidebar/sidebar-main";
 import { adminServices, studentService } from "../sidebar/sidebar-list";
 import SideFooter from "../sidebar/sidebar-footer";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
 import { User } from "@repo/types";
 
 interface AppSidebar {
   type: "Admin" | "Student";
-  user? : User
+  user?: User;
 }
 
-export function AppSidebar({ type , user }: AppSidebar) {
+export function AppSidebar({ type, user }: AppSidebar) {
   const currentPath = usePathname();
 
   return (
-    <Sidebar variant="sidebar" collapsible="icon">
+    <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader className="p-5">
         <SidebarMenu>
           <SidebarMenuItem>
             <p className="truncate font-semibold group-data-[collapsible=icon]:hidden">
-            {type === "Student" ? " บริการยืม/คืนอุปกรณ์" : "CMM ADMIN PANEL"}
+              {type === "Student" ? " บริการยืม/คืนอุปกรณ์" : "CMM ADMIN PANEL"}
             </p>
           </SidebarMenuItem>
         </SidebarMenu>
