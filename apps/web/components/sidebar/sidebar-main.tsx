@@ -42,9 +42,19 @@ const SidebarMain = ({ currentPath, label, items }: SidebarMainProps) => {
     return false;
   };
 
+  const isPathActive = (itemHref: string): boolean => {
+    if (!itemHref) return false;
+
+    if (itemHref === "/" || itemHref === "/admin") {
+      return currentPath === itemHref;
+    }
+
+    return currentPath.startsWith(itemHref);
+  };
+
   const renderMenuItems = (item: SidebarItem, isSub: boolean = false) => {
     const hasSub = item.subItems && item.subItems.length > 0;
-    const isActive = currentPath === item.href;
+    const isActive = isPathActive(item.href);
     const childActive = isChildActive(item);
 
     if (hasSub) {
@@ -64,7 +74,7 @@ const SidebarMain = ({ currentPath, label, items }: SidebarMainProps) => {
                     isActive &&
                       "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground  min-w-8 "
                   )}
-                  asChild
+                  
                 >
                   <Link href={item.href}>
                     <span>{item.title}</span>

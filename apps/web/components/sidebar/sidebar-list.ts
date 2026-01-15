@@ -42,7 +42,7 @@ export const adminServices = [
         subItems: [
           {
             title: "หมวดหมู่อุปกรณ์",
-            href: "/admin/equipmentCategory",
+            href: "/admin/category",
             // subItems: [
             //   { title: "กล้อง", href: "/admin/equipmentCategory/camera" },
             //   { title: "เลนส์", href: "/admin/equipmentCategory/lens" },

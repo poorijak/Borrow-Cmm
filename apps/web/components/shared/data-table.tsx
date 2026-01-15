@@ -93,6 +93,7 @@ export default function DataTable<TData, TValue>({
                     key={header.id}
                     colSpan={header.colSpan}
                     style={{ width: header.getSize() }}
+                    className="text-muted-foreground"
                   >
                     {header.isPlaceholder
                       ? null

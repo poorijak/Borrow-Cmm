@@ -7,11 +7,19 @@ import {
 } from "../ui/dropdown-menu";
 import { Badge } from "../ui/badge";
 import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type styleButtonType = {
+  bgColor?: string;
+  textColor?: string;
+};
 
 type Option<T extends string> = {
   value: T;
   lable: string;
   icon?: React.ReactNode;
+  style?: styleButtonType;
+  clasName?: string;
 };
 
 interface DropdownStatusProps<T extends string> {
@@ -31,10 +39,18 @@ export default function DropdownStatus<T extends string>({
     <div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Badge className="py-1 hover:cursor-pointer" variant="outline">
+          <Badge
+            style={{ backgroundColor: currentStatus?.style?.bgColor }}
+            className={cn(
+              "py-1 md:py-1.5 hover:cursor-pointer rounded-md",
+              currentStatus?.clasName
+            )}
+          >
             {currentStatus?.icon}
-            <span> {currentStatus?.lable}</span>
-            <ChevronDown />
+            <span style={{ color: currentStatus?.style?.textColor }}>
+              {currentStatus?.lable}
+            </span>
+            <ChevronDown style={{ color: currentStatus?.style?.textColor }} />
           </Badge>
         </DropdownMenuTrigger>
 

@@ -52,7 +52,6 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
     id: "",
     title: "",
   });
-  const [newStatus, setNewStatus] = useState<ActiveStatus>();
 
   const { mutate, isPending } = useUpdateStatus();
 
@@ -75,66 +74,65 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
       key: "All",
       value: "all",
       defaultValue: true,
-      href: "/admin/equipmentCategory",
+      href: "/admin/category",
     },
     {
       name: "เปิดใช้งาน",
       key: "Active",
       value: "Active",
-      href: "/admin/equipmentCategory?status=active",
+      href: "/admin/category?status=active",
     },
     {
       name: "ปิดใช้งาน",
       key: "Inactive",
       value: "Inactive",
-      href: "/admin/equipmentCategory?status=inactive",
+      href: "/admin/category?status=inactive",
     },
   ];
 
   const columns: ColumnDef<Categories>[] = [
     {
-      accessorKey: "preview",
-      header: "Preview",
-      size: 250,
-      minSize: 100,
-      maxSize: 160,
-      cell: ({ row }) => (
-        <div className="relative size-10 ">
-          <Image
-            className="rounded-sm border object-cover"
-            alt="preview image"
-            fill
-            src={getPublicUrl(row.original.mainImage)}
-          />
-        </div>
-      ),
-    },
-    {
       accessorKey: "title",
-      header: "หมวดหมู่",
-      size: 320,
+      header: () => <div className="pl-10">หมวดหมู่</div>,
+      size: 100,
       cell: ({ row }) => {
         const id = row.original.id;
         const title = row.original.title;
         return (
-          <Link
-            href={`equipmentCategory/${id}`}
-            className="font- hover:underline hover:text-primary transition-colors duration-75 hover:underline-offset-4"
-          >
-            {title}
-          </Link>
+          <div className="flex items-center gap-3 ml-5 relative group">
+            <div className="relative size-10 shrink-0 group-hover:-translate-y-0.5 transition-transform duration-200">
+              <Image
+                className="rounded-sm border object-cover"
+                alt="preview image"
+                fill
+                src={getPublicUrl(row.original.mainImage)}
+              />
+            </div>
+
+            <Link
+              href={`category/${id}`}
+              className="font- hover:underline hover:text-primary group-hover:underline underline-offset-4 after:absolute after:inset-0 after:z-0 transition-colors duration-75 hover:underline-offset-4"
+            >
+              {title}
+            </Link>
+          </div>
         );
       },
     },
     {
       accessorKey: "equipmentCount",
-      header: "จำนวนอุปกรณ์",
-      size: 140,
+      header: () => <div className="text-center">จำนวนอุปกรณ์</div>,
+      size: 50,
+      cell: ({ row }) => {
+        return (
+          <div className="text-center">{row.getValue("equipmentCount")}</div>
+        );
+      },
     },
     {
       accessorKey: "status",
       header: "สถานะ",
-      size: 170,
+      size: 100,
       cell: ({ row }) => {
         const value = row.original.status;
 
@@ -154,6 +152,10 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
                     className="text-green-600"
                   />
                 ),
+                style: {
+                  bgColor: "#dcfae9",
+                  textColor: "#1b8c42",
+                },
               },
               {
                 value: "inactive",
@@ -164,6 +166,10 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
                     className="text-destructive"
                   />
                 ),
+                style: {
+                  bgColor: "#ffe9e6",
+                  textColor: "#c72d22",
+                },
               },
             ]}
           />
@@ -197,7 +203,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
             <DropdownMenuContent align="end">
               <DropdownMenuItem>
                 <Link
-                  href={`equipmentCategory/${row.original.id}`}
+                  href={`category/${row.original.id}`}
                   className="flex items-center gap-2"
                 >
                   <Eye />
