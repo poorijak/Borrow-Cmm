@@ -104,4 +104,23 @@ export class CategoryService {
 
     return { sucess: true };
   }
+
+  async updateMainCateStatus(
+    id: string,
+    data: Prisma.EquipmentCategoryUpdateInput,
+  ) {
+    const cate = await this.getCategory(id);
+
+    if (!cate) {
+      throw new NotFoundException('Category not found');
+    }
+
+    if (cate.status === data.status) {
+      throw new BadRequestException('กรุณาเลือกหมวดหมู่อื่น');
+    }
+    return await this.prisma.equipmentCategory.update({
+      where: { id },
+      data,
+    });
+  }
 }

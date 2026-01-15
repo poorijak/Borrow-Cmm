@@ -13,6 +13,7 @@ if (typeof window !== "undefined") {
   api.interceptors.response.use(
     (response) => response,
     async (error) => {
+      const message = error.response?.data?.message || "เกิดข้อผิดพลาด";
       const originalRequest = error.config;
 
       if (error.response?.status === 401 && !originalRequest._retry) {
@@ -28,7 +29,7 @@ if (typeof window !== "undefined") {
           return Promise.reject(refreshError);
         }
       }
-      return Promise.reject(error);
+      return Promise.reject(new Error(message));
     }
   );
 }

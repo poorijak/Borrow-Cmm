@@ -35,7 +35,7 @@ export const upsertCategory = async (categoryData: CategoryFormValue) => {
   };
 
   const { data } = categoryData.categoryId
-    ? await api.patch(`/categories/${categoryData.categoryId}`, payload, {})
+    ? await api.patch(`/categories/${categoryData.categoryId}`, payload)
     : await api.post("categories", payload);
 
   return data;

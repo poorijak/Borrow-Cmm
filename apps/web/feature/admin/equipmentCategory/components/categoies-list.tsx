@@ -2,7 +2,7 @@
 
 import TabsMenu from "@/components/shared/tabsMenu";
 import React, { useState } from "react";
-import { useGetCategories } from "../hooks/useCategory";
+import { useGetCategories, useUpdateStatus } from "../hooks/useCategory";
 import { ActiveStatus, Categories } from "@repo/types";
 import Image from "next/image";
 import { getPublicUrl } from "@/lib/utils";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   ChevronDown,
   ChevronsUpDown,
+  CircleCheck,
   EllipsisVertical,
   Eye,
   Pencil,
@@ -30,6 +31,7 @@ import DataTable from "@/components/shared/data-table";
 import Link from "next/link";
 import UpsertCategory from "./upsert-modal";
 import DeleleCategoryModal from "./delete-modal";
+import StatsuDropdown from "@/components/shared/dropdown-status";
 
 interface CategoriesListProps {
   status: ActiveStatus;
@@ -50,8 +52,9 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
     id: "",
     title: "",
   });
+  const [newStatus, setNewStatus] = useState<ActiveStatus>();
 
-  console.log(data);
+  const { mutate, isPending } = useUpdateStatus();
 
   const sp = useSearchParams();
   const router = useRouter();
@@ -132,29 +135,40 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
       accessorKey: "status",
       header: "สถานะ",
       size: 170,
-      cell: ({ row }) => (
-        <Badge className="py-1 " variant="outline">
-          {row.original.status === "active" ? (
-            <div className="flex items-center gap-1">
-              <Icon
-                icon="icon-park-solid:check-one"
-                className="text-green-600"
-              />
-              <span>เปิดใช้งาน</span>
-              <ChevronDown className="size-3" />
-            </div>
-          ) : (
-            <div className="flex items-center gap-1">
-              <Icon
-                icon="icon-park-solid:close-one"
-                className="text-destructive"
-              />
-              <span>ปิดใช้งาน</span>
-              <ChevronDown className="size-3" />
-            </div>
-          )}
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const value = row.original.status;
+
+        return (
+          <StatsuDropdown
+            value={value}
+            onStatusChange={(setNewStatus) => {
+              mutate({ id: row.original.id, newStatus: setNewStatus });
+            }}
+            option={[
+              {
+                value: "active",
+                lable: "เปิดใช้งาน",
+                icon: (
+                  <Icon
+                    icon="icon-park-solid:check-one"
+                    className="text-green-600"
+                  />
+                ),
+              },
+              {
+                value: "inactive",
+                lable: "ปิดใช้งาน",
+                icon: (
+                  <Icon
+                    icon="icon-park-solid:close-one"
+                    className="text-destructive"
+                  />
+                ),
+              },
+            ]}
+          />
+        );
+      },
     },
     {
       accessorKey: "updatedAt",

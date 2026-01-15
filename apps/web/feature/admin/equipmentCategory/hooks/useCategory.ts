@@ -5,6 +5,11 @@ import { CategoryFormValue } from "@repo/schemas";
 import { ActiveStatus, CategoriesResponse } from "@repo/types";
 import api from "@/lib/axios";
 
+interface updateStatusValue {
+  id: string;
+  newStatus: ActiveStatus;
+}
+
 export const useMutationCategory = () => {
   const queryClient = useQueryClient();
 
@@ -55,4 +60,63 @@ export const useGetCategories = (status: ActiveStatus, page: number) => {
     },
   });
   return query;
+};
+
+export const useUpdateStatus = () => {
+  const queryClient = useQueryClient();
+
+  const mutate = useMutation<
+    any,
+    Error,
+    updateStatusValue,
+    {
+      prevCategories: [
+        queryKey: readonly unknown[],
+        data: CategoriesResponse | undefined,
+      ][];
+    }
+  >({
+    mutationFn: async ({ id, newStatus }) => {
+      const { data } = await api.patch(`/categories/${id}/status`, {
+        status: newStatus,
+      });
+      return data;
+    },
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({ queryKey: ["categories"] });
+
+      const prevCategories = queryClient.getQueriesData<CategoriesResponse>({
+        queryKey: ["categories"],
+      });
+
+      queryClient.setQueriesData<CategoriesResponse>(
+        { queryKey: ["categories"] },
+        (oldData) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            data: oldData.data.map((item) =>
+              item.id === variables.id
+                ? { ...item, status: variables.newStatus }
+                : item
+            ),
+          };
+        }
+      );
+
+      return { prevCategories };
+    },
+    onError: (error, variables, context) => {
+      if (context?.prevCategories) {
+        context.prevCategories.forEach(([key, oldData]) => {
+          queryClient.setQueryData(key, oldData);
+        });
+      }
+      toast.error(error.message || "เกิดข้อผิดพลาดจาก");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+  return mutate;
 };
