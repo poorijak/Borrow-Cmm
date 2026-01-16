@@ -23,3 +23,19 @@ export interface CategoriesResponse {
     totalPages: number;
   };
 }
+
+export interface SubCategories {
+  id: string;
+  title: string;
+  updatedAt: string;
+  equipmentCout: number;
+}
+
+export interface SubCategoriesResponse {
+  data: SubCategories[];
+  meta: {
+    page: number;
+    totalCount: number;
+    totalPages: number;
+  };
+}

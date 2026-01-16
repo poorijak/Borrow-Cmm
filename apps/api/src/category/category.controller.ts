@@ -105,6 +105,30 @@ export class CategoryController {
     return cate;
   }
 
+  @Get(':id/subCategories')
+  async findSubAll(
+    @Param('id') id: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    const limit = 10;
+
+    const skip = (page - 1) * limit;
+
+    const [data, totalCount] = await Promise.all([
+      this.categoryService.getSubCategories(id, { skip, limit }),
+      this.categoryService.countSubCategories({ mainCategoryId: id }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        totalCount,
+        page,
+        totalPages: Math.ceil(totalCount / limit),
+      },
+    };
+  }
+
   @Patch(':id/status')
   updateStatus(
     @Param('id') id: string,

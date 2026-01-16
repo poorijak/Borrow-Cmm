@@ -31,12 +31,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchbar: boolean;
+  className?: string;
 }
 
 export default function DataTable<TData, TValue>({
   columns,
   data,
   searchbar = false,
+  className,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -83,7 +85,12 @@ export default function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-lg border min-h-[480px] max-h-[550px] overflow-hidden">
+      <div
+        className={cn(
+          "rounded-lg border min-h-[480px] max-h-[550px] overflow-hidden",
+          className
+        )}
+      >
         <Table>
           <TableHeader className="bg-muted sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (

@@ -53,7 +53,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
     title: "",
   });
 
-  const { mutate, isPending } = useUpdateStatus();
+  const { mutate } = useUpdateStatus();
 
   const sp = useSearchParams();
   const router = useRouter();

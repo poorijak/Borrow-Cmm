@@ -81,6 +81,36 @@ export class CategoryService {
     }
   }
 
+  async getSubCategories(
+    mainCategoryId: string,
+    params: {
+      skip?: number;
+      limit?: number;
+    },
+  ) {
+    const { skip = 0, limit = 1 } = params;
+    const existingCate = await this.getCategoryById(mainCategoryId);
+
+    if (!existingCate) {
+      throw new NotFoundException('ไม่พบหมวดหมู่นี้');
+    }
+
+    const subCate = await this.prisma.equipmentSubCategory.findMany({
+      where: {
+        mainCategoryId,
+      },
+      skip,
+      take: limit,
+    });
+
+    return subCate.map(({ id, title, updatedAt }) => ({
+      id,
+      title,
+      updatedAt: formatDateToDDMMYY(updatedAt),
+      equipmentCout: 1,
+    }));
+  }
+
   async getCategoryById(id: string) {
     const cate = await this.prisma.equipmentCategory.findUnique({
       where: { id },
@@ -98,6 +128,10 @@ export class CategoryService {
   }) {
     const { where } = params;
     return await this.prisma.equipmentCategory.count({ where });
+  }
+
+  async countSubCategories(where: Prisma.EquipmentSubCategoryWhereInput) {
+    return await this.prisma.equipmentSubCategory.count({ where });
   }
 
   async deleteCategory(id: string) {

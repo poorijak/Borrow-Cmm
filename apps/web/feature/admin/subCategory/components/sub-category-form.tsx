@@ -56,37 +56,34 @@ const SubCategoryForm = ({ id }: SubCategoryFormProps) => {
       <header className="mb-5">
         <h3 className="text-2xl font-bold">หมวดหมู่ย่อย</h3>
       </header>
-      <div className="grid grid-cols-1 md:grid-cols-7 ">
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>เพิ่มหมวดหมู่ย่อย</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(handleSubmit, (err) => {
-                  console.log(err);
-                })}
-                className="space-y-5"
-              >
-                <InputForm
-                  control={form.control}
-                  name="title"
-                  placeholder="เช่น DSLR, Action Camera, Mirrorless"
-                />
-                <SubmitBtn
-                  pending={isPending}
-                  title="บันทึก"
-                  className="w-full"
-                  icon={Save}
-                />
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>เพิ่มหมวดหมู่ย่อย</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleSubmit, (err) => {
+                console.log(err);
+              })}
+              className="space-y-5"
+            >
+              <InputForm
+                control={form.control}
+                name="title"
+                placeholder="เช่น DSLR, Action Camera, Mirrorless"
+              />
+              <SubmitBtn
+                pending={isPending}
+                title="บันทึก"
+                className="w-full"
+                icon={Save}
+              />
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
 
-        <div className="col-span-5"></div>
-      </div>
     </div>
   );
 };

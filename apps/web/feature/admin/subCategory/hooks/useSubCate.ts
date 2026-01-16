@@ -1,6 +1,10 @@
 import api from "@/lib/axios";
 import { subCategoryValue } from "@repo/schemas";
-import { Categories, CategoriesResponse } from "@repo/types";
+import {
+  Categories,
+  CategoriesResponse,
+  SubCategoriesResponse,
+} from "@repo/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -40,7 +44,23 @@ export const useSubCategory = () => {
     },
     onSuccess: () => {
       toast.success("สร้างหมวดหมู่ย่อยสำเร็จ");
-      queryClient.invalidateQueries({ queryKey: ["subCategory"] });
+      queryClient.invalidateQueries({ queryKey: ["sub-category"] });
+    },
+  });
+};
+
+export const useGetSubCategories = (mainCateId: string, page: number) => {
+  return useQuery({
+    queryKey: ["sub-category", mainCateId, page],
+    queryFn: async ({ queryKey }) => {
+      const [, mainCateId, page] = queryKey as ["sub-category", string, number];
+
+      const { data } = await api.get<SubCategoriesResponse>(
+        `/categories/${mainCateId}/subCategories`,
+        { params: { page } }
+      );
+
+      return data;
     },
   });
 };
