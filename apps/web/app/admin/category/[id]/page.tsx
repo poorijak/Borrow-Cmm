@@ -1,16 +1,19 @@
+import { Separator } from "@/components/ui/separator";
+import SubCategoryForm from "@/feature/admin/subCategory/components/sub-category-form";
+import SubHeader from "@/feature/admin/subCategory/components/sub-header";
 import React from "react";
 
 interface CategoryDetailPageProps {
   params: { id: string };
 }
-const page = ({ params }: CategoryDetailPageProps) => {
-  const { id } = params;
+const page = async ({ params }: CategoryDetailPageProps) => {
+  const { id } = await params;
 
   return (
-    <div>
-      <header className="flex flex-col gap-4">
-        <h2 className="text-3xl font-bold">หมวดหมู่อุปกรณ์</h2>
-      </header>
+    <div className="space-y-7">
+      <SubHeader id={id} />
+      <Separator />
+      <SubCategoryForm id={id} />
     </div>
   );
 };

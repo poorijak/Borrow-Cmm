@@ -1,0 +1,46 @@
+import api from "@/lib/axios";
+import { subCategoryValue } from "@repo/schemas";
+import { Categories, CategoriesResponse } from "@repo/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+export const useGetCategoryDetail = (id: string) => {
+  const queryClient = useQueryClient();
+
+  return useQuery({
+    queryKey: ["categories", id],
+    queryFn: async () => {
+      const { data } = await api.get<Categories>(`/categories/${id}`);
+      return data;
+    },
+    initialData: () => {
+      const allCache = queryClient.getQueriesData<CategoriesResponse>({
+        queryKey: ["categories", id],
+      });
+
+      for (const [key, cacheData] of allCache) {
+        const foundItem = cacheData?.data.find((i) => i.id === id);
+
+        if (key.includes(id)) continue;
+
+        if (foundItem) return foundItem;
+      }
+      return undefined;
+    },
+  });
+};
+
+export const useSubCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: subCategoryValue) => {
+      const subCate = await api.post("/categories/subCategory", data);
+      return subCate;
+    },
+    onSuccess: () => {
+      toast.success("สร้างหมวดหมู่ย่อยสำเร็จ");
+      queryClient.invalidateQueries({ queryKey: ["subCategory"] });
+    },
+  });
+};

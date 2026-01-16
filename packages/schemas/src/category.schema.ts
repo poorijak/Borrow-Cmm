@@ -49,3 +49,9 @@ export type CategoryFormValue = z.infer<typeof categoryFormSchema>;
 export type CategoryRequest = z.infer<typeof categorySchema>;
 export type CategoryValue = z.infer<typeof categorySchema>;
 export type UpdateStatusSchema = z.infer<typeof updateStatusCategorySchema>;
+
+export const subCategoryFormSchema = baseSchema.extend({
+  mainCateId: z.string().min(1).optional(),
+});
+
+export type subCategoryValue = z.infer<typeof subCategoryFormSchema>;

@@ -14,9 +14,10 @@ import {
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import {
-  CategoryRequest,
   categorySchema,
   type CategoryValue,
+  subCategoryFormSchema,
+  type subCategoryValue,
   updateStatusCategorySchema,
   type UpdateStatusSchema,
 } from '@repo/schemas';
@@ -37,16 +38,31 @@ export class CategoryController {
     });
   }
 
+  @Post('/subCategory')
+  createSub(
+    @Body(new ZodValidationPipe(subCategoryFormSchema)) data: subCategoryValue,
+  ) {
+    const subCate = this.categoryService.createSub(
+      {
+        title: data.title,
+        mainCategory: {
+          connect: {
+            id: data.mainCateId,
+          },
+        },
+        status: 'active',
+      },
+      data.mainCateId,
+    );
+
+    return subCate;
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() body: unknown) {
-    const parsed = categorySchema.safeParse(body);
-
-    if (!parsed.success) {
-      throw new BadRequestException(parsed.error.flatten());
-    }
-
-    const data: CategoryRequest = parsed.data;
-
+  update(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(categorySchema)) data: CategoryValue,
+  ) {
     return this.categoryService.updateMain(id, {
       title: data.title,
       mainImage: data.imageKey,
@@ -81,6 +97,12 @@ export class CategoryController {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  @Get(':id')
+  async find(@Param('id') id: string) {
+    const cate = this.categoryService.getCategoryById(id);
+    return cate;
   }
 
   @Patch(':id/status')
