@@ -8,15 +8,12 @@ import Image from "next/image";
 import { getPublicUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  ChevronDown,
   ChevronsUpDown,
-  CircleCheck,
   EllipsisVertical,
   Eye,
   Pencil,
   Trash2,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Icon } from "@iconify/react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
@@ -242,13 +239,6 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
   return (
     <div className="space-y-5">
       <TabsMenu tabItems={tabs} />
-      <DataTable columns={columns} data={categories} searchbar={false} />
-      <Pagination
-        page={page}
-        total={meta?.total}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-      />
       <UpsertCategory
         open={isModalUpsertOpen}
         onOpenChange={setIsModalUpsertOpen}

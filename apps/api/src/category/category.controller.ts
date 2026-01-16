@@ -38,24 +38,21 @@ export class CategoryController {
     });
   }
 
-  @Post('/subCategory')
+  @Post(':mainCateId/subCategory')
   createSub(
+    @Param('mainCateId') mainCateId: string,
     @Body(new ZodValidationPipe(subCategoryFormSchema)) data: subCategoryValue,
   ) {
-    const subCate = this.categoryService.createSub(
-      {
-        title: data.title,
-        mainCategory: {
-          connect: {
-            id: data.mainCateId,
-          },
-        },
-        status: 'active',
-      },
-      data.mainCateId,
-    );
+    return this.categoryService.upsertSubCate(data, mainCateId);
+  }
 
-    return subCate;
+  @Patch(':mainCateId/subCategory/:id')
+  updateSubCate(
+    @Param('id') id: string,
+    @Param('mainCateId') mainCateId: string,
+    @Body(new ZodValidationPipe(subCategoryFormSchema)) data: subCategoryValue,
+  ) {
+    return this.categoryService.upsertSubCate(data, mainCateId, id);
   }
 
   @Patch(':id')
@@ -110,7 +107,7 @@ export class CategoryController {
     @Param('id') id: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
   ) {
-    const limit = 10;
+    const limit = 5;
 
     const skip = (page - 1) * limit;
 

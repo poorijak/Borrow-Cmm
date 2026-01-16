@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import DataTable from "@/components/shared/data-table";
 import EditSubCateModal from "./edit-sub-category-modal";
+import Pagination from "@/components/shared/pagination";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface SubCategoryListProps {
   id: string;
@@ -21,18 +23,31 @@ interface SubCategoryListProps {
 }
 
 const SubCategoryList = ({ id, page }: SubCategoryListProps) => {
+  // state
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isSubCateSelected, setIsSubCateSelected] = useState<SubCategories>();
+  const [isSubCateSelected, setIsSubCateSelected] = useState<
+    SubCategories | undefined
+  >();
 
+  // hooks
+  const router = useRouter();
+  const sp = useSearchParams();
   const { data } = useGetSubCategories(id, page);
 
+  const meta = data?.meta;
   const subCategores = data?.data ?? [];
+
+  const onPageChange = (newPage: number) => {
+    const newParams = new URLSearchParams(sp);
+    newParams.set("page", newPage.toString());
+    router.push(`?${newParams.toString()}`);
+  };
 
   const columns: ColumnDef<SubCategories>[] = [
     {
       accessorKey: "title",
       header: "หมวดหมู่",
-      size: 100,
+      size: 200,
     },
     {
       accessorKey: "equipmentCount",
@@ -55,6 +70,7 @@ const SubCategoryList = ({ id, page }: SubCategoryListProps) => {
     },
     {
       accessorKey: "updatedAt",
+      size: 150,
       header: ({ column }) => (
         <Button
           variant="ghost"
@@ -68,7 +84,7 @@ const SubCategoryList = ({ id, page }: SubCategoryListProps) => {
     },
     {
       id: "actions",
-      size: 60,
+      size: 20,
       cell: ({ row }) => (
         <>
           <DropdownMenu>
@@ -109,12 +125,20 @@ const SubCategoryList = ({ id, page }: SubCategoryListProps) => {
 
   return (
     <div>
-      <DataTable
-        data={subCategores}
-        columns={columns}
-        searchbar={false}
-        className="min-h-auto"
-      />
+      <div className="space-y-5">
+        <DataTable
+          data={subCategores}
+          columns={columns}
+          searchbar={false}
+          className="min-h-auto"
+        />
+        <Pagination
+          page={page}
+          totalPages={meta?.totalPages ?? 1}
+          total={meta?.totalCount}
+          onPageChange={onPageChange}
+        />
+      </div>
       <EditSubCateModal
         mainCateId={id}
         data={isSubCateSelected}

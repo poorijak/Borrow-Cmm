@@ -21,9 +21,10 @@ export class CategoryService {
     return cate;
   }
 
-  async createSub(
-    data: Prisma.EquipmentSubCategoryCreateInput,
-    mainCateId?: string,
+  async upsertSubCate(
+    data: { title: string },
+    mainCateId: string,
+    id?: string,
   ) {
     const existingCate = await this.prisma.equipmentCategory.findUnique({
       where: { id: mainCateId },
@@ -33,8 +34,22 @@ export class CategoryService {
       throw new NotFoundException('ไม่พบหมวดหมู่นี้');
     }
 
-    const subCate = await this.prisma.equipmentSubCategory.create({
-      data,
+    const subCate = await this.prisma.equipmentSubCategory.upsert({
+      where: {
+        id: id || '',
+      },
+      update: {
+        title: data.title,
+      },
+      create: {
+        title: data.title,
+        mainCategory: {
+          connect: {
+            id: existingCate.id,
+          },
+        },
+        status: 'active',
+      },
     });
 
     return subCate;

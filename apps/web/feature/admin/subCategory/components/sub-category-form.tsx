@@ -28,24 +28,20 @@ const SubCategoryForm = ({ id }: SubCategoryFormProps) => {
     resolver: zodResolver(subCategoryFormSchema),
     defaultValues: {
       title: "",
-      mainCateId: id,
     },
     mode: "onSubmit",
   });
 
   const handleSubmit = (data: subCategoryValue) => {
-    console.log(data);
-
     mutate(
       {
-        title: data.title,
+        data: { title: data.title },
         mainCateId: id,
       },
       {
         onSuccess: () => {
           form.reset({
             title: "",
-            mainCateId: id,
           });
         },
       }
@@ -83,7 +79,6 @@ const SubCategoryForm = ({ id }: SubCategoryFormProps) => {
           </Form>
         </CardContent>
       </Card>
-
     </div>
   );
 };

@@ -38,8 +38,18 @@ export const useSubCategory = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: subCategoryValue) => {
-      const subCate = await api.post("/categories/subCategory", data);
+    mutationFn: async ({
+      data,
+      mainCateId,
+      id,
+    }: {
+      data: subCategoryValue;
+      mainCateId: string;
+      id?: string;
+    }) => {
+      const { data: subCate } = id
+        ? await api.patch(`/categories/${mainCateId}/subCategory/${id}`, data)
+        : await api.post(`/categories/${mainCateId}/subCategory`, data);
       return subCate;
     },
     onSuccess: () => {
