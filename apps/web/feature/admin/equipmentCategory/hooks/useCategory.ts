@@ -46,14 +46,18 @@ export const useDeleteCategory = () => {
   return mutate;
 };
 
-export const useGetCategories = (status: ActiveStatus, page: number) => {
+export const useGetCategories = (
+  page?: number,
+  limit?: number,
+  status?: ActiveStatus
+) => {
   const query = useQuery({
     queryKey: ["categories", status, page],
     queryFn: async ({ queryKey }) => {
       const [, status, page] = queryKey as ["categories", ActiveStatus, number];
 
       const { data } = await api.get<CategoriesResponse>("/categories", {
-        params: { status, page },
+        params: { status, page, limit },
       });
 
       return data;

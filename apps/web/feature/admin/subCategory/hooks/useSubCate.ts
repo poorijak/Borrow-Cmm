@@ -59,7 +59,11 @@ export const useSubCategory = () => {
   });
 };
 
-export const useGetSubCategories = (mainCateId: string, page: number) => {
+export const useGetSubCategories = (
+  mainCateId?: string,
+  page?: number,
+  limit?: number
+) => {
   return useQuery({
     queryKey: ["sub-category", mainCateId, page],
     queryFn: async ({ queryKey }) => {
@@ -67,11 +71,12 @@ export const useGetSubCategories = (mainCateId: string, page: number) => {
 
       const { data } = await api.get<SubCategoriesResponse>(
         `/categories/${mainCateId}/subCategories`,
-        { params: { page } }
+        { params: { page, limit } }
       );
 
       return data;
     },
+    enabled: !!mainCateId,
   });
 };
 

@@ -8,26 +8,30 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { cn } from "@/lib/utils";
+import { Textarea } from "../ui/textarea";
 
 interface InputFormProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
-  type?: string;
+  type?: "input" | "textArea";
   label?: string;
   required?: boolean;
   placeholder?: string;
+  className?: string;
 }
 
 const InputForm = <T extends FieldValues>({
   control,
   name,
   label,
-  type,
+  type = "input",
   required,
   placeholder,
+  className,
 }: InputFormProps<T>) => {
   return (
-    <div>
+    <div className={cn(className)}>
       <FormField
         control={control}
         name={name}
@@ -40,13 +44,21 @@ const InputForm = <T extends FieldValues>({
               </FormLabel>
             )}
             <FormControl>
-              <Input
-                className="placeholder:text-xs"
-                placeholder={placeholder}
-                type={type}
-                {...field}
-                required={required}
-              />
+              {type === "input" ? (
+                <Input
+                  className="placeholder:text-xs"
+                  placeholder={placeholder}
+                  {...field}
+                  required={required}
+                />
+              ) : (
+                <Textarea
+                  className="placeholder:text-xs"
+                  placeholder={placeholder}
+                  {...field}
+                  required={required}
+                />
+              )}
             </FormControl>
             <FormMessage />
           </FormItem>

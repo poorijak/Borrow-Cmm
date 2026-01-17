@@ -1,4 +1,6 @@
 import { Separator } from "@/components/ui/separator";
+import EquipmentHeader from "@/feature/admin/equipment/components/equipement-header";
+import EquipmentList from "@/feature/admin/equipment/components/equipment-list";
 import SubCategoryForm from "@/feature/admin/subCategory/components/sub-category-form";
 import SubCategoryList from "@/feature/admin/subCategory/components/sub-category-list";
 import SubHeader from "@/feature/admin/subCategory/components/sub-header";
@@ -12,6 +14,8 @@ const page = async ({ params, searchParams }: CategoryDetailPageProps) => {
   const { id } = await params;
   const page = parseInt((await searchParams).page || "1");
 
+  
+
   return (
     <div className="space-y-7">
       <SubHeader id={id} />
@@ -24,6 +28,9 @@ const page = async ({ params, searchParams }: CategoryDetailPageProps) => {
           <SubCategoryList id={id} page={page} />
         </div>
       </div>
+      <Separator />
+      <EquipmentHeader type="equipmentWithCate" mainCateId={id} />
+      <EquipmentList />
     </div>
   );
 };

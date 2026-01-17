@@ -36,7 +36,7 @@ interface CategoriesListProps {
 }
 
 const CategoriesList = ({ status, page }: CategoriesListProps) => {
-  const { data } = useGetCategories(status, page);
+  const { data } = useGetCategories(page, undefined, status);
   const [isModalUpsertOpen, setIsModalUpsertOpen] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [isSelected, setIsSelected] = useState<Categories | undefined>(
@@ -107,7 +107,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
             </div>
 
             <Link
-              href={`category/${id}`}
+              href={`category/${id}/equipment`}
               className="font- hover:underline hover:text-primary group-hover:underline underline-offset-4 after:absolute after:inset-0 after:z-0 transition-colors duration-75 hover:underline-offset-4"
             >
               {title}

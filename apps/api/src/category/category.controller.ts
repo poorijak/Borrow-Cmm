@@ -79,8 +79,8 @@ export class CategoryController {
   async findAll(
     @Query('status') status: ActiveStatus,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ) {
-    const limit = 10;
     const skip = (page - 1) * limit;
 
     const where = status ? { status } : undefined;
@@ -110,9 +110,8 @@ export class CategoryController {
   async findSubAll(
     @Param('id') id: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(5), ParseIntPipe) limit: number,
   ) {
-    const limit = 5;
-
     const skip = (page - 1) * limit;
 
     const [data, totalCount] = await Promise.all([

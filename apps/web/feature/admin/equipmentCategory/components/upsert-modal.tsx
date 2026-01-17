@@ -24,13 +24,10 @@ const UpsertCategory = ({
   onOpenChange,
   data: category,
 }: UpsertCategoryProsp) => {
-  console.log(category);
-
   const { mutate, isPending } = useMutationCategory();
 
   const [existingRemove, setExistingRemove] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
-
 
   const form = useForm<CategoryFormValue>({
     resolver: zodResolver(categoryFormSchema),

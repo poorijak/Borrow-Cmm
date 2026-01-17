@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import { AdminModule } from './admin/admin.module';
 import { UploadModule } from './upload/upload.module';
 import { CategoryModule } from './category/category.module';
+import { EquipmentModule } from './equipment/equipment.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CategoryModule } from './category/category.module';
     AdminModule,
     UploadModule,
     CategoryModule,
+    EquipmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
