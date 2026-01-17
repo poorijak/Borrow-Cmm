@@ -16,6 +16,7 @@ import DataTable from "@/components/shared/data-table";
 import EditSubCateModal from "./edit-sub-category-modal";
 import Pagination from "@/components/shared/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
+import DeleleCategoryModal from "../../equipmentCategory/components/delete-modal";
 
 interface SubCategoryListProps {
   id: string;
@@ -25,9 +26,17 @@ interface SubCategoryListProps {
 const SubCategoryList = ({ id, page }: SubCategoryListProps) => {
   // state
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isSubCateSelected, setIsSubCateSelected] = useState<
     SubCategories | undefined
   >();
+  const [isDeleteSelected, setIsDeleteSelected] = useState<{
+    id: string;
+    title: string;
+  }>({
+    id: "",
+    title: "",
+  });
 
   // hooks
   const router = useRouter();
@@ -46,8 +55,9 @@ const SubCategoryList = ({ id, page }: SubCategoryListProps) => {
   const columns: ColumnDef<SubCategories>[] = [
     {
       accessorKey: "title",
-      header: "หมวดหมู่",
+      header: () => <div className="pl-8"> หมวดหมู่</div>,
       size: 200,
+      cell: ({ row }) => <div className="ml-8">{row.original.title}</div>,
     },
     {
       accessorKey: "equipmentCount",
@@ -105,13 +115,13 @@ const SubCategoryList = ({ id, page }: SubCategoryListProps) => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
-                // onClick={() => {
-                //   setIsDeleteModal(true);
-                //   setIsDeleteSelected({
-                //     id: row.original.id,
-                //     title: row.original.title,
-                //   });
-                // }}
+                onClick={() => {
+                  setIsDeleteOpen(true);
+                  setIsDeleteSelected({
+                    id: row.original.id,
+                    title: row.original.title,
+                  });
+                }}
               >
                 <Trash2 className="text-destructive" />
                 ลบ
@@ -130,7 +140,7 @@ const SubCategoryList = ({ id, page }: SubCategoryListProps) => {
           data={subCategores}
           columns={columns}
           searchbar={false}
-          className="min-h-auto"
+          className="min-h-[297px]"
         />
         <Pagination
           page={page}
@@ -144,6 +154,11 @@ const SubCategoryList = ({ id, page }: SubCategoryListProps) => {
         data={isSubCateSelected}
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
+      />
+      <DeleleCategoryModal
+        data={isDeleteSelected}
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
       />
     </div>
   );

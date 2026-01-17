@@ -71,6 +71,10 @@ export class CategoryController {
     return this.categoryService.deleteCategory(id);
   }
 
+  @Delete('subCategory/:id')
+  async deleteSub(@Param('id') id: string) {
+    return this.categoryService.deleteSubCategory(id);
+  }
   @Get()
   async findAll(
     @Query('status') status: ActiveStatus,

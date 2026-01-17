@@ -1,28 +1,27 @@
 import Modal from "@/components/shared/modal";
+import SubmitBtn from "@/components/shared/submit-btn";
 import { Button } from "@/components/ui/button";
 import { TriangleAlert } from "lucide-react";
 import React, { useEffect } from "react";
-import { useDeleteCategory } from "../hooks/useCategory";
-import SubmitBtn from "@/components/shared/submit-btn";
-import { useDeleteSubCategory } from "../../subCategory/hooks/useSubCate";
+import { useDeleteSubCategory } from "../hooks/useSubCate";
 
-type DeleleCategoryModalProps = {
+interface DeleteSubCategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data: {
     id: string;
     title: string;
   };
-};
+}
 
-const DeleleCategoryModal = ({
+const DeleteSubCategoryModal = ({
   open,
   onOpenChange,
   data,
-}: DeleleCategoryModalProps) => {
+}: DeleteSubCategoryModalProps) => {
   const { mutate, isPending, isSuccess } = useDeleteSubCategory();
 
-  const handleDeleteCategory = () => {
+  const handleDeleteSubCategory = () => {
     mutate(data.id);
   };
 
@@ -34,7 +33,7 @@ const DeleleCategoryModal = ({
 
   return (
     <Modal onOpenChange={onOpenChange} open={open} size="sm">
-      <div className="flex justify-center  flex-col  items-center">
+      <div className="flex justify-center gap-3 flex-col  items-center">
         <div className="size-25 mb-7 flex justify-center  items-center  p-1 rounded-full bg-destructive/10">
           <TriangleAlert className="text-destructive" size={60} />
         </div>
@@ -49,27 +48,25 @@ const DeleleCategoryModal = ({
           </p>
         </div>
 
-        <div className="flex w-full items-center flex-col mt-5 gap-3">
-          <SubmitBtn
-            variant="destructive"
-            size="lg"
-            onClick={handleDeleteCategory}
-            className="w-full"
-            title="ใช่ ลบเลย"
-            pending={isPending}
-          />
+        <div className="flex items-center w-full flex-col mt-5 gap-10">
           <Button
             variant="outline"
             size="lg"
             onClick={() => onOpenChange(false)}
-            className="w-full"
           >
             ไม่ เก็บไว้ก่อน
           </Button>
+          <SubmitBtn
+            variant="destructive"
+            size="lg"
+            onClick={handleDeleteSubCategory}
+            title="ใช่ ลบเลย"
+            pending={isPending}
+          />
         </div>
       </div>
     </Modal>
   );
 };
 
-export default DeleleCategoryModal;
+export default DeleteSubCategoryModal;

@@ -74,3 +74,17 @@ export const useGetSubCategories = (mainCateId: string, page: number) => {
     },
   });
 };
+
+export const useDeleteSubCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => {
+      return api.delete(`/categories/subCategory/${id}`);
+    },
+    onSuccess: () => {
+      toast.success("ลบหมวดหมู่ย่อยสำเร็จ");
+      queryClient.invalidateQueries({ queryKey: ["sub-category"] });
+    },
+  });
+};

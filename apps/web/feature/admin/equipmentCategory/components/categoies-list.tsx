@@ -239,6 +239,13 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
   return (
     <div className="space-y-5">
       <TabsMenu tabItems={tabs} />
+      <DataTable columns={columns} data={categories} searchbar={false} />
+      <Pagination
+        page={page}
+        total={meta?.total}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+      />
       <UpsertCategory
         open={isModalUpsertOpen}
         onOpenChange={setIsModalUpsertOpen}

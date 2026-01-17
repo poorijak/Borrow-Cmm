@@ -138,6 +138,10 @@ export class CategoryService {
     return cate;
   }
 
+  async getSubCategoryById(id: string) {
+    return this.prisma.equipmentSubCategory.findUnique({ where: { id } });
+  }
+
   async countCategories(params: {
     where?: Prisma.EquipmentCategoryWhereInput;
   }) {
@@ -167,6 +171,18 @@ export class CategoryService {
     await this.prisma.equipmentCategory.delete({ where: { id } });
 
     return { sucess: true };
+  }
+
+  async deleteSubCategory(id: string) {
+    const existingSubCate = await this.getSubCategoryById(id);
+
+    if (!existingSubCate) {
+      throw new NotFoundException('ไม่พบหมวดหมู่นี้');
+    }
+
+    return await this.prisma.equipmentSubCategory.delete({
+      where: { id },
+    });
   }
 
   async updateMainCateStatus(
