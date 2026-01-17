@@ -70,4 +70,20 @@ model EquipmentSubCategory {
   mainCategoryId String
   mainCategory   EquipmentCategory @relation(fields: [mainCategoryId], references: [id], onDelete: Cascade)
   status         ActiveStatus
+  equipment      Equipment[]
+}
+
+model Equipment {
+  id            String               @id @default(uuid())
+  mainImage     String
+  title         String
+  description   String?
+  totalStock    Int
+  borrowedQty   Int
+  reservedQty   Int
+  status        ActiveStatus
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  subCategoryId String
+  category      EquipmentSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
 }
