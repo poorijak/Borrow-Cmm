@@ -14,9 +14,10 @@ import {
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import {
-  CategoryRequest,
   categorySchema,
   type CategoryValue,
+  subCategoryFormSchema,
+  type subCategoryValue,
   updateStatusCategorySchema,
   type UpdateStatusSchema,
 } from '@repo/schemas';
@@ -37,16 +38,28 @@ export class CategoryController {
     });
   }
 
+  @Post(':mainCateId/subCategory')
+  createSub(
+    @Param('mainCateId') mainCateId: string,
+    @Body(new ZodValidationPipe(subCategoryFormSchema)) data: subCategoryValue,
+  ) {
+    return this.categoryService.upsertSubCate(data, mainCateId);
+  }
+
+  @Patch(':mainCateId/subCategory/:id')
+  updateSubCate(
+    @Param('id') id: string,
+    @Param('mainCateId') mainCateId: string,
+    @Body(new ZodValidationPipe(subCategoryFormSchema)) data: subCategoryValue,
+  ) {
+    return this.categoryService.upsertSubCate(data, mainCateId, id);
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() body: unknown) {
-    const parsed = categorySchema.safeParse(body);
-
-    if (!parsed.success) {
-      throw new BadRequestException(parsed.error.flatten());
-    }
-
-    const data: CategoryRequest = parsed.data;
-
+  update(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(categorySchema)) data: CategoryValue,
+  ) {
     return this.categoryService.updateMain(id, {
       title: data.title,
       mainImage: data.imageKey,
@@ -58,6 +71,10 @@ export class CategoryController {
     return this.categoryService.deleteCategory(id);
   }
 
+  @Delete('subCategory/:id')
+  async deleteSub(@Param('id') id: string) {
+    return this.categoryService.deleteSubCategory(id);
+  }
   @Get()
   async findAll(
     @Query('status') status: ActiveStatus,
@@ -79,6 +96,36 @@ export class CategoryController {
         page,
         total,
         totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  @Get(':id')
+  async find(@Param('id') id: string) {
+    const cate = this.categoryService.getCategoryById(id);
+    return cate;
+  }
+
+  @Get(':id/subCategories')
+  async findSubAll(
+    @Param('id') id: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    const limit = 5;
+
+    const skip = (page - 1) * limit;
+
+    const [data, totalCount] = await Promise.all([
+      this.categoryService.getSubCategories(id, { skip, limit }),
+      this.categoryService.countSubCategories({ mainCategoryId: id }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        totalCount,
+        page,
+        totalPages: Math.ceil(totalCount / limit),
       },
     };
   }

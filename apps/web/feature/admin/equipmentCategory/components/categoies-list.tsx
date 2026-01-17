@@ -8,15 +8,12 @@ import Image from "next/image";
 import { getPublicUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  ChevronDown,
   ChevronsUpDown,
-  CircleCheck,
   EllipsisVertical,
   Eye,
   Pencil,
   Trash2,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Icon } from "@iconify/react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
@@ -53,7 +50,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
     title: "",
   });
 
-  const { mutate, isPending } = useUpdateStatus();
+  const { mutate } = useUpdateStatus();
 
   const sp = useSearchParams();
   const router = useRouter();

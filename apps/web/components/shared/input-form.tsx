@@ -13,7 +13,7 @@ interface InputFormProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   type?: string;
-  label: string;
+  label?: string;
   required?: boolean;
   placeholder?: string;
 }
@@ -33,12 +33,15 @@ const InputForm = <T extends FieldValues>({
         name={name}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>
-              {label} {required && <span className="text-destructive">*</span>}
-            </FormLabel>
+            {label && (
+              <FormLabel>
+                {label}
+                {required && <span className="text-destructive">*</span>}
+              </FormLabel>
+            )}
             <FormControl>
               <Input
-              className="placeholder:text-xs"
+                className="placeholder:text-xs"
                 placeholder={placeholder}
                 type={type}
                 {...field}

@@ -21,8 +21,42 @@ export class CategoryService {
     return cate;
   }
 
+  async upsertSubCate(
+    data: { title: string },
+    mainCateId: string,
+    id?: string,
+  ) {
+    const existingCate = await this.prisma.equipmentCategory.findUnique({
+      where: { id: mainCateId },
+    });
+
+    if (!existingCate) {
+      throw new NotFoundException('ไม่พบหมวดหมู่นี้');
+    }
+
+    const subCate = await this.prisma.equipmentSubCategory.upsert({
+      where: {
+        id: id || '',
+      },
+      update: {
+        title: data.title,
+      },
+      create: {
+        title: data.title,
+        mainCategory: {
+          connect: {
+            id: existingCate.id,
+          },
+        },
+        status: 'active',
+      },
+    });
+
+    return subCate;
+  }
+
   async updateMain(id: string, data: Prisma.EquipmentCategoryUpdateInput) {
-    const cate = await this.getCategory(id);
+    const cate = await this.getCategoryById(id);
 
     if (!cate) {
       throw new BadRequestException('Category not found');
@@ -32,14 +66,6 @@ export class CategoryService {
       where: { id: cate.id },
       data,
     });
-  }
-
-  async createSub(data: Prisma.EquipmentSubCategoryCreateInput) {
-    const cate = await this.prisma.equipmentSubCategory.create({
-      data,
-    });
-
-    return cate;
   }
 
   async getCategories(params: {
@@ -70,12 +96,50 @@ export class CategoryService {
     }
   }
 
-  async getCategory(id: string) {
+  async getSubCategories(
+    mainCategoryId: string,
+    params: {
+      skip?: number;
+      limit?: number;
+    },
+  ) {
+    const { skip = 0, limit = 1 } = params;
+    const existingCate = await this.getCategoryById(mainCategoryId);
+
+    if (!existingCate) {
+      throw new NotFoundException('ไม่พบหมวดหมู่นี้');
+    }
+
+    const subCate = await this.prisma.equipmentSubCategory.findMany({
+      where: {
+        mainCategoryId,
+      },
+      skip,
+      take: limit,
+    });
+
+    return subCate.map(({ id, title, updatedAt }) => ({
+      id,
+      title,
+      updatedAt: formatDateToDDMMYY(updatedAt),
+      equipmentCout: 1,
+    }));
+  }
+
+  async getCategoryById(id: string) {
     const cate = await this.prisma.equipmentCategory.findUnique({
       where: { id },
     });
 
+    if (!cate) {
+      throw new NotFoundException('Category not found');
+    }
+
     return cate;
+  }
+
+  async getSubCategoryById(id: string) {
+    return this.prisma.equipmentSubCategory.findUnique({ where: { id } });
   }
 
   async countCategories(params: {
@@ -85,8 +149,12 @@ export class CategoryService {
     return await this.prisma.equipmentCategory.count({ where });
   }
 
+  async countSubCategories(where: Prisma.EquipmentSubCategoryWhereInput) {
+    return await this.prisma.equipmentSubCategory.count({ where });
+  }
+
   async deleteCategory(id: string) {
-    const cate = await this.getCategory(id);
+    const cate = await this.getCategoryById(id);
 
     if (!cate) {
       throw new NotFoundException('Cateogory not found');
@@ -105,11 +173,23 @@ export class CategoryService {
     return { sucess: true };
   }
 
+  async deleteSubCategory(id: string) {
+    const existingSubCate = await this.getSubCategoryById(id);
+
+    if (!existingSubCate) {
+      throw new NotFoundException('ไม่พบหมวดหมู่นี้');
+    }
+
+    return await this.prisma.equipmentSubCategory.delete({
+      where: { id },
+    });
+  }
+
   async updateMainCateStatus(
     id: string,
     data: Prisma.EquipmentCategoryUpdateInput,
   ) {
-    const cate = await this.getCategory(id);
+    const cate = await this.getCategoryById(id);
 
     if (!cate) {
       throw new NotFoundException('Category not found');
