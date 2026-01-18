@@ -4,6 +4,7 @@ import InputForm from "@/components/shared/input-form";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -21,9 +22,10 @@ import SelectedInput from "@/components/shared/input-selected";
 import { useGetSubCategories } from "../../subCategory/hooks/useSubCate";
 import { useGetCategories } from "../../equipmentCategory/hooks/useCategory";
 import SubmitBtn from "@/components/shared/submit-btn";
-import { Trash2 } from "lucide-react";
+import { FlaskRound, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useEquipment } from "../hooks/useEquipment";
 
 interface UpsetEquipmentModalProps {
   open: boolean;
@@ -43,6 +45,8 @@ const UpsetEquipmentModal = ({
   const [isCategoryId, setIsCategoryId] = useState<string>(mainCateId || "");
   const [existingRemove, setExistingRemove] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [isActiveTab, setIsActiveTab] = useState("รายละเอียด");
+  const { mutate, isPending } = useEquipment();
 
   // fetching Data
   const { data: categoriesData } = useGetCategories(1, 99);
@@ -96,6 +100,21 @@ const UpsetEquipmentModal = ({
   // handle function
   const handleSubmit = (data: EquipmentFormValue) => {
     console.log(data);
+
+    mutate(data, {
+      onSuccess: () => {
+        handleRemoveImage();
+        form.reset({
+          title: "",
+          imageFile: undefined,
+          totalStock: 0,
+          status: "active",
+          subCategoryId: "",
+          mainCategoryId: "",
+        });
+        onOpenChange(false);
+      },
+    });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,8 +122,22 @@ const UpsetEquipmentModal = ({
 
     if (!file) return;
 
+    form.setValue("imageFile", file, { shouldDirty: true });
+
     const url = URL.createObjectURL(file);
     setPreview(url);
+  };
+
+  const handleNext = async () => {
+    const isFristPageValue = await form.trigger([
+      "title",
+      "subCategoryId",
+      "description",
+    ]);
+
+    if (isFristPageValue) {
+      setIsActiveTab("จำนวนอุปกรณ์");
+    }
   };
 
   const handleRemoveImage = () => {
@@ -135,7 +168,6 @@ const UpsetEquipmentModal = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>เพิ่มอุปกรณ์ใหม่</DialogTitle>
-          {/* <DialogDescription></DialogDescription> */}
         </DialogHeader>
         <div className="space-y-5">
           {imageSrc ? (
@@ -175,7 +207,11 @@ const UpsetEquipmentModal = ({
               </div>
             </div>
           )}
-          <Tabs className="w-full" defaultValue="รายละเอียด">
+          <Tabs
+            className="w-full"
+            value={isActiveTab}
+            onValueChange={setIsActiveTab}
+          >
             <TabsList className="text-muted-foreground mb-3 inline-flex h-8 w-full items-center justify-start rounded-none border-b bg-transparent p-0">
               {tabsList.map((t, i) => (
                 <TabsTrigger
@@ -190,7 +226,12 @@ const UpsetEquipmentModal = ({
               <div className="flex-1 border-b border-transparent"></div>
             </TabsList>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit((e) => handleSubmit(e))}>
+              <form
+                onSubmit={form.handleSubmit(handleSubmit, (e) =>
+                  console.log(e),
+                )}
+                onChange={() => form.clearErrors()}
+              >
                 <TabsContent value="รายละเอียด">
                   <input
                     hidden
@@ -212,23 +253,34 @@ const UpsetEquipmentModal = ({
                     />
 
                     {type === "equipmentPage" && (
-                      <div className="col-span-1">
-                        <SelectedInput
-                          data={categoriesData?.data}
-                          selected={categoriesData?.data.find(
-                            (c) => c.id === isCategoryId,
-                          )}
-                          placeholder="เลือกหมวดหมู่หลัก"
-                          renderLabel={(item) => item.title}
-                          onSelected={(item) => {
-                            setIsCategoryId(item.id);
-                            form.setValue("subCategoryId", "");
-                          }}
-                          getUniqueKey={(item) => item.id}
-                          label="หมวดหมู่หลัก"
-                          require
-                        />
-                      </div>
+                      <Controller
+                        name="mainCategoryId"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                          <div className="col-span-1">
+                            <SelectedInput
+                              data={categoriesData?.data}
+                              selected={categoriesData?.data.find(
+                                (c) => c.id === field.value,
+                              )}
+                              placeholder="เลือกหมวดหมู่หลัก"
+                              renderLabel={(item) => item.title}
+                              onSelected={(item) => {
+                                field.onChange(item.id);
+                                setIsCategoryId(item.id);
+                                form.setValue("subCategoryId", "");
+                              }}
+                              getUniqueKey={(item) => item.id}
+                              label="หมวดหมู่หลัก"
+                            />
+                            {fieldState.error && (
+                              <span className="ml-1 text-[11px] font-medium text-red-500">
+                                *{fieldState.error.message}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      />
                     )}
 
                     <div
@@ -240,21 +292,28 @@ const UpsetEquipmentModal = ({
                         name="subCategoryId"
                         control={form.control}
                         rules={{ required: "เลือก" }}
-                        render={({ field }) => {
+                        render={({ field, fieldState }) => {
                           const currentObject = subCategoryData?.data.find(
                             (item) => item.id === field.value,
                           );
                           return (
-                            <SelectedInput
-                              data={subCategoryData?.data}
-                              selected={currentObject}
-                              placeholder="เลือกหมวดหมู่ย่อย"
-                              renderLabel={(item) => item.title}
-                              onSelected={(item) => field.onChange(item.id)}
-                              getUniqueKey={(item) => item.id}
-                              label="หมวดหมู่ย่อย"
-                              require
-                            />
+                            <div>
+                              <SelectedInput
+                                data={subCategoryData?.data}
+                                selected={currentObject}
+                                placeholder="เลือกหมวดหมู่ย่อย"
+                                renderLabel={(item) => item.title}
+                                onSelected={(item) => field.onChange(item.id)}
+                                getUniqueKey={(item) => item.id}
+                                label="หมวดหมู่ย่อย"
+                                require
+                              />
+                              {fieldState.error && (
+                                <span className="ml-1 text-[11px] font-medium text-red-500">
+                                  *{fieldState.error.message}
+                                </span>
+                              )}
+                            </div>
                           );
                         }}
                       />
@@ -269,33 +328,55 @@ const UpsetEquipmentModal = ({
                       placeholder="ระบุรายละเอียดสเปค..."
                     />
                     <Separator className="col-span-2" />
-                    <Button className="col-span-2 w-full">ต่อไป</Button>
+                    <Button
+                      onClick={handleNext}
+                      type="button"
+                      className="col-span-2 w-full"
+                    >
+                      ต่อไป
+                    </Button>
                   </div>
                 </TabsContent>
                 <TabsContent
                   value="จำนวนอุปกรณ์"
                   className="flex w-full flex-col gap-5"
                 >
-                  <div className="grid grid-cols-2 gap-5">
-                    <input
-                      hidden
-                      accept="image/*"
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleImageChange}
-                    />
-                    <div className="border-border col-span-2 w-32 rounded-md border px-3 py-2 text-xs font-medium">
-                      <span>ข้อมูลจำนวนอุปกรณ์</span>
+                  <div className="flex flex-col justify-between">
+                    <div className="space-y-5">
+                      <input
+                        hidden
+                        accept="image/*"
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                      />
+                      <div className="border-border w-32 rounded-md border px-3 py-2 text-xs font-medium">
+                        <span>ข้อมูลจำนวนอุปกรณ์</span>
+                      </div>
+                      <InputForm
+                        label="สต๊อกทั้งหมด"
+                        control={form.control}
+                        name="totalStock"
+                        required
+                      />
+                      <Separator />
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-1/3"
+                          onClick={() => setIsActiveTab("รายละเอียด")}
+                        >
+                          ย้อนกลับ
+                        </Button>
+                        <SubmitBtn
+                          pending={isPending}
+                          title="บันทึก"
+                          className="flex-1"
+                        />
+                      </div>
                     </div>
-                    <InputForm
-                      label="สต๊อกทั้งหมด"
-                      control={form.control}
-                      name="totalStock"
-                      required
-                    />
                   </div>
-                  <Separator />
-                  <SubmitBtn title="บันทึก" className="w-full" />
                 </TabsContent>
               </form>
             </Form>

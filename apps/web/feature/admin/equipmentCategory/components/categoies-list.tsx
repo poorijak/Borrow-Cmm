@@ -122,7 +122,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
       size: 50,
       cell: ({ row }) => {
         return (
-          <div className="text-center">{row.getValue("equipmentCount")}</div>
+          <div className="text-center">{row.original.equipmentCount}</div>
         );
       },
     },

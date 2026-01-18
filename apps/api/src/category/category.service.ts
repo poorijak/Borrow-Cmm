@@ -79,16 +79,41 @@ export class CategoryService {
         skip,
         take: limit,
         where,
+        include: {
+          equipmentSubCategories: {
+            include: {
+              _count: {
+                select: { equipment: true },
+              },
+            },
+          },
+        },
       });
 
-      return cate.map(({ id, title, status, updatedAt, mainImage }) => ({
-        id,
-        title,
-        status,
-        updatedAt: formatDateToDDMMYY(updatedAt),
-        mainImage,
-        equipmentCount: 1,
-      }));
+      return cate.map(
+        ({
+          id,
+          title,
+          status,
+          updatedAt,
+          mainImage,
+          equipmentSubCategories,
+        }) => {
+          const totalEquipment = equipmentSubCategories.reduce(
+            (acc, sub) => acc + sub._count.equipment,
+            0,
+          );
+
+          return {
+            id,
+            title,
+            status,
+            updatedAt: formatDateToDDMMYY(updatedAt),
+            mainImage,
+            equipmentCount: totalEquipment,
+          };
+        },
+      );
     } catch (error) {
       console.error(error);
 
@@ -116,13 +141,20 @@ export class CategoryService {
       },
       skip,
       take: limit,
+      include: {
+        _count: {
+          select: {
+            equipment: true,
+          },
+        },
+      },
     });
 
-    return subCate.map(({ id, title, updatedAt }) => ({
+    return subCate.map(({ id, title, updatedAt, _count }) => ({
       id,
       title,
       updatedAt: formatDateToDDMMYY(updatedAt),
-      equipmentCout: 1,
+      equipmentCout: _count.equipment,
     }));
   }
 
