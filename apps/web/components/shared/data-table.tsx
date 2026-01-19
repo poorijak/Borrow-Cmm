@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  searchbar: boolean;
+  searchbar?: boolean;
   className?: string;
 }
 

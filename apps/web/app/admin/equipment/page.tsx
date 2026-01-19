@@ -1,10 +1,20 @@
 import EquipmentHeader from "@/feature/admin/equipment/components/equipement-header";
+import EquipmentList from "@/feature/admin/equipment/components/equipment-list";
+import { ActiveStatus } from "@repo/types";
 import React from "react";
 
-const page = () => {
+interface EquipmentPageProps {
+  searchParams: Promise<{ page?: string; status?: string }>;
+}
+
+const page = async ({ searchParams }: EquipmentPageProps) => {
+  const status = (await searchParams).status as ActiveStatus;
+  const page = parseInt((await searchParams).page || "1");
+
   return (
-    <div>
+    <div className="space-y-5">
       <EquipmentHeader type="equipmentPage" />
+      <EquipmentList status={status} page={page} />
     </div>
   );
 };

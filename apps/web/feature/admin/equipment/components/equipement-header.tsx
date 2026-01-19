@@ -14,7 +14,7 @@ const EquipmentHeader = ({ type, mainCateId }: EquipmentHeaderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex items-center justify-between">
       <header>
         <div className="text-2xl font-bold">
           {type === "equipmentPage" ? (

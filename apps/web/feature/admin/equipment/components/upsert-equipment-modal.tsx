@@ -22,7 +22,7 @@ import SelectedInput from "@/components/shared/input-selected";
 import { useGetSubCategories } from "../../subCategory/hooks/useSubCate";
 import { useGetCategories } from "../../equipmentCategory/hooks/useCategory";
 import SubmitBtn from "@/components/shared/submit-btn";
-import { FlaskRound, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useEquipment } from "../hooks/useEquipment";
@@ -83,8 +83,8 @@ const UpsetEquipmentModal = ({
           imageKey: equipment.mainImage,
           totalStock: equipment.totalStock,
           status: equipment.status,
-          subCategoryId: equipment.subCategoryId,
-          mainCategoryId: equipment.mainCateogoryId,
+          subCategoryId: equipment.subCategory.id,
+          mainCategoryId: equipment.mainCategory.id,
         }
       : {
           title: "",
@@ -301,11 +301,11 @@ const UpsetEquipmentModal = ({
                               <SelectedInput
                                 data={subCategoryData?.data}
                                 selected={currentObject}
-                                placeholder="เลือกหมวดหมู่ย่อย"
-                                renderLabel={(item) => item.title}
                                 onSelected={(item) => field.onChange(item.id)}
+                                renderLabel={(item) => item.title}
                                 getUniqueKey={(item) => item.id}
                                 label="หมวดหมู่ย่อย"
+                                placeholder="เลือกหมวดหมู่ย่อย"
                                 require
                               />
                               {fieldState.error && (
@@ -350,10 +350,8 @@ const UpsetEquipmentModal = ({
                         ref={fileInputRef}
                         onChange={handleImageChange}
                       />
-                      <div className="border-border w-32 rounded-md border px-3 py-2 text-xs font-medium">
-                        <span>ข้อมูลจำนวนอุปกรณ์</span>
-                      </div>
                       <InputForm
+                        inputTypeValue="number"
                         label="สต๊อกทั้งหมด"
                         control={form.control}
                         name="totalStock"

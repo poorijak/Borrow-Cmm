@@ -14,7 +14,7 @@ interface SelectedInputProps<T> {
   onSelected: (seleted: T) => void;
   placeholder?: string;
   renderLabel: (selected: T) => string;
-  getUniqueKey: (selted: T) => string;
+  getUniqueKey: (selected: T) => string;
   label?: string;
   require?: boolean;
 }
@@ -37,6 +37,8 @@ export default function SelectedInput<T>({
     }
   };
 
+  const currentValue = selected ? getUniqueKey(selected) : undefined;
+
   return (
     <div className="w-full">
       {label && (
@@ -45,12 +47,10 @@ export default function SelectedInput<T>({
           {require && <span className="text-destructive">*</span>}
         </Label>
       )}
-      <Select onValueChange={handleValueChange}>
+      <Select onValueChange={handleValueChange} value={currentValue}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder={placeholder}>
-            <span className="text-sm">
-              {selected ? renderLabel(selected) : placeholder}
-            </span>
+            <span className="text-sm">currentValue</span>
           </SelectValue>
         </SelectTrigger>
 

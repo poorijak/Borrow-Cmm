@@ -1,4 +1,4 @@
-import React from "react";
+import React, { HTMLInputTypeAttribute } from "react";
 import { Control, FieldValues, Path } from "react-hook-form";
 import {
   FormControl,
@@ -15,6 +15,7 @@ interface InputFormProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   type?: "input" | "textArea";
+  inputTypeValue?: HTMLInputTypeAttribute;
   label?: string;
   required?: boolean;
   placeholder?: string;
@@ -29,6 +30,7 @@ const InputForm = <T extends FieldValues>({
   required,
   placeholder,
   className,
+  inputTypeValue = "text",
 }: InputFormProps<T>) => {
   return (
     <div className={cn(className)}>
@@ -49,6 +51,8 @@ const InputForm = <T extends FieldValues>({
                   className="placeholder:text-xs"
                   placeholder={placeholder}
                   {...field}
+                  type={inputTypeValue}
+                  min={1}
                   required={required}
                 />
               ) : (

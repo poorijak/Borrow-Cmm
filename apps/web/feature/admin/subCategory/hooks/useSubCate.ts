@@ -62,7 +62,7 @@ export const useSubCategory = () => {
 export const useGetSubCategories = (
   mainCateId?: string,
   page?: number,
-  limit?: number
+  limit?: number,
 ) => {
   return useQuery({
     queryKey: ["sub-category", mainCateId, page],
@@ -71,7 +71,7 @@ export const useGetSubCategories = (
 
       const { data } = await api.get<SubCategoriesResponse>(
         `/categories/${mainCateId}/subCategories`,
-        { params: { page, limit } }
+        { params: { page, limit } },
       );
 
       return data;

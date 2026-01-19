@@ -3,13 +3,16 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
+  DefaultValuePipe,
+  ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { EquipmentService } from './equipment.service';
 import { ZodValidationPipe } from 'src/common/pipe/zod-validator';
 import { equipmentSchema, type EquipmentValue } from '@repo/schemas';
+import { EquipmentResponse, type ActiveStatus } from '@repo/types';
+import { Prisma } from '@prisma/client';
 
 @Controller('equipment')
 export class EquipmentController {
@@ -31,5 +34,37 @@ export class EquipmentController {
         },
       },
     });
+  }
+
+  @Get()
+  async findAll(
+    @Query('status') status: ActiveStatus,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('categoryId') categoryId: string,
+  ): Promise<EquipmentResponse> {
+    const where: Prisma.EquipmentWhereInput = {};
+
+    if (status) where.status = status;
+    if (categoryId)
+      where.category = {
+        mainCategoryId: categoryId,
+      };
+
+    const skip = (page - 1) * limit;
+
+    const [equipments, totalCount] = await Promise.all([
+      this.equipmentService.getEquipments({ skip, limit, where }),
+      this.equipmentService.equipmentCount(),
+    ]);
+
+    return {
+      data: equipments,
+      meta: {
+        totalCount,
+        page,
+        totalPage: Math.ceil(totalCount / limit),
+      },
+    };
   }
 }
