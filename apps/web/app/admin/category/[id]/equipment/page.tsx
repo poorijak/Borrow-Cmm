@@ -9,11 +9,12 @@ import React from "react";
 
 interface CategoryDetailPageProps {
   params: { id: string };
-  searchParams: Promise<{ page?: string; status?: string }>;
+  searchParams: Promise<{ subPage?: string; eqPage: string; status?: string }>;
 }
 const page = async ({ params, searchParams }: CategoryDetailPageProps) => {
   const { id } = await params;
-  const page = parseInt((await searchParams).page || "1");
+  const subPage = parseInt((await searchParams).subPage || "1");
+  const eqPage = parseInt((await searchParams).eqPage || "1");
   const status = (await (await searchParams).status) as ActiveStatus;
 
   return (
@@ -25,12 +26,12 @@ const page = async ({ params, searchParams }: CategoryDetailPageProps) => {
           <SubCategoryForm id={id} />
         </div>
         <div className="col-span-1 lg:col-span-5">
-          <SubCategoryList id={id} page={page} />
+          <SubCategoryList id={id} page={subPage} />
         </div>
       </div>
       <Separator />
       <EquipmentHeader type="equipmentWithCate" mainCateId={id} />
-      <EquipmentList page={page} status={status} categoryId={id} />
+      <EquipmentList type="equipmentWithCate" page={eqPage} status={status} categoryId={id} />
     </div>
   );
 };

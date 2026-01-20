@@ -51,7 +51,6 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
   });
 
   const { mutate } = useUpdateStatus();
-
   const sp = useSearchParams();
   const router = useRouter();
 

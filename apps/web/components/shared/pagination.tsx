@@ -22,9 +22,9 @@ const Pagination = ({
   onPageChange,
 }: PaginationProps) => {
   return (
-    <div className="w-full flex items-center justify-between px-0 md:px-5">
+    <div className="flex w-full items-center justify-between px-0 md:px-5">
       <div className="hidden md:flex">
-        <span className="text-muted-foreground  ">
+        <span className="text-muted-foreground">
           พบทั้งหมด <span className="text-primary">{total}</span> รายการ
         </span>
       </div>

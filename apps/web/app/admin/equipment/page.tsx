@@ -4,17 +4,17 @@ import { ActiveStatus } from "@repo/types";
 import React from "react";
 
 interface EquipmentPageProps {
-  searchParams: Promise<{ page?: string; status?: string }>;
+  searchParams: Promise<{ eqPage?: string; status?: string }>;
 }
 
 const page = async ({ searchParams }: EquipmentPageProps) => {
   const status = (await searchParams).status as ActiveStatus;
-  const page = parseInt((await searchParams).page || "1");
+  const page = parseInt((await searchParams).eqPage || "1");
 
   return (
     <div className="space-y-5">
       <EquipmentHeader type="equipmentPage" />
-      <EquipmentList status={status} page={page} />
+      <EquipmentList type="equipmentPage" status={status} page={page} />
     </div>
   );
 };

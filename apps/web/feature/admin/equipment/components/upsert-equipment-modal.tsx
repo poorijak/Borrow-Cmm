@@ -12,7 +12,7 @@ import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Icon } from "@iconify/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { equipmentFormSchema, EquipmentFormValue } from "@repo/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +26,7 @@ import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useEquipment } from "../hooks/useEquipment";
+import { Label } from "@/components/ui/label";
 
 interface UpsetEquipmentModalProps {
   open: boolean;
@@ -85,6 +86,7 @@ const UpsetEquipmentModal = ({
           status: equipment.status,
           subCategoryId: equipment.subCategory.id,
           mainCategoryId: equipment.mainCategory.id,
+          eqiupmentId: equipment.id,
         }
       : {
           title: "",
@@ -96,6 +98,45 @@ const UpsetEquipmentModal = ({
         },
     mode: "onSubmit",
   });
+
+  useEffect(() => {
+    if (!open) return;
+
+    if (equipment) {
+      form.reset({
+        title: equipment.title,
+        imageKey: equipment.mainImage,
+        imageFile: undefined,
+        totalStock: equipment.totalStock,
+        status: equipment.status,
+        subCategoryId: equipment.subCategory.id,
+        mainCategoryId: equipment.mainCategory.id,
+        description: equipment.description ?? "",
+        eqiupmentId: equipment.id,
+      });
+
+      setIsCategoryId(equipment.mainCategory.id);
+      setExistingRemove(false);
+      setPreview(null);
+      setIsActiveTab("รายละเอียด");
+    } else {
+      form.reset({
+        title: "",
+        imageKey: undefined,
+        imageFile: undefined,
+        totalStock: 0,
+        status: "active",
+        subCategoryId: "",
+        mainCategoryId: mainCateId ?? "",
+        description: "",
+      });
+
+      setIsCategoryId(mainCateId ?? "");
+      setExistingRemove(false);
+      setPreview(null);
+      setIsActiveTab("รายละเอียด");
+    }
+  }, [equipment, open, mainCateId, form]);
 
   // handle function
   const handleSubmit = (data: EquipmentFormValue) => {
@@ -168,6 +209,7 @@ const UpsetEquipmentModal = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>เพิ่มอุปกรณ์ใหม่</DialogTitle>
+          <DialogDescription> </DialogDescription>
         </DialogHeader>
         <div className="space-y-5">
           {imageSrc ? (
@@ -327,6 +369,41 @@ const UpsetEquipmentModal = ({
                       className="col-span-2"
                       placeholder="ระบุรายละเอียดสเปค..."
                     />
+
+                    {equipment && (
+                      <Controller
+                        name="status"
+                        control={form.control}
+                        rules={{ required: "เลือก" }}
+                        render={({ field, fieldState }) => {
+                          return (
+                            <div className="space-y-3">
+                              <Label>สถานะอุปกรณ์</Label>
+                              <Tabs
+                                value={field.value}
+                                onValueChange={(value) => field.onChange(value)}
+                                className="w-[400px]"
+                              >
+                                <TabsList>
+                                  <TabsTrigger value="active">
+                                    เปิดใช้งาน
+                                  </TabsTrigger>
+                                  <TabsTrigger value="inactive">
+                                    ปิดใช้งาน
+                                  </TabsTrigger>
+                                </TabsList>
+                              </Tabs>
+
+                              {fieldState.error && (
+                                <span className="ml-1 text-[11px] font-medium text-red-500">
+                                  *{fieldState.error.message}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        }}
+                      />
+                    )}
                     <Separator className="col-span-2" />
                     <Button
                       onClick={handleNext}

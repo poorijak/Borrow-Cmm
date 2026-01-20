@@ -50,7 +50,7 @@ export default function SelectedInput<T>({
       <Select onValueChange={handleValueChange} value={currentValue}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder={placeholder}>
-            <span className="text-sm">currentValue</span>
+            <span className="text-sm">{currentValue}</span>
           </SelectValue>
         </SelectTrigger>
 

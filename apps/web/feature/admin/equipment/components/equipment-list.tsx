@@ -1,8 +1,8 @@
 "use client";
 
 import TabsMenu from "@/components/shared/tabsMenu";
-import { usePathname } from "next/navigation";
-import React from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import React, { useState } from "react";
 import { useGetEquipments } from "../hooks/useEquipment";
 import { ActiveStatus, Equipment } from "@repo/types";
 import { ColumnDef } from "@tanstack/react-table";
@@ -26,23 +26,43 @@ import { getPublicUrl } from "@/lib/utils";
 import DataTable from "@/components/shared/data-table";
 import DropdownStatus from "@/components/shared/dropdown-status";
 import { Icon } from "@iconify/react";
+import Pagination from "@/components/shared/pagination";
+import { useUpdateStatus } from "../server/equipment";
+import UpsetEquipmentModal from "./upsert-equipment-modal";
 
 interface EquipmentListProps {
   categoryId?: string;
   status: ActiveStatus;
   page: number;
+  type: "equipmentWithCate" | "equipmentPage";
 }
 
-const EquipmentList = ({ categoryId, page, status }: EquipmentListProps) => {
+const EquipmentList = ({
+  categoryId,
+  page,
+  status,
+  type,
+}: EquipmentListProps) => {
+  // hooks
   const pathName = usePathname();
+  const sp = useSearchParams();
+  const router = useRouter();
 
-  console.log(pathName);
+  // state
+  const [isOpenUpsert, setIsOpenUpsert] = useState(false);
+  const [isSelected, setIsSelected] = useState<Equipment>();
 
   const { data } = useGetEquipments(undefined, page, categoryId, status);
+  const { mutate } = useUpdateStatus();
+
+  // handle funciton
+  const handlePageChange = (newPage: number) => {
+    const newParams = new URLSearchParams(sp);
+    newParams.set("eqPage", newPage.toString());
+    router.push(`?${newParams.toString()}`);
+  };
 
   const equipments = data?.data ?? [];
-
-  console.log(equipments);
 
   const tabs = [
     {
@@ -65,14 +85,12 @@ const EquipmentList = ({ categoryId, page, status }: EquipmentListProps) => {
       href: `${pathName}?status=inactive`,
     },
   ];
-
   const columns: ColumnDef<Equipment>[] = [
     {
       accessorKey: "title",
       header: () => <div className="text-center">อุปกรณ์</div>,
       size: 100,
       cell: ({ row }) => {
-        const id = row.original.id;
         const title = row.original.title;
         return (
           <div className="group relative ml-5 flex items-center gap-3">
@@ -85,12 +103,7 @@ const EquipmentList = ({ categoryId, page, status }: EquipmentListProps) => {
               />
             </div>
 
-            <Link
-              href={`category/${id}/equipment`}
-              className="font- hover:text-primary underline-offset-4 transition-colors duration-75 group-hover:underline after:absolute after:inset-0 after:z-0 hover:underline hover:underline-offset-4"
-            >
-              {title}
-            </Link>
+            <span>{title}</span>
           </div>
         );
       },
@@ -126,20 +139,21 @@ const EquipmentList = ({ categoryId, page, status }: EquipmentListProps) => {
         return <div className="text-center">{availableQty}</div>;
       },
     },
-    {
-      accessorKey: "totalStock",
-      header: () => <div className="text-center">สต๊อกทั้งหมด</div>,
-      size: 100,
-      cell: ({ row }) => {
-        return <div className="text-center">{row.original.totalStock}</div>;
-      },
-    },
+
     {
       accessorKey: "borrowedQty",
       header: () => <div className="text-center">จำนวนที่ถูกยืมทั้งหมด</div>,
       size: 100,
       cell: ({ row }) => {
         return <div className="text-center">{row.original.borrowedQty}</div>;
+      },
+    },
+    {
+      accessorKey: "totalStock",
+      header: () => <div className="text-center">สต๊อกทั้งหมด</div>,
+      size: 100,
+      cell: ({ row }) => {
+        return <div className="text-center">{row.original.totalStock}</div>;
       },
     },
     {
@@ -153,7 +167,7 @@ const EquipmentList = ({ categoryId, page, status }: EquipmentListProps) => {
           <DropdownStatus
             value={value}
             onStatusChange={(setNewStatus) => {
-              // mutate({ id: row.original.id, newStatus: setNewStatus });
+              mutate({ id: row.original.id, newStatus: setNewStatus });
             }}
             option={[
               {
@@ -214,20 +228,11 @@ const EquipmentList = ({ categoryId, page, status }: EquipmentListProps) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Link
-                  href={`category/${row.original.id}`}
-                  className="flex items-center gap-2"
-                >
-                  <Eye />
-                  ดูเพิ่มเติม
-                </Link>
-              </DropdownMenuItem>
               <DropdownMenuItem
-              // onClick={() => {
-              //   setIsModalUpsertOpen(true);
-              //   setIsSelected(row.original);
-              // }}
+                onClick={() => {
+                  setIsOpenUpsert(true);
+                  setIsSelected(row.original);
+                }}
               >
                 <Pencil />
                 แก้ไข
@@ -256,6 +261,18 @@ const EquipmentList = ({ categoryId, page, status }: EquipmentListProps) => {
     <div className="space-y-7">
       <TabsMenu tabItems={tabs} />
       <DataTable data={equipments} columns={columns} />
+      <Pagination
+        page={page}
+        totalPages={data?.meta.totalPage ?? 1}
+        total={data?.meta.totalCount}
+        onPageChange={handlePageChange}
+      />
+      <UpsetEquipmentModal
+        open={isOpenUpsert}
+        onOpenChange={setIsOpenUpsert}
+        type={type}
+        data={isSelected}
+      />
     </div>
   );
 };

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Equipment } from '@repo/types';
 import { PrismaService } from 'prisma/prisma.service';
@@ -21,12 +25,19 @@ export class EquipmentService {
     });
   }
 
+  async updateData(id: string, data: Prisma.EquipmentUpdateInput) {
+    return this.prisma.equipment.update({
+      where: { id },
+      data,
+    });
+  }
+
   async getEquipments(params: {
     skip?: number;
     limit?: number;
     where?: Prisma.EquipmentWhereInput;
   }): Promise<Equipment[]> {
-    const { skip = 1, limit = 10, where } = params;
+    const { skip, limit, where } = params;
 
     const equipments = await this.prisma.equipment.findMany({
       skip,
@@ -86,5 +97,18 @@ export class EquipmentService {
 
   async equipmentCount() {
     return await this.prisma.equipment.count();
+  }
+
+  async updateEquipmnetStatus(id: string, data: Prisma.EquipmentUpdateInput) {
+    const equipment = await this.prisma.equipment.findUnique({ where: { id } });
+
+    if (!equipment) {
+      throw new NotFoundException('ไม่พบหมวดหมู่นี้');
+    }
+
+    if (equipment.status === data.status) {
+      throw new BadRequestException('กรุณาเลือกหมวดหมู่อื่น');
+    }
+    return await this.prisma.equipment.update({ where: { id }, data });
   }
 }

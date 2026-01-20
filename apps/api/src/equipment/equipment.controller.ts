@@ -7,10 +7,16 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { EquipmentService } from './equipment.service';
 import { ZodValidationPipe } from 'src/common/pipe/zod-validator';
-import { equipmentSchema, type EquipmentValue } from '@repo/schemas';
+import {
+  equipmentSchema,
+  type UpdateStatusSchema,
+  updateStatusSchema,
+  type EquipmentValue,
+} from '@repo/schemas';
 import { EquipmentResponse, type ActiveStatus } from '@repo/types';
 import { Prisma } from '@prisma/client';
 
@@ -36,6 +42,24 @@ export class EquipmentController {
     });
   }
 
+  @Patch(':id')
+  udpateEquipment(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(equipmentSchema)) body: EquipmentValue,
+  ) {
+    return this.equipmentService.updateData(id, {
+      title: body.title,
+      description: body.description,
+      totalStock: body.totalStock,
+      mainImage: body.imageKey,
+      status: body.status,
+      category: {
+        connect: {
+          id: body.subCategoryId,
+        },
+      },
+    });
+  }
   @Get()
   async findAll(
     @Query('status') status: ActiveStatus,
@@ -46,6 +70,7 @@ export class EquipmentController {
     const where: Prisma.EquipmentWhereInput = {};
 
     if (status) where.status = status;
+
     if (categoryId)
       where.category = {
         mainCategoryId: categoryId,
@@ -66,5 +91,13 @@ export class EquipmentController {
         totalPage: Math.ceil(totalCount / limit),
       },
     };
+  }
+
+  @Patch(':id/status')
+  async updateStatus(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(updateStatusSchema)) data: UpdateStatusSchema,
+  ) {
+    return this.equipmentService.updateEquipmnetStatus(id, data);
   }
 }

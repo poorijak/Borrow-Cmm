@@ -18,7 +18,7 @@ import {
   type CategoryValue,
   subCategoryFormSchema,
   type subCategoryValue,
-  updateStatusCategorySchema,
+  updateStatusSchema,
   type UpdateStatusSchema,
 } from '@repo/schemas';
 import { ActiveStatus } from '@prisma/client';
@@ -132,7 +132,7 @@ export class CategoryController {
   @Patch(':id/status')
   updateStatus(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(updateStatusCategorySchema))
+    @Body(new ZodValidationPipe(updateStatusSchema))
     data: UpdateStatusSchema,
   ) {
     return this.categoryService.updateMainCateStatus(id, data);

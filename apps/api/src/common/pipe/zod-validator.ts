@@ -6,13 +6,18 @@ export class ZodValidationPipe<T> implements PipeTransform {
   constructor(private schema: ZodSchema<T>) {}
 
   transform(value: unknown): T {
+    if (!value) {
+      throw new BadRequestException('No data provider');
+    }
+
     const result = this.schema.safeParse(value);
 
     if (!result.success) {
-      const error = result.error.flatten().fieldErrors;
+      const fieldErrors = result.error.flatten().fieldErrors;
       throw new BadRequestException({
+        statusCode: 400,
         message: 'Validate failed',
-        error,
+        errors: fieldErrors,
       });
     }
     return result.data;

@@ -7,12 +7,14 @@ const baseSchema = z.object({
   title: z.string().min(MIN_TITLE_LENGTH, {
     message: `ชื่อต้องมีความยาวอย่างน้อย ${MIN_TITLE_LENGTH} อักษร`,
   }),
-  description: z.string({ message : "กรุณากรอกคำอธิบายเพิ่มเติมของอุปกรณ์"}).min(MIN_DESCRIPTION_LENGTH, {
-    message: `คำอธิบายต้องมีความยาวอย่างน้อย ${MIN_DESCRIPTION_LENGTH} อักษร`,
-  }),
+  description: z
+    .string({ message: "กรุณากรอกคำอธิบายเพิ่มเติมของอุปกรณ์" })
+    .min(MIN_DESCRIPTION_LENGTH, {
+      message: `คำอธิบายต้องมีความยาวอย่างน้อย ${MIN_DESCRIPTION_LENGTH} อักษร`,
+    }),
   subCategoryId: z.string().min(1, { message: "กรุณาเลือกหมวดหมู่ย่อย" }),
   totalStock: z.coerce
-    .number({ message : "สต๊อกทั้งหมดต้องเป็นตัวเลข"})
+    .number({ message: "สต๊อกทั้งหมดต้องเป็นตัวเลข" })
     .min(1, { message: "จำนวนสต๊อกต้องมีมากกว่า 1" }),
 });
 
@@ -20,10 +22,12 @@ export const equipmentSchema = baseSchema.extend({
   imageKey: z.string(),
   mainCategoryId: z.string().optional(),
   status: z.enum(["active", "inactive"]).optional(),
+  eqiupmentId: z.string().optional(),
 });
 
 export const equipmentFormSchema = baseSchema
   .extend({
+    eqiupmentId: z.string().optional(),
     imageFile: z.instanceof(File).optional(),
     imageKey: z.string().optional(),
     mainCategoryId: string().optional(),
