@@ -32,6 +32,7 @@ export const useGetEquipments = (
   subCategoryId?: string,
   status?: ActiveStatus,
   totalStock?: QuatitySortType,
+  search?: string,
 ) => {
   return useQuery({
     queryKey: [
@@ -41,17 +42,29 @@ export const useGetEquipments = (
       categoryId,
       subCategoryId,
       totalStock,
+      search,
     ],
     queryFn: async ({ queryKey }) => {
-      const [_, page, status, categoryId, subCategoryId] = queryKey as [
-        "equipment",
-        number,
-        ActiveStatus,
-        string,
-        string | undefined,
-      ];
+      const [_, page, status, categoryId, subCategoryId, totalStock] =
+        queryKey as [
+          "equipment",
+          number,
+          ActiveStatus,
+          string,
+          string | undefined,
+          QuatitySortType,
+          string,
+        ];
       const { data } = await api.get<EquipmentResponse>("/equipment", {
-        params: { status, page, limit, categoryId, subCategoryId, totalStock },
+        params: {
+          status,
+          page,
+          limit,
+          categoryId,
+          subCategoryId,
+          totalStock,
+          search,
+        },
       });
       return data;
     },

@@ -10,6 +10,7 @@ interface EquipmentPageProps {
     mainCategory?: string;
     subCategory?: string;
     totalStock?: string;
+    search?: string;
   }>;
 }
 
@@ -19,6 +20,7 @@ const page = async ({ searchParams }: EquipmentPageProps) => {
   const mainCate = await (await searchParams).mainCategory;
   const subCate = await (await searchParams).subCategory;
   const totalStock = (await (await searchParams).totalStock) as QuatitySortType;
+  const search = (await (await searchParams).search) || "";
 
   return (
     <div className="space-y-5">
@@ -30,6 +32,7 @@ const page = async ({ searchParams }: EquipmentPageProps) => {
         status={status}
         page={page}
         totalStock={totalStock}
+        search={search}
       />
     </div>
   );

@@ -34,10 +34,14 @@ export class GetEquipmentsQueryDto {
     }
     return Array.isArray(value) ? value : [value];
   })
-  @IsArray() 
+  @IsArray()
   categoryId?: string[];
 
   @IsOptional()
   @IsIn(['asc', 'desc'])
   totalStock?: QuatitySortType;
+
+  @IsOptional()
+  @IsString()
+  search?: string;
 }

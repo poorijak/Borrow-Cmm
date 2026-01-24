@@ -4,6 +4,7 @@ import { ReadonlyURLSearchParams } from "next/navigation";
 import { Icon } from "@iconify/react";
 import FilterInput from "./filter-input";
 import { Input } from "../ui/input";
+import DataTableSearch from "./data-table-search";
 
 interface filterConfigType<T> {
   key: string;
@@ -18,6 +19,7 @@ interface DataTableToolsBarProps<T> {
   sp: ReadonlyURLSearchParams;
   filterConfig: filterConfigType<T>[];
   handleClearAll: () => void;
+  searchbarPlacehodler?: string;
 }
 
 const DataTableToolsBar = <T extends string | number>({
@@ -25,6 +27,7 @@ const DataTableToolsBar = <T extends string | number>({
   sp,
   filterConfig,
   handleClearAll,
+  searchbarPlacehodler,
 }: DataTableToolsBarProps<T>) => {
   return (
     <div>
@@ -36,7 +39,7 @@ const DataTableToolsBar = <T extends string | number>({
             รีเซ็ตตัวกรอง
           </Button>
         </div>
-        <div className="flex justify-between gap-5 md:flex-row flex-col">
+        <div className="flex flex-col justify-between gap-5 md:flex-row">
           <div className="flex items-center gap-3 overflow-auto pb-5">
             {filterConfig
               .sort((a, b) => {
@@ -68,7 +71,7 @@ const DataTableToolsBar = <T extends string | number>({
               })}
           </div>
           <div>
-            <Input className="w-full md:w-72" />
+            <DataTableSearch placeholder={searchbarPlacehodler} />
           </div>
         </div>
       </div>

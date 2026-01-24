@@ -28,7 +28,6 @@ import Pagination from "@/components/shared/pagination";
 import { useUpdateStatus } from "../server/equipment";
 import UpsetEquipmentModal from "./upsert-equipment-modal";
 import DeleteEquipmentModal from "./delete-equipment-modal";
-import FilterInput from "@/components/shared/filter-input";
 import { useGetCategories } from "../../equipmentCategory/hooks/useCategory";
 import { useGetSubCategoryAll } from "../../subCategory/hooks/useSubCate";
 import DataTableContent, { DataTable } from "@/components/shared/data-table";
@@ -41,6 +40,7 @@ interface EquipmentListProps {
   page: number;
   type: "equipmentWithCate" | "equipmentPage";
   totalStock?: QuatitySortType;
+  search : string
 }
 
 interface CategoriesOptions {
@@ -55,6 +55,7 @@ const EquipmentList = ({
   subCategoryId,
   type,
   totalStock,
+  search
 }: EquipmentListProps) => {
   // hooks
   const pathName = usePathname();
@@ -74,6 +75,7 @@ const EquipmentList = ({
     subCategoryId,
     status,
     totalStock,
+    search
   );
   const { data: categories } = useGetCategories();
   const { data: subCategories } = useGetSubCategoryAll();
@@ -376,6 +378,7 @@ const EquipmentList = ({
           sp={sp}
           handelFillter={handelFillter}
           handleClearAll={handleClearAll}
+          searchbarPlacehodler="เช่น กล้อง sony R3"
         />
         <DataTableContent data={equipments} columns={columns} />
       </DataTable>

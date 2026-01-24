@@ -116,17 +116,23 @@ export class EquipmentService {
       page,
       limit = 10,
       totalStock = 'desc', // กำหนด Default ตรงนี้ได้เลย
+      search,
     } = query;
 
     console.log('main', categoryId);
 
     console.log('sub', subCategoryId);
 
+    console.log('search', search);
+
     const where: Prisma.EquipmentWhereInput = {};
     const orderBy: Prisma.EquipmentOrderByWithRelationInput = {};
 
     if (status) where.status = status;
 
+    if (search && search.length > 0) {
+      where.OR = [{ title: { contains: search, mode: 'insensitive' } }];
+    }
     if (categoryId && categoryId.length > 0) {
       where.category = {
         mainCategoryId: { in: categoryId },
