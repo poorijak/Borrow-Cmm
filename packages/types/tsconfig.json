@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+
+    "stripInternal": true,
+    "noEmit": false
+  },
+  "include": ["src"]
+}
