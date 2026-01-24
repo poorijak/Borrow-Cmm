@@ -1,4 +1,4 @@
-import InputForm from "@/components/shared/input-form";
+import InputForm from "@/components/shared/form-input";
 import Modal from "@/components/shared/modal";
 import { Form } from "@/components/ui/form";
 import { Save, Trash2 } from "lucide-react";
@@ -24,13 +24,10 @@ const UpsertCategory = ({
   onOpenChange,
   data: category,
 }: UpsertCategoryProsp) => {
-  console.log(category);
-
   const { mutate, isPending } = useMutationCategory();
 
   const [existingRemove, setExistingRemove] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
-
 
   const form = useForm<CategoryFormValue>({
     resolver: zodResolver(categoryFormSchema),

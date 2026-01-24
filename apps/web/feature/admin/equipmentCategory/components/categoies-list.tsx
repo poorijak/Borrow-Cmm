@@ -36,7 +36,7 @@ interface CategoriesListProps {
 }
 
 const CategoriesList = ({ status, page }: CategoriesListProps) => {
-  const { data } = useGetCategories(status, page);
+  const { data } = useGetCategories(page, undefined, status);
   const [isModalUpsertOpen, setIsModalUpsertOpen] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [isSelected, setIsSelected] = useState<Categories | undefined>(
@@ -51,7 +51,6 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
   });
 
   const { mutate } = useUpdateStatus();
-
   const sp = useSearchParams();
   const router = useRouter();
 
@@ -107,7 +106,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
             </div>
 
             <Link
-              href={`category/${id}`}
+              href={`category/${id}/equipment`}
               className="font- hover:underline hover:text-primary group-hover:underline underline-offset-4 after:absolute after:inset-0 after:z-0 transition-colors duration-75 hover:underline-offset-4"
             >
               {title}
@@ -122,7 +121,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
       size: 50,
       cell: ({ row }) => {
         return (
-          <div className="text-center">{row.getValue("equipmentCount")}</div>
+          <div className="text-center">{row.original.equipmentCount}</div>
         );
       },
     },
@@ -142,7 +141,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
             option={[
               {
                 value: "active",
-                lable: "เปิดใช้งาน",
+              label: "เปิดใช้งาน",
                 icon: (
                   <Icon
                     icon="icon-park-solid:check-one"
@@ -156,7 +155,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
               },
               {
                 value: "inactive",
-                lable: "ปิดใช้งาน",
+                label: "ปิดใช้งาน",
                 icon: (
                   <Icon
                     icon="icon-park-solid:close-one"

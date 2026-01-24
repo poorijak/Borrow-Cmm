@@ -40,7 +40,7 @@ export const categoryFormSchema = baseSchema
     }
   });
 
-export const updateStatusCategorySchema = z.object({
+export const updateStatusSchema = z.object({
   status: z.enum(["active", "inactive"]),
 });
 
@@ -48,7 +48,7 @@ export const updateStatusCategorySchema = z.object({
 export type CategoryFormValue = z.infer<typeof categoryFormSchema>;
 export type CategoryRequest = z.infer<typeof categorySchema>;
 export type CategoryValue = z.infer<typeof categorySchema>;
-export type UpdateStatusSchema = z.infer<typeof updateStatusCategorySchema>;
+export type UpdateStatusSchema = z.infer<typeof updateStatusSchema>;
 
 export const subCategoryFormSchema = baseSchema;
 

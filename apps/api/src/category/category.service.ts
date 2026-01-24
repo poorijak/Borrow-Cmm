@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { ActiveStatus } from '@repo/types';
 import { PrismaService } from 'prisma/prisma.service';
 import { R2Service } from 'src/cloudflare/r2.service';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
@@ -79,16 +80,41 @@ export class CategoryService {
         skip,
         take: limit,
         where,
+        include: {
+          equipmentSubCategories: {
+            include: {
+              _count: {
+                select: { equipment: true },
+              },
+            },
+          },
+        },
       });
 
-      return cate.map(({ id, title, status, updatedAt, mainImage }) => ({
-        id,
-        title,
-        status,
-        updatedAt: formatDateToDDMMYY(updatedAt),
-        mainImage,
-        equipmentCount: 1,
-      }));
+      return cate.map(
+        ({
+          id,
+          title,
+          status,
+          updatedAt,
+          mainImage,
+          equipmentSubCategories,
+        }) => {
+          const totalEquipment = equipmentSubCategories.reduce(
+            (acc, sub) => acc + sub._count.equipment,
+            0,
+          );
+
+          return {
+            id,
+            title,
+            status,
+            updatedAt: formatDateToDDMMYY(updatedAt),
+            mainImage,
+            equipmentCount: totalEquipment,
+          };
+        },
+      );
     } catch (error) {
       console.error(error);
 
@@ -116,14 +142,25 @@ export class CategoryService {
       },
       skip,
       take: limit,
+      include: {
+        _count: {
+          select: {
+            equipment: true,
+          },
+        },
+      },
     });
 
-    return subCate.map(({ id, title, updatedAt }) => ({
+    return subCate.map(({ id, title, updatedAt, _count }) => ({
       id,
       title,
       updatedAt: formatDateToDDMMYY(updatedAt),
-      equipmentCout: 1,
+      equipmentCout: _count.equipment,
     }));
+  }
+
+  async getSubCategoriesAll() {
+    return await this.prisma.equipmentSubCategory.findMany();
   }
 
   async getCategoryById(id: string) {
@@ -140,6 +177,49 @@ export class CategoryService {
 
   async getSubCategoryById(id: string) {
     return this.prisma.equipmentSubCategory.findUnique({ where: { id } });
+  }
+
+  async getPaginatedSubCategories(
+    mainCategoryId: string,
+    params: { page: number; limit: number },
+  ) {
+    const skip = (params.page - 1) * params.limit;
+
+    const [data, totalCount] = await Promise.all([
+      this.getSubCategories(mainCategoryId, { skip, limit: params.limit }),
+      this.countSubCategories({ mainCategoryId }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        totalCount,
+        page: params.page,
+        totalPages: Math.ceil(totalCount / params.limit),
+      },
+    };
+  }
+  async getPaginatedCategories(
+    status: ActiveStatus,
+    params: { page: number; limit: number },
+  ) {
+    const skip = (params.page - 1) * params.limit;
+
+    const where = status ? { status } : undefined;
+
+    const [data, total] = await Promise.all([
+      this.getCategories({ skip, limit: params.limit, where }),
+      this.countCategories({ where }),
+    ]);
+
+    return {
+      data: data,
+      meta: {
+        page: params.page,
+        total,
+        totalPages: Math.ceil(total / params.limit),
+      },
+    };
   }
 
   async countCategories(params: {

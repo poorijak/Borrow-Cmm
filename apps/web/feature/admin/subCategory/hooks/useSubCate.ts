@@ -3,6 +3,7 @@ import { subCategoryValue } from "@repo/schemas";
 import {
   Categories,
   CategoriesResponse,
+  SubCategories,
   SubCategoriesResponse,
 } from "@repo/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -59,7 +60,11 @@ export const useSubCategory = () => {
   });
 };
 
-export const useGetSubCategories = (mainCateId: string, page: number) => {
+export const useGetSubCategories = (
+  mainCateId?: string,
+  page?: number,
+  limit?: number,
+) => {
   return useQuery({
     queryKey: ["sub-category", mainCateId, page],
     queryFn: async ({ queryKey }) => {
@@ -67,11 +72,12 @@ export const useGetSubCategories = (mainCateId: string, page: number) => {
 
       const { data } = await api.get<SubCategoriesResponse>(
         `/categories/${mainCateId}/subCategories`,
-        { params: { page } }
+        { params: { page, limit } },
       );
 
       return data;
     },
+    enabled: !!mainCateId,
   });
 };
 
@@ -85,6 +91,18 @@ export const useDeleteSubCategory = () => {
     onSuccess: () => {
       toast.success("ลบหมวดหมู่ย่อยสำเร็จ");
       queryClient.invalidateQueries({ queryKey: ["sub-category"] });
+    },
+  });
+};
+
+export const useGetSubCategoryAll = () => {
+  return useQuery({
+    queryKey: ["sub-category"],
+    queryFn: async () => {
+      const { data } = await api.get<SubCategories[]>(
+        "/categories/subCategories",
+      );
+      return data;
     },
   });
 };

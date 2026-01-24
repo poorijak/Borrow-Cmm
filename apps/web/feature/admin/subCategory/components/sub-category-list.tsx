@@ -48,7 +48,7 @@ const SubCategoryList = ({ id, page }: SubCategoryListProps) => {
 
   const onPageChange = (newPage: number) => {
     const newParams = new URLSearchParams(sp);
-    newParams.set("page", newPage.toString());
+    newParams.set("subPage", newPage.toString());
     router.push(`?${newParams.toString()}`);
   };
 

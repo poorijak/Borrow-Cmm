@@ -1,6 +1,6 @@
 "use client";
 
-import InputForm from "@/components/shared/input-form";
+import InputForm from "@/components/shared/form-input";
 import SubmitBtn from "@/components/shared/submit-btn";
 import {
   Card,
