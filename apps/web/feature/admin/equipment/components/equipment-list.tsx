@@ -4,10 +4,9 @@ import TabsMenu from "@/components/shared/tabsMenu";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { useGetEquipments } from "../hooks/useEquipment";
-import { ActiveStatus, Equipment } from "@repo/types";
+import { ActiveStatus, Equipment, QuatitySortType } from "@repo/types";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
-import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,30 +17,44 @@ import { Button } from "@/components/ui/button";
 import {
   ChevronsUpDown,
   EllipsisVertical,
-  Eye,
+  FolderTree,
   Pencil,
   Trash2,
 } from "lucide-react";
 import { getPublicUrl } from "@/lib/utils";
-import DataTable from "@/components/shared/data-table";
 import DropdownStatus from "@/components/shared/dropdown-status";
 import { Icon } from "@iconify/react";
 import Pagination from "@/components/shared/pagination";
 import { useUpdateStatus } from "../server/equipment";
 import UpsetEquipmentModal from "./upsert-equipment-modal";
+import DeleteEquipmentModal from "./delete-equipment-modal";
+import FilterInput from "@/components/shared/filter-input";
+import { useGetCategories } from "../../equipmentCategory/hooks/useCategory";
+import { useGetSubCategoryAll } from "../../subCategory/hooks/useSubCate";
+import DataTableContent, { DataTable } from "@/components/shared/data-table";
+import DataTableToolsBar from "@/components/shared/data-table-toolsbar";
 
 interface EquipmentListProps {
   categoryId?: string;
   status: ActiveStatus;
+  subCategoryId?: string;
   page: number;
   type: "equipmentWithCate" | "equipmentPage";
+  totalStock?: QuatitySortType;
+}
+
+interface CategoriesOptions {
+  label: string;
+  value: string;
 }
 
 const EquipmentList = ({
   categoryId,
   page,
   status,
+  subCategoryId,
   type,
+  totalStock,
 }: EquipmentListProps) => {
   // hooks
   const pathName = usePathname();
@@ -50,9 +63,21 @@ const EquipmentList = ({
 
   // state
   const [isOpenUpsert, setIsOpenUpsert] = useState(false);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isSelected, setIsSelected] = useState<Equipment>();
 
-  const { data } = useGetEquipments(undefined, page, categoryId, status);
+  // hooks
+  const { data } = useGetEquipments(
+    undefined,
+    page,
+    categoryId,
+    subCategoryId,
+    status,
+    totalStock,
+  );
+  const { data: categories } = useGetCategories();
+  const { data: subCategories } = useGetSubCategoryAll();
+
   const { mutate } = useUpdateStatus();
 
   // handle funciton
@@ -62,7 +87,73 @@ const EquipmentList = ({
     router.push(`?${newParams.toString()}`);
   };
 
+  const handelCloseUpsert = (open: boolean) => {
+    setIsOpenUpsert(open);
+    if (!open) setIsSelected(undefined);
+  };
+  const handelCloseDelete = (open: boolean) => {
+    setIsOpenDelete(open);
+    if (!open) setIsSelected(undefined);
+  };
+
+  const categoryOptions: CategoriesOptions[] =
+    categories?.data.map((c) => ({
+      label: c.title,
+      value: c.id,
+    })) ?? [];
+
+  const subCategoryOptions: CategoriesOptions[] =
+    subCategories?.map((subCate) => ({
+      label: subCate.title,
+      value: subCate.id,
+    })) ?? [];
+
+  const handelFillter = (
+    key: string,
+    val: string,
+    isSingle: boolean = false,
+  ) => {
+    const params = new URLSearchParams(sp.toString());
+
+    if (isSingle) {
+      const currentValue = params.get(key);
+      if (currentValue === val) {
+        params.delete(key);
+      } else {
+        params.set(key, val);
+      }
+    } else {
+      const currentValues = params.get(key)?.split(",") || [];
+
+      let newValues;
+      if (currentValues.includes(val)) {
+        newValues = currentValues.filter((v) => v !== val);
+      } else {
+        newValues = [...currentValues, val];
+      }
+
+      if (newValues.length > 0) {
+        params.set(key, newValues.join(","));
+      } else {
+        params.delete(key);
+      }
+    }
+
+    params.set("eqPage", "1");
+    router.push(`${pathName}?${params.toString()}`, { scroll: false });
+  };
+
+  const handleClearAll = () => {
+    router.push(pathName, { scroll: false });
+  };
+
+  //var
   const equipments = data?.data ?? [];
+
+  const totalStockOptions: { label: string; value: QuatitySortType }[] = [
+    { label: "น้อยไปมาก", value: "asc" },
+    { label: "มากไปน้อย", value: "desc" },
+  ];
 
   const tabs = [
     {
@@ -172,7 +263,7 @@ const EquipmentList = ({
             option={[
               {
                 value: "active",
-                lable: "เปิดใช้งาน",
+                label: "เปิดใช้งาน",
                 icon: (
                   <Icon
                     icon="icon-park-solid:check-one"
@@ -186,7 +277,7 @@ const EquipmentList = ({
               },
               {
                 value: "inactive",
-                lable: "ปิดใช้งาน",
+                label: "ปิดใช้งาน",
                 icon: (
                   <Icon
                     icon="icon-park-solid:close-one"
@@ -239,13 +330,10 @@ const EquipmentList = ({
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
-                // onClick={() => {
-                //   setIsDeleteModal(true);
-                //   setIsDeleteSelected({
-                //     id: row.original.id,
-                //     title: row.original.title,
-                //   });
-                // }}
+                onClick={() => {
+                  setIsOpenDelete(true);
+                  setIsSelected(row.original);
+                }}
               >
                 <Trash2 className="text-destructive" />
                 ลบ
@@ -257,10 +345,40 @@ const EquipmentList = ({
     },
   ];
 
+  const filterConfig = [
+    {
+      key: "mainCategory",
+      title: "หมวดหมู่หลัก",
+      icon: <FolderTree />,
+      option: categoryOptions,
+    },
+    {
+      key: "subCategory",
+      title: "หมวดหมู่ย่อย",
+      icon: <FolderTree />,
+      option: subCategoryOptions,
+    },
+    {
+      key: "totalStock",
+      title: "สต๊อกทั้งหมด",
+      icon: <FolderTree />,
+      option: totalStockOptions,
+      type: "radio" as const,
+    },
+  ];
+
   return (
-    <div className="space-y-7">
+    <div className="space-y-5">
       <TabsMenu tabItems={tabs} />
-      <DataTable data={equipments} columns={columns} />
+      <DataTable>
+        <DataTableToolsBar
+          filterConfig={filterConfig}
+          sp={sp}
+          handelFillter={handelFillter}
+          handleClearAll={handleClearAll}
+        />
+        <DataTableContent data={equipments} columns={columns} />
+      </DataTable>
       <Pagination
         page={page}
         totalPages={data?.meta.totalPage ?? 1}
@@ -269,8 +387,13 @@ const EquipmentList = ({
       />
       <UpsetEquipmentModal
         open={isOpenUpsert}
-        onOpenChange={setIsOpenUpsert}
+        onOpenChange={handelCloseUpsert}
         type={type}
+        data={isSelected}
+      />
+      <DeleteEquipmentModal
+        open={isOpenDelete}
+        onOpenChange={handelCloseDelete}
         data={isSelected}
       />
     </div>

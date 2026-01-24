@@ -1,6 +1,6 @@
 "use client";
 
-import InputForm from "@/components/shared/input-form";
+import InputForm from "@/components/shared/form-input";
 import Modal from "@/components/shared/modal";
 import SubmitBtn from "@/components/shared/submit-btn";
 import { Form } from "@/components/ui/form";

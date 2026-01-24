@@ -3,6 +3,7 @@ import { subCategoryValue } from "@repo/schemas";
 import {
   Categories,
   CategoriesResponse,
+  SubCategories,
   SubCategoriesResponse,
 } from "@repo/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -90,6 +91,18 @@ export const useDeleteSubCategory = () => {
     onSuccess: () => {
       toast.success("ลบหมวดหมู่ย่อยสำเร็จ");
       queryClient.invalidateQueries({ queryKey: ["sub-category"] });
+    },
+  });
+};
+
+export const useGetSubCategoryAll = () => {
+  return useQuery({
+    queryKey: ["sub-category"],
+    queryFn: async () => {
+      const { data } = await api.get<SubCategories[]>(
+        "/categories/subCategories",
+      );
+      return data;
     },
   });
 };

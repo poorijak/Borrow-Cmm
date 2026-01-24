@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { ActiveStatus } from '@repo/types';
 import { PrismaService } from 'prisma/prisma.service';
 import { R2Service } from 'src/cloudflare/r2.service';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
@@ -158,6 +159,10 @@ export class CategoryService {
     }));
   }
 
+  async getSubCategoriesAll() {
+    return await this.prisma.equipmentSubCategory.findMany();
+  }
+
   async getCategoryById(id: string) {
     const cate = await this.prisma.equipmentCategory.findUnique({
       where: { id },
@@ -172,6 +177,49 @@ export class CategoryService {
 
   async getSubCategoryById(id: string) {
     return this.prisma.equipmentSubCategory.findUnique({ where: { id } });
+  }
+
+  async getPaginatedSubCategories(
+    mainCategoryId: string,
+    params: { page: number; limit: number },
+  ) {
+    const skip = (params.page - 1) * params.limit;
+
+    const [data, totalCount] = await Promise.all([
+      this.getSubCategories(mainCategoryId, { skip, limit: params.limit }),
+      this.countSubCategories({ mainCategoryId }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        totalCount,
+        page: params.page,
+        totalPages: Math.ceil(totalCount / params.limit),
+      },
+    };
+  }
+  async getPaginatedCategories(
+    status: ActiveStatus,
+    params: { page: number; limit: number },
+  ) {
+    const skip = (params.page - 1) * params.limit;
+
+    const where = status ? { status } : undefined;
+
+    const [data, total] = await Promise.all([
+      this.getCategories({ skip, limit: params.limit, where }),
+      this.countCategories({ where }),
+    ]);
+
+    return {
+      data: data,
+      meta: {
+        page: params.page,
+        total,
+        totalPages: Math.ceil(total / params.limit),
+      },
+    };
   }
 
   async countCategories(params: {

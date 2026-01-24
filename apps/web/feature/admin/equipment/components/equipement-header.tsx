@@ -16,7 +16,7 @@ const EquipmentHeader = ({ type, mainCateId }: EquipmentHeaderProps) => {
   return (
     <div className="flex items-center justify-between">
       <header>
-        <div className="text-2xl font-bold">
+        <div className="text-3xl font-bold">
           {type === "equipmentPage" ? (
             <h2>อุปกรณ์</h2>
           ) : (

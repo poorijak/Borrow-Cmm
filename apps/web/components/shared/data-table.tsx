@@ -27,18 +27,29 @@ import { Columns2 } from "lucide-react";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
 
+export const DataTable = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return <div className={cn("flex flex-col gap-4", className)}>{children}</div>;
+};
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchbar?: boolean;
+  configBtn?: boolean;
   className?: string;
 }
 
-export default function DataTable<TData, TValue>({
+export default function DataTableContent<TData, TValue>({
   columns,
   data,
-  searchbar = false,
   className,
+  configBtn = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -56,41 +67,37 @@ export default function DataTable<TData, TValue>({
     },
   });
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col">
       <div className="flex justify-start md:justify-between">
-        <div className={cn(!searchbar && "hidden")}>
-          <Input />
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <Columns2 className="text-muted-foreground" />
-              ปรับแต่ง
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div
-        className={cn(
-          "rounded-lg border min-h-[480px] max-h-[550px] overflow-hidden",
-          className
+        {configBtn && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Columns2 className="text-muted-foreground" />
+                ปรับแต่ง
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
-      >
+      </div>
+      <div className={cn("overflow-hidden rounded-lg border", className)}>
         <Table>
           <TableHeader className="bg-muted sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -106,7 +113,7 @@ export default function DataTable<TData, TValue>({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -122,7 +129,7 @@ export default function DataTable<TData, TValue>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

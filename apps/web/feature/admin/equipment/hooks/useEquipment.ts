@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { upsertEquipment } from "../server/equipment";
 import { toast } from "sonner";
-import { ActiveStatus, EquipmentResponse } from "@repo/types";
+import { ActiveStatus, EquipmentResponse, QuatitySortType } from "@repo/types";
 import api from "@/lib/axios";
 
 export const useEquipment = () => {
@@ -29,21 +29,49 @@ export const useGetEquipments = (
   limit?: number,
   page?: number,
   categoryId?: string,
+  subCategoryId?: string,
   status?: ActiveStatus,
+  totalStock?: QuatitySortType,
 ) => {
   return useQuery({
-    queryKey: ["equipment", page, status, categoryId],
+    queryKey: [
+      "equipment",
+      page,
+      status,
+      categoryId,
+      subCategoryId,
+      totalStock,
+    ],
     queryFn: async ({ queryKey }) => {
-      const [_, page, status, categoryId] = queryKey as [
+      const [_, page, status, categoryId, subCategoryId] = queryKey as [
         "equipment",
         number,
         ActiveStatus,
         string,
+        string | undefined,
       ];
       const { data } = await api.get<EquipmentResponse>("/equipment", {
-        params: { status, page, limit, categoryId },
+        params: { status, page, limit, categoryId, subCategoryId, totalStock },
       });
       return data;
+    },
+  });
+};
+
+export const useDeleteEquipment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string | undefined) => {
+      const equipment = await api.delete(`/equipment/${id}`);
+      return equipment;
+    },
+    onSuccess: () => {
+      toast.success("ลบอุปกรณ์สำเสร็จ");
+      queryClient.invalidateQueries({ queryKey: ["equipment"] });
+    },
+    onError: (err) => {
+      toast.error(err.message || "เกิดข้อผิดพลาด");
     },
   });
 };

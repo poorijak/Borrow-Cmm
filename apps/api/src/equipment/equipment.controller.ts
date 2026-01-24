@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Query,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { EquipmentService } from './equipment.service';
 import { ZodValidationPipe } from 'src/common/pipe/zod-validator';
@@ -17,8 +18,12 @@ import {
   updateStatusSchema,
   type EquipmentValue,
 } from '@repo/schemas';
-import { EquipmentResponse, type ActiveStatus } from '@repo/types';
-import { Prisma } from '@prisma/client';
+import {
+  EquipmentResponse,
+  type QuatitySortType,
+  type ActiveStatus,
+} from '@repo/types';
+import { GetEquipmentsQueryDto } from './dto/EquipmentDto';
 
 @Controller('equipment')
 export class EquipmentController {
@@ -62,35 +67,9 @@ export class EquipmentController {
   }
   @Get()
   async findAll(
-    @Query('status') status: ActiveStatus,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('categoryId') categoryId: string,
+    @Query() query: GetEquipmentsQueryDto,
   ): Promise<EquipmentResponse> {
-    const where: Prisma.EquipmentWhereInput = {};
-
-    if (status) where.status = status;
-
-    if (categoryId)
-      where.category = {
-        mainCategoryId: categoryId,
-      };
-
-    const skip = (page - 1) * limit;
-
-    const [equipments, totalCount] = await Promise.all([
-      this.equipmentService.getEquipments({ skip, limit, where }),
-      this.equipmentService.equipmentCount(),
-    ]);
-
-    return {
-      data: equipments,
-      meta: {
-        totalCount,
-        page,
-        totalPage: Math.ceil(totalCount / limit),
-      },
-    };
+    return this.equipmentService.getPaginatedEquipment(query);
   }
 
   @Patch(':id/status')
@@ -99,5 +78,10 @@ export class EquipmentController {
     @Body(new ZodValidationPipe(updateStatusSchema)) data: UpdateStatusSchema,
   ) {
     return this.equipmentService.updateEquipmnetStatus(id, data);
+  }
+
+  @Delete(':id')
+  async deleteEquipment(@Param('id') id: string) {
+    return this.equipmentService.deleteEquipment(id);
   }
 }

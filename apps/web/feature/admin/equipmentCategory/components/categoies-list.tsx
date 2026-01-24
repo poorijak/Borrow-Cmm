@@ -141,7 +141,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
             option={[
               {
                 value: "active",
-                lable: "เปิดใช้งาน",
+              label: "เปิดใช้งาน",
                 icon: (
                   <Icon
                     icon="icon-park-solid:check-one"
@@ -155,7 +155,7 @@ const CategoriesList = ({ status, page }: CategoriesListProps) => {
               },
               {
                 value: "inactive",
-                lable: "ปิดใช้งาน",
+                label: "ปิดใช้งาน",
                 icon: (
                   <Icon
                     icon="icon-park-solid:close-one"

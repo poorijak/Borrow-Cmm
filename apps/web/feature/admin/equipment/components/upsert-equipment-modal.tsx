@@ -1,6 +1,6 @@
 "use client";
 
-import InputForm from "@/components/shared/input-form";
+import InputForm from "@/components/shared/form-input";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import { equipmentFormSchema, EquipmentFormValue } from "@repo/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Equipment } from "@repo/types";
 import { cn, getPublicUrl } from "@/lib/utils";
-import SelectedInput from "@/components/shared/input-selected";
+import SelectedInput from "@/components/shared/selected-input";
 import { useGetSubCategories } from "../../subCategory/hooks/useSubCate";
 import { useGetCategories } from "../../equipmentCategory/hooks/useCategory";
 import SubmitBtn from "@/components/shared/submit-btn";

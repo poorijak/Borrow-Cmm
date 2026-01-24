@@ -16,7 +16,7 @@ type styleButtonType = {
 
 type Option<T extends string> = {
   value: T;
-  lable: string;
+  label: string;
   icon?: React.ReactNode;
   style?: styleButtonType;
   clasName?: string;
@@ -42,13 +42,13 @@ export default function DropdownStatus<T extends string>({
           <Badge
             style={{ backgroundColor: currentStatus?.style?.bgColor }}
             className={cn(
-              "py-1 md:py-1.5 hover:cursor-pointer rounded-md",
-              currentStatus?.clasName
+              "rounded-md py-1 hover:cursor-pointer md:py-1.5",
+              currentStatus?.clasName,
             )}
           >
             {currentStatus?.icon}
             <span style={{ color: currentStatus?.style?.textColor }}>
-              {currentStatus?.lable}
+              {currentStatus?.label}
             </span>
             <ChevronDown style={{ color: currentStatus?.style?.textColor }} />
           </Badge>
@@ -62,7 +62,7 @@ export default function DropdownStatus<T extends string>({
               disabled={currentStatus?.value === opt.value}
             >
               {opt.icon}
-              <span>{opt.lable}</span>
+              <span>{opt.label}</span>
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
