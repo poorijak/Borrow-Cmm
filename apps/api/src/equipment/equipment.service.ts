@@ -45,7 +45,6 @@ export class EquipmentService {
   }): Promise<Equipment[]> {
     const { skip, limit, where, orderBy } = params;
 
-    console.log(skip);
 
     const equipments = await this.prisma.equipment.findMany({
       skip,
@@ -119,11 +118,6 @@ export class EquipmentService {
       search,
     } = query;
 
-    console.log('main', categoryId);
-
-    console.log('sub', subCategoryId);
-
-    console.log('search', search);
 
     const where: Prisma.EquipmentWhereInput = {};
     const orderBy: Prisma.EquipmentOrderByWithRelationInput = {};

@@ -59,9 +59,7 @@ const SubCategoryForm = ({ id }: SubCategoryFormProps) => {
         <CardContent>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(handleSubmit, (err) => {
-                console.log(err);
-              })}
+              onSubmit={form.handleSubmit(handleSubmit)}
               className="space-y-5"
             >
               <InputForm

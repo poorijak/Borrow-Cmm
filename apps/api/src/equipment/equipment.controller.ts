@@ -63,8 +63,6 @@ export class EquipmentController {
   async findAll(
     @Query() query: GetEquipmentsQueryDto,
   ): Promise<EquipmentResponse> {
-    console.log(query);
-
     return this.equipmentService.getPaginatedEquipment(query);
   }
 

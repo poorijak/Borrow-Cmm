@@ -15,7 +15,6 @@ const MainLayout = async ({ children }: MainLayoutProps) => {
 
   if (!user) redirect("/auth/signin");
   
-  console.log(user.profileImage);
 
   return (
     <SidebarProvider>

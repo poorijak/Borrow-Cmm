@@ -140,7 +140,6 @@ const UpsetEquipmentModal = ({
 
   // handle function
   const handleSubmit = (data: EquipmentFormValue) => {
-    console.log(data);
 
     mutate(data, {
       onSuccess: () => {
@@ -269,9 +268,7 @@ const UpsetEquipmentModal = ({
             </TabsList>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(handleSubmit, (e) =>
-                  console.log(e),
-                )}
+                onSubmit={form.handleSubmit(handleSubmit)}
                 onChange={() => form.clearErrors()}
               >
                 <TabsContent value="รายละเอียด">
