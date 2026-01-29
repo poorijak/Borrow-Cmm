@@ -66,6 +66,13 @@ export class EquipmentController {
     return this.equipmentService.getPaginatedEquipment(query);
   }
 
+  @Get(':categoryId')
+  async findByCategoryId(@Param('categoryId') id: string) {
+    return this.equipmentService.getEquipmentByCategoryId({
+      id,
+    });
+  }
+
   @Patch(':id/status')
   async updateStatus(
     @Param('id') id: string,

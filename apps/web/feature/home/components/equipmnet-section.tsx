@@ -1,3 +1,4 @@
+import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -5,7 +6,9 @@ import React from "react";
 const EquipmentSection = () => {
   return (
     <div className="space-y-4 p-4">
-      <h1 className="text-2xl font-bold">บริการสำหรับนักศึกษา</h1>
+      <div className="flex justify-between">
+        <h1 className="w-60 text-2xl font-bold">บริการสำหรับนักศึกษา</h1>
+      </div>
       <div className="flex flex-col gap-4 md:flex-row">
         <div className="group relative aspect-square h-48 w-full cursor-pointer overflow-hidden rounded-lg border md:w-[450px]">
           <Link href="/equipment" className="">
@@ -28,10 +31,10 @@ const EquipmentSection = () => {
             <div className="absolute inset-0 z-10 bg-black/20 group-hover:bg-black/40" />
 
             <h2 className="absolute bottom-2 left-5 z-20 text-lg font-bold text-white">
-              ยืมอุปกรณ์
+              จองห้องปฏิบัติการ
             </h2>
           </Link>
-        </div>{" "}
+        </div>
       </div>
     </div>
   );

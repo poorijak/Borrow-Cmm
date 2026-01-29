@@ -1,11 +1,14 @@
-import React from 'react'
+import EquipmentWrapper from "@/feature/equipment/components/equipment-wrapper";
+import React from "react";
 
-const page = () => {
-  return (
-    <div>
-      Pgae
-    </div>
-  )
+interface equipmentPageProps {
+  params: { id: string };
 }
 
-export default page
+const page = async ({ params }: equipmentPageProps) => {
+  const { id } = await params;
+
+  return <EquipmentWrapper id={id} />;
+};
+
+export default page;

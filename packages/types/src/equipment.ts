@@ -1,14 +1,6 @@
 import { ActiveStatus } from "./status";
 
-export type Equipment = {
-  id: string;
-  mainImage: string;
-  title: string;
-  description: string | null;
-  totalStock: number;
-  borrowedQty: number;
-  reservedQty: number;
-  status: ActiveStatus;
+export interface Equipment extends EquipmentItem {
   updatedAt: string;
   subCategory: {
     id: string;
@@ -18,7 +10,7 @@ export type Equipment = {
     id: string;
     title: string;
   };
-};
+}
 
 export interface EquipmentResponse {
   data: Equipment[];
@@ -29,3 +21,14 @@ export interface EquipmentResponse {
   };
 }
 
+export type EquipmentItem = {
+  id: string;
+  title: string;
+  mainImage: string;
+  description: string | null;
+  totalStock: number;
+  borrowedQty: number;
+  reservedQty: number;
+  status: ActiveStatus;
+  subCategoryId?: string;
+};

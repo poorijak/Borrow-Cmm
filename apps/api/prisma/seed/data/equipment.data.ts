@@ -20,6 +20,33 @@ export const equipments = [
     subCategoryCode: 'CAM-MIR',
   },
   {
+    title: 'CANON EOS R7',
+    mainImage: 'CMM_image/Camera/Eos_r6.webp',
+    description:
+      'กล้อง Mirrorless Full-frame สาย Hybrid ความละเอียด 20MP โดดเด่นด้านการถ่ายในที่แสงน้อยและระบบกันสั่นในตัวเครื่อง (IBIS) ที่ทรงพลัง',
+    status: ActiveStatus.active,
+    totalStock: 10,
+    subCategoryCode: 'CAM-MIR',
+  },
+  {
+    title: 'CANON EOS R8',
+    mainImage: 'CMM_image/Camera/Eos_r6.webp',
+    description:
+      'กล้อง Mirrorless Full-frame สาย Hybrid ความละเอียด 20MP โดดเด่นด้านการถ่ายในที่แสงน้อยและระบบกันสั่นในตัวเครื่อง (IBIS) ที่ทรงพลัง',
+    status: ActiveStatus.active,
+    totalStock: 10,
+    subCategoryCode: 'CAM-MIR',
+  },
+  {
+    title: 'CANON EOS R9',
+    mainImage: 'CMM_image/Camera/Eos_r6.webp',
+    description:
+      'กล้อง Mirrorless Full-frame สาย Hybrid ความละเอียด 20MP โดดเด่นด้านการถ่ายในที่แสงน้อยและระบบกันสั่นในตัวเครื่อง (IBIS) ที่ทรงพลัง',
+    status: ActiveStatus.active,
+    totalStock: 10,
+    subCategoryCode: 'CAM-MIR',
+  },
+  {
     title: 'CANON EOS 6D',
     mainImage: 'CMM_image/Camera/Eos_6d.webp',
     description:

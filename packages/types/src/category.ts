@@ -1,3 +1,4 @@
+import { EquipmentItem } from "./equipment";
 import { ActiveStatus } from "./status";
 
 export type CreateCategoryFormInput = {
@@ -38,4 +39,20 @@ export interface SubCategoriesResponse {
     totalCount: number;
     totalPages: number;
   };
+}
+
+export type SubCategoryWithEquipment = {
+  id: string;
+  title: string;
+  status: ActiveStatus;
+  equipments: EquipmentItem[];
+};
+
+export interface CategoryDetailResponse {
+  category: {
+    id: string;
+    title: string;
+    mainImage: string | null;
+    subCategory: SubCategoryWithEquipment[];
+  } | null;
 }

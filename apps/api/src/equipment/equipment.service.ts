@@ -45,7 +45,6 @@ export class EquipmentService {
   }): Promise<Equipment[]> {
     const { skip, limit, where, orderBy } = params;
 
-
     const equipments = await this.prisma.equipment.findMany({
       skip,
       take: limit,
@@ -107,6 +106,51 @@ export class EquipmentService {
     return await this.prisma.equipment.findUnique({ where: { id } });
   }
 
+  async getEquipmentByCategoryId(
+    where: Prisma.EquipmentCategoryWhereUniqueInput,
+  ) {
+    const data = await this.prisma.equipmentCategory.findUnique({
+      where,
+      select: {
+        id: true,
+        title: true,
+        mainImage: true,
+        equipmentSubCategories: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            equipment: {
+              select: {
+                id: true,
+                title: true,
+                mainImage: true,
+                description: true,
+                totalStock: true,
+                borrowedQty: true,
+                reservedQty: true,
+                status: true,
+                subCategoryId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!data) return { category: null };
+
+    return {
+      category: {
+        ...data,
+        subCategory: data.equipmentSubCategories.map((s) => ({
+          ...s,
+          equipments: s.equipment,
+        })),
+      },
+    };
+  }
+
   async getPaginatedEquipment(query: GetEquipmentsQueryDto) {
     const {
       status,
@@ -117,7 +161,6 @@ export class EquipmentService {
       totalStock = 'desc', // กำหนด Default ตรงนี้ได้เลย
       search,
     } = query;
-
 
     const where: Prisma.EquipmentWhereInput = {};
     const orderBy: Prisma.EquipmentOrderByWithRelationInput = {};
