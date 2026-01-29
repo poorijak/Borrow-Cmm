@@ -31,6 +31,8 @@ export class CategoryService {
       where: { id: mainCateId },
     });
 
+    const code = this.generateCategoryCode();
+
     if (!existingCate) {
       throw new NotFoundException('ไม่พบหมวดหมู่นี้');
     }
@@ -44,6 +46,7 @@ export class CategoryService {
       },
       create: {
         title: data.title,
+        code,
         mainCategory: {
           connect: {
             id: existingCate.id,
@@ -282,5 +285,9 @@ export class CategoryService {
       where: { id },
       data,
     });
+  }
+
+  generateCategoryCode() {
+    return 'CUSTOM_' + Date.now().toString(36).toUpperCase();
   }
 }

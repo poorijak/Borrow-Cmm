@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Body,
-  BadRequestException,
   Get,
   Query,
   DefaultValuePipe,
@@ -31,8 +30,11 @@ export class CategoryController {
   @Post()
   @UsePipes(new ZodValidationPipe(categorySchema))
   create(@Body(new ZodValidationPipe(categorySchema)) data: CategoryValue) {
+    const code = this.categoryService.generateCategoryCode();
+
     return this.categoryService.createMain({
       title: data.title,
+      code,
       mainImage: data.imageKey,
       status: 'active',
     });

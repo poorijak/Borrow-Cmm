@@ -40,7 +40,7 @@ interface EquipmentListProps {
   page: number;
   type: "equipmentWithCate" | "equipmentPage";
   totalStock?: QuatitySortType;
-  search : string
+  search?: string;
 }
 
 interface CategoriesOptions {
@@ -55,7 +55,7 @@ const EquipmentList = ({
   subCategoryId,
   type,
   totalStock,
-  search
+  search,
 }: EquipmentListProps) => {
   // hooks
   const pathName = usePathname();
@@ -75,7 +75,7 @@ const EquipmentList = ({
     subCategoryId,
     status,
     totalStock,
-    search
+    search,
   );
   const { data: categories } = useGetCategories();
   const { data: subCategories } = useGetSubCategoryAll();

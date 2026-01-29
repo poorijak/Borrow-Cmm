@@ -4,8 +4,6 @@ import {
   Post,
   Body,
   Param,
-  DefaultValuePipe,
-  ParseIntPipe,
   Query,
   Patch,
   Delete,
@@ -18,11 +16,7 @@ import {
   updateStatusSchema,
   type EquipmentValue,
 } from '@repo/schemas';
-import {
-  EquipmentResponse,
-  type QuatitySortType,
-  type ActiveStatus,
-} from '@repo/types';
+import { EquipmentResponse } from '@repo/types';
 import { GetEquipmentsQueryDto } from './dto/EquipmentDto';
 
 @Controller('equipment')
@@ -69,9 +63,14 @@ export class EquipmentController {
   async findAll(
     @Query() query: GetEquipmentsQueryDto,
   ): Promise<EquipmentResponse> {
-    console.log(query);
-
     return this.equipmentService.getPaginatedEquipment(query);
+  }
+
+  @Get(':categoryId')
+  async findByCategoryId(@Param('categoryId') id: string) {
+    return this.equipmentService.getEquipmentByCategoryId({
+      id,
+    });
   }
 
   @Patch(':id/status')

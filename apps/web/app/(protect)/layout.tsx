@@ -6,15 +6,14 @@ import { User } from "@repo/types";
 import { redirect } from "next/navigation";
 import React from "react";
 
-interface MainLayoutProps {
+interface ProtectLayoutProps {
   children: React.ReactNode;
 }
 
-const MainLayout = async ({ children }: MainLayoutProps) => {
+const ProtectLayout = async ({ children }: ProtectLayoutProps) => {
   const user: User = await getUser();
 
   if (!user) redirect("/auth/signin");
-  
 
   return (
     <SidebarProvider>
@@ -29,4 +28,4 @@ const MainLayout = async ({ children }: MainLayoutProps) => {
   );
 };
 
-export default MainLayout;
+export default ProtectLayout;

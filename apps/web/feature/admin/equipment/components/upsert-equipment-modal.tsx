@@ -140,8 +140,6 @@ const UpsetEquipmentModal = ({
 
   // handle function
   const handleSubmit = (data: EquipmentFormValue) => {
-    console.log(data);
-
     mutate(data, {
       onSuccess: () => {
         handleRemoveImage();
@@ -269,9 +267,7 @@ const UpsetEquipmentModal = ({
             </TabsList>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(handleSubmit, (e) =>
-                  console.log(e),
-                )}
+                onSubmit={form.handleSubmit(handleSubmit)}
                 onChange={() => form.clearErrors()}
               >
                 <TabsContent value="รายละเอียด">
@@ -312,7 +308,7 @@ const UpsetEquipmentModal = ({
                                 setIsCategoryId(item.id);
                                 form.setValue("subCategoryId", "");
                               }}
-                              getUniqueKey={(item) => item.id}
+                              getUniqueKey={(item) => item.title}
                               label="หมวดหมู่หลัก"
                             />
                             {fieldState.error && (
@@ -345,7 +341,7 @@ const UpsetEquipmentModal = ({
                                 selected={currentObject}
                                 onSelected={(item) => field.onChange(item.id)}
                                 renderLabel={(item) => item.title}
-                                getUniqueKey={(item) => item.id}
+                                getUniqueKey={(item) => item.title}
                                 label="หมวดหมู่ย่อย"
                                 placeholder="เลือกหมวดหมู่ย่อย"
                                 require

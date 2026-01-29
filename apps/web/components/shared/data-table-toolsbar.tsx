@@ -3,7 +3,6 @@ import { Button } from "../ui/button";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { Icon } from "@iconify/react";
 import FilterInput from "./filter-input";
-import { Input } from "../ui/input";
 import DataTableSearch from "./data-table-search";
 
 interface filterConfigType<T> {
