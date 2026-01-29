@@ -41,11 +41,12 @@ const EquipmentCard = ({
                 fill
                 alt="Preview Equipment"
                 className="object-cover"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 25vw, 20vw"
               />
             </div>
           </div>
           <h1 className="text-base font-bold md:text-xl">{title}</h1>
-          <p className="text-muted-foreground  text-[10px] md:text-xs flex">
+          <p className="text-muted-foreground flex text-[10px] md:text-xs">
             {description}
           </p>
 
