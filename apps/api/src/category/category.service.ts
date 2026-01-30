@@ -6,7 +6,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { ActiveStatus } from '@repo/types';
 import { PrismaService } from 'prisma/prisma.service';
-import { R2Service } from 'src/cloudflare/r2.service';
+import { R2Service } from 'src/common/cloudflare/r2.service';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 
 @Injectable()

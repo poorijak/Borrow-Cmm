@@ -83,9 +83,19 @@ model Equipment {
   totalStock    Int
   borrowedQty   Int
   reservedQty   Int
+  totalBorrowed Int
   status        ActiveStatus
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
   subCategoryId String
   category      EquipmentSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+}
+
+model Course {
+  id        String       @id @default(uuid())
+  code      String       @unique
+  label     String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  status    ActiveStatus
 }

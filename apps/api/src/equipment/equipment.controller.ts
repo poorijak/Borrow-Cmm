@@ -32,6 +32,7 @@ export class EquipmentController {
       totalStock: body.totalStock,
       borrowedQty: 0,
       reservedQty: 0,
+      totalBorrowed: 0,
       status: 'active',
       category: {
         connect: {

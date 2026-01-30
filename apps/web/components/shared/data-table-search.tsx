@@ -9,9 +9,11 @@ import { cn } from "@/lib/utils";
 const DataTableSearch = ({
   placeholder,
   className,
+  pageParams = "page",
 }: {
   placeholder?: string;
   className?: string;
+  pageParams?: string;
 }) => {
   const router = useRouter();
   const pathName = usePathname();
@@ -27,7 +29,7 @@ const DataTableSearch = ({
       } else {
         params.delete("search");
       }
-      params.set("eqPage", "1");
+      params.set(pageParams, "1");
       router.push(`${pathName}?${params.toString()}`, { scroll: true });
     }, 10);
     return () => clearTimeout(timer);

@@ -19,6 +19,7 @@ interface DataTableToolsBarProps<T> {
   filterConfig: filterConfigType<T>[];
   handleClearAll: () => void;
   searchbarPlacehodler?: string;
+  pageParams: string;
 }
 
 const DataTableToolsBar = <T extends string | number>({
@@ -27,6 +28,7 @@ const DataTableToolsBar = <T extends string | number>({
   filterConfig,
   handleClearAll,
   searchbarPlacehodler,
+  pageParams,
 }: DataTableToolsBarProps<T>) => {
   return (
     <div>
@@ -70,7 +72,10 @@ const DataTableToolsBar = <T extends string | number>({
               })}
           </div>
           <div>
-            <DataTableSearch placeholder={searchbarPlacehodler} />
+            <DataTableSearch
+              pageParams={pageParams}
+              placeholder={searchbarPlacehodler}
+            />
           </div>
         </div>
       </div>

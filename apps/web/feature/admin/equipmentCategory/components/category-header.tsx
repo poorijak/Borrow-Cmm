@@ -10,16 +10,12 @@ const CategoryHeader = () => {
 
   return (
     <div>
-      <div className="flex justify-between pb-10  flex-col md:flex-row gap-4 md:items-center">
+      <div className="flex flex-col justify-between gap-4 space-y-5 md:flex-row md:items-center">
         <header className="flex flex-col gap-4">
           <h2 className="text-3xl font-bold">หมวดหมู่อุปกรณ์</h2>
         </header>
         <div>
-          <Button
-            size="lg"
-            className="px-10 w-full"
-            onClick={() => setIsOpen(true)}
-          >
+          <Button size="lg" className="w-full" onClick={() => setIsOpen(true)}>
             <Plus />
             <span>เพิ่มหมวดหมู่</span>
           </Button>
