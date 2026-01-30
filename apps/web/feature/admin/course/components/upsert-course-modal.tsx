@@ -86,7 +86,7 @@ const UpsertCourseModal = ({
           <InputForm
             control={form.control}
             name="label"
-            label="กรุณากรอกขื่อวิชา"
+            label="กรุณากรอกชื่อวิชา"
             placeholder="เช่น Introduction to Programming"
             required
           />

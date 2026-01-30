@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { TriangleAlert } from "lucide-react";
 import React, { useEffect } from "react";
 import SubmitBtn from "@/components/shared/submit-btn";
-import { Course, Equipment } from "@repo/types";
+import { Course } from "@repo/types";
 import { useDeleteCourse } from "../hooks/useCourse";
 
 type DeleteCourseProps = {

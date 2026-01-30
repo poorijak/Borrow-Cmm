@@ -24,20 +24,20 @@ export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @Post()
-  upsert(@Body(new ZodValidationPipe(courseFormSchema)) body: CourseValue) {
-    return this.courseService.upsert({
-      where: { id: body.courseId || '' },
-      update: {
-        label: body.label,
-        code: body.code,
-        status: ActiveStatus.active,
-      },
-      create: {
-        label: body.label,
-        code: body.code,
-        status: ActiveStatus.active,
-      },
+  create(@Body(new ZodValidationPipe(courseFormSchema)) body: CourseValue) {
+    return this.courseService.create({
+      label: body.label,
+      code: body.code,
+      status: ActiveStatus.active,
     });
+  }
+
+  @Patch(':id')
+  update(
+    @Body(new ZodValidationPipe(courseFormSchema)) body: CourseValue,
+    @Param('id') id: string,
+  ) {
+    return this.courseService.udpate(id, body);
   }
 
   @Get()

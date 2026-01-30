@@ -19,7 +19,9 @@ export const useMutateCourse = () => {
 
   return useMutation({
     mutationFn: async (data: CourseFormValue) => {
-      const { data: course } = await api.post("/course", data);
+      const { data: course } = data.courseId
+        ? await api.patch(`/course/${data.courseId}`, data)
+        : await api.post("/course", data);
       return course;
     },
     onSuccess: (data, variables) => {

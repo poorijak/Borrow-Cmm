@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
@@ -35,6 +35,10 @@ const DataTableSearch = ({
     return () => clearTimeout(timer);
   }, [value, pathName, router]);
 
+  const handleResetInput = () => {
+    setValue("");
+  };
+
   return (
     <div className="relative">
       <Search className="text-muted-foreground absolute top-2.5 left-3 size-4" />
@@ -44,6 +48,12 @@ const DataTableSearch = ({
         onChange={(e) => setValue(e.target.value)}
         className={cn(className, "pl-9 placeholder:text-xs")}
       />
+      {value && (
+        <X
+          onClick={handleResetInput}
+          className="text-muted-foreground absolute top-2.5 right-3 size-4 hover:cursor-pointer"
+        />
+      )}
     </div>
   );
 };

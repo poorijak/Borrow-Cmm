@@ -11,8 +11,25 @@ import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 @Injectable()
 export class CourseService {
   constructor(private readonly prisma: PrismaService) {}
-  async upsert(data: Prisma.CourseUpsertArgs) {
-    return await this.prisma.course.upsert(data);
+  async create(data: Prisma.CourseCreateInput) {
+    return await this.prisma.course.create({ data });
+  }
+
+  async udpate(id: string, data: Prisma.CourseUpdateInput) {
+    const existingCourse = await this.findById(id);
+
+    if (!existingCourse) {
+      throw new NotFoundException('ไม่พบรายวิชานี้');
+    }
+
+    if (existingCourse.code === data.code) {
+      throw new BadRequestException('รายวิชามีอยู่แล้ว โปรดเลือกรายวิชาใหม่');
+    }
+
+    return await this.prisma.course.update({
+      where: { id: existingCourse.id },
+      data: { label: data.label, code: data.code },
+    });
   }
 
   async findAll(params: {
@@ -41,6 +58,10 @@ export class CourseService {
         updatedAt: formatDateToDDMMYY(c.updatedAt),
       };
     });
+  }
+
+  async findById(id: string) {
+    return await this.prisma.course.findUnique({ where: { id } });
   }
 
   async courseCount() {
