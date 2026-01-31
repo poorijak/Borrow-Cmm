@@ -99,3 +99,14 @@ model Course {
   updatedAt DateTime     @updatedAt
   status    ActiveStatus
 }
+
+model Laboratory {
+  id            String       @id @default(uuid())
+  name          String
+  labCode       String       @unique
+  totalBorrowed Int
+  status        ActiveStatus
+  image         String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}

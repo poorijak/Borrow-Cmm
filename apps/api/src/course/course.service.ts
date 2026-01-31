@@ -22,8 +22,17 @@ export class CourseService {
       throw new NotFoundException('ไม่พบรายวิชานี้');
     }
 
-    if (existingCourse.code === data.code) {
-      throw new BadRequestException('รายวิชามีอยู่แล้ว โปรดเลือกรายวิชาใหม่');
+    if (typeof data.code === 'string') {
+      const duplicatedCourse = await this.prisma.course.findFirst({
+        where: {
+          code: data.code,
+          NOT: { id },
+        },
+      });
+
+      if (duplicatedCourse) {
+        throw new BadRequestException('รายวิชามีอยู่แล้ว โปรดเลือกรายวิชาใหม่');
+      }
     }
 
     return await this.prisma.course.update({
@@ -50,6 +59,9 @@ export class CourseService {
         updatedAt: true,
         status: true,
       },
+      orderBy: {
+        code: 'asc',
+      },
     });
 
     return courses.map((c) => {
@@ -69,7 +81,7 @@ export class CourseService {
   }
 
   async getPaginatedCourse(query: GetCourseQueryDTO) {
-    const { search, status, page, courseId, limit } = query;
+    const { search, status, page, limit } = query;
 
     const where: Prisma.CourseWhereInput = {};
 
@@ -82,10 +94,6 @@ export class CourseService {
         { label: { contains: search, mode: 'insensitive' } },
         { code: { contains: search, mode: 'insensitive' } },
       ];
-    }
-
-    if (courseId && courseId.length > 0) {
-      where.id = { in: courseId };
     }
 
     const skip = (page - 1) * limit;
@@ -112,8 +120,8 @@ export class CourseService {
       throw new NotFoundException('ไม่พบรายวิชานี้');
     }
 
-    if (course.status === data.status) {
-      throw new BadRequestException('กรุณาเลือกหมวดหมู่อื่น');
+    if (typeof data.status === 'string' && course.status === data.status) {
+      throw new BadRequestException('กรุณาเลือกสถานะอื่น');
     }
     return await this.prisma.course.update({ where: { id }, data });
   }

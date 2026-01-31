@@ -7,7 +7,6 @@ interface CoursePageProps {
   searchParams: Promise<{
     page?: string;
     status?: string;
-    courseId?: string;
     search?: string;
   }>;
 }
@@ -15,18 +14,12 @@ interface CoursePageProps {
 const page = async ({ searchParams }: CoursePageProps) => {
   const status = (await searchParams).status as ActiveStatus;
   const page = parseInt((await (await searchParams).page) || "1");
-  const courseId = await (await searchParams).courseId;
   const search = (await (await searchParams).search) || "";
 
   return (
     <div className="space-y-5">
       <CourseHeader />
-      <CourseList
-        status={status}
-        page={page}
-        courseId={courseId}
-        search={search}
-      />
+      <CourseList status={status} page={page} search={search} />
     </div>
   );
 };

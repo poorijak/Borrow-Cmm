@@ -11,6 +11,7 @@ import { UploadModule } from './upload/upload.module';
 import { CategoryModule } from './category/category.module';
 import { EquipmentModule } from './equipment/equipment.module';
 import { CourseModule } from './course/course.module';
+import { LaboratoryModule } from './laboratory/laboratory.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CourseModule } from './course/course.module';
     CategoryModule,
     EquipmentModule,
     CourseModule,
+    LaboratoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

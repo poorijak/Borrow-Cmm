@@ -68,7 +68,7 @@ export const useUpdateStatus = () => {
     Error,
     updateStatusValue,
     {
-      prevCategories: [
+      prev: [
         queryKey: readonly unknown[],
         data: CourseResponse | undefined,
       ][];
@@ -83,7 +83,7 @@ export const useUpdateStatus = () => {
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey: ["course"] });
 
-      const prevCategories = queryClient.getQueriesData<CourseResponse>({
+      const prev = queryClient.getQueriesData<CourseResponse>({
         queryKey: ["course"],
       });
 
@@ -102,11 +102,11 @@ export const useUpdateStatus = () => {
         },
       );
 
-      return { prevCategories };
+      return { prev };
     },
     onError: (error, variables, context) => {
-      if (context?.prevCategories) {
-        context.prevCategories.forEach(([key, oldData]) => {
+      if (context?.prev) {
+        context.prev.forEach(([key, oldData]) => {
           queryClient.setQueryData(key, oldData);
         });
       }

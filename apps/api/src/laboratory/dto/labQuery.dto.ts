@@ -1,8 +1,8 @@
+import { type ActiveStatus } from '@repo/types';
 import { Type } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, IsString } from 'class-validator';
-import type { ActiveStatus } from '@repo/types';
 
-export class GetCourseQueryDTO {
+export class GetLaboratoryQueryDto {
   @IsOptional()
   @IsIn(['active', 'inactive'])
   status?: ActiveStatus;

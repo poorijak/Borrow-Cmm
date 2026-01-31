@@ -63,7 +63,7 @@ export class CategoryService {
     const cate = await this.getCategoryById(id);
 
     if (!cate) {
-      throw new BadRequestException('Category not found');
+      throw new BadRequestException('ไม่พบหมวดหมู่นี้');
     }
 
     return await this.prisma.equipmentCategory.update({

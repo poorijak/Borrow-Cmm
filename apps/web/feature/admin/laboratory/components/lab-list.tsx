@@ -1,81 +1,91 @@
 "use client";
 
-import TabsMenu from "@/components/shared/tabsMenu";
-import React, { useState } from "react";
-import { useCourse, useUpdateStatus } from "../hooks/useCourse";
-import { ColumnDef } from "@tanstack/react-table";
-import { ActiveStatus, Course } from "@repo/types";
 import DropdownStatus from "@/components/shared/dropdown-status";
-import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
-import { ChevronsUpDown, EllipsisVertical, Pencil, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Icon } from "@iconify/react";
+import { ActiveStatus, Laboratory } from "@repo/types";
+import { ChevronsUpDown, EllipsisVertical, Pencil, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { useLaboratory, useUpdateStatus } from "../hooks/useLaboratory";
+import TabsMenu from "@/components/shared/tabsMenu";
 import DataTableContent, { DataTable } from "@/components/shared/data-table";
-import Pagination from "@/components/shared/pagination";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import UpsertCourseModal from "./upsert-course-modal";
+import { ColumnDef } from "@tanstack/react-table";
+import Image from "next/image";
+import { getPublicUrl } from "@/lib/utils";
 import DataTableSearch from "@/components/shared/data-table-search";
-import DeleteCourseModal from "./delete-equipment-modal";
+import Pagination from "@/components/shared/pagination";
+import { useRouter, useSearchParams } from "next/navigation";
+import UpsertLabModal from "./upsert-lab-modal";
+import DeleteLabModal from "./delete-lab-modal";
 
-interface CourseListProps {
-  status: ActiveStatus;
+interface LaboratoryListProps {
   page: number;
-  courseId?: string;
+  status: ActiveStatus;
   search: string;
 }
 
-const CourseList = ({ search, status, page, courseId }: CourseListProps) => {
-  const router = useRouter();
-  const sp = useSearchParams();
-  const pathName = usePathname();
-
+const LaboratoryList = ({ page, status, search }: LaboratoryListProps) => {
+  const { data } = useLaboratory(status, search, page, undefined);
   const [isUpsertOpen, setIsUpsertOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [isSelected, setIsSelected] = useState<Course | undefined>(undefined);
-  const { data } = useCourse(status, search, courseId, page, undefined);
+  const [isSelected, setIsSeleted] = useState<Laboratory | undefined>(
+    undefined,
+  );
   const { mutate } = useUpdateStatus();
 
-  const courses = data?.data ?? [];
+  const router = useRouter();
+  const sp = useSearchParams();
 
-  const handlePageChange = (newPage: number) => {
-    const newParams = new URLSearchParams(sp);
-    newParams.set("page", newPage.toString());
-    router.push(`?${newParams.toString()}`);
-  };
+  const laboratory = data?.data ?? [];
 
-  const handleUpsert = (open: boolean) => {
+  const handleUpsertModal = (open: boolean) => {
     setIsUpsertOpen(open);
     if (!open) {
-      setIsSelected(undefined);
+      setIsSeleted(undefined);
     }
   };
-  const handleDelete = (open: boolean) => {
+  const handleDeleteModal = (open: boolean) => {
     setIsDeleteOpen(open);
     if (!open) {
-      setIsSelected(undefined);
+      setIsSeleted(undefined);
     }
   };
 
-  const columns: ColumnDef<Course>[] = [
+  const columns: ColumnDef<Laboratory>[] = [
     {
-      accessorKey: "lable",
-      header: () => <div className="pl-5">รายวิชา</div>,
+      accessorKey: "name",
+      header: () => <div className="text-center">ชื่อห้อง</div>,
       size: 100,
       cell: ({ row }) => {
-        return <div className="pl-5">{row.original.label}</div>;
+        const name = row.original.name;
+        return (
+          <div className="group relative ml-5 flex items-center gap-3">
+            <div className="relative size-10 shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5">
+              <Image
+                className="rounded-sm border object-cover"
+                alt="preview image"
+                fill
+                src={getPublicUrl(row.original.image)}
+              />
+            </div>
+
+            <span>{name}</span>
+          </div>
+        );
       },
     },
     {
       accessorKey: "code",
-      header: () => <div className="text-center">รหัสวิชา</div>,
+      header: () => <div className="text-center">รหัสห้อง</div>,
       size: 100,
       cell: ({ row }) => {
-        return <div className="text-center">{row.original.code}</div>;
+        return <div className="text-center">{row.original.labCode}</div>;
       },
     },
     {
@@ -153,7 +163,7 @@ const CourseList = ({ search, status, page, courseId }: CourseListProps) => {
               <DropdownMenuItem
                 onClick={() => {
                   setIsUpsertOpen(true);
-                  setIsSelected(row.original);
+                  setIsSeleted(row.original);
                 }}
               >
                 <Pencil />
@@ -163,7 +173,7 @@ const CourseList = ({ search, status, page, courseId }: CourseListProps) => {
                 variant="destructive"
                 onClick={() => {
                   setIsDeleteOpen(true);
-                  setIsSelected(row.original);
+                  setIsSeleted(row.original);
                 }}
               >
                 <Trash2 className="text-destructive" />
@@ -175,57 +185,60 @@ const CourseList = ({ search, status, page, courseId }: CourseListProps) => {
       ),
     },
   ];
+
   const tabs = [
     {
       name: "ทั้งหมด",
       key: "All",
       value: "all",
       defaultValue: true,
-      href: "/admin/course",
+      href: "/admin/laboratory",
     },
     {
       name: "เปิดใช้งาน",
       key: "Active",
       value: "Active",
-      href: "/admin/course?status=active",
+      href: "/admin/laboratory?status=active",
     },
     {
       name: "ปิดใช้งาน",
       key: "Inactive",
       value: "Inactive",
-      href: "/admin/course?status=inactive",
+      href: "/admin/laboratory?status=inactive",
     },
   ];
 
-  console.log(isSelected);
+  const handlePageChange = (newPage: number) => {
+    const newParams = new URLSearchParams(sp);
+    newParams.set("page", newPage.toString());
+    router.push(`?${newParams.toString()}`);
+  };
 
   return (
     <div className="space-y-5">
       <TabsMenu tabItems={tabs} />
       <DataTable>
-        <div className="w-80">
-          <DataTableSearch placeholder="ค้นหารายวิชา เช่น Web Development, CMM123" />
-        </div>
-        <DataTableContent data={courses} columns={columns} />
+        <DataTableSearch />
+        <DataTableContent data={laboratory} columns={columns} />
         <Pagination
-          totalPages={data?.meta.totalPage ?? 1}
-          total={data?.meta.totalCount}
-          onPageChange={handlePageChange}
           page={page}
+          total={data?.meta.totalCout}
+          totalPages={data?.meta.totalCout ?? 1}
+          onPageChange={handlePageChange}
         />
       </DataTable>
-      <UpsertCourseModal
+      <UpsertLabModal
         open={isUpsertOpen}
-        onOpenChange={handleUpsert}
-        data={isSelected}
+        onOpenChange={handleUpsertModal}
+        lab={isSelected}
       />
-      <DeleteCourseModal
+      <DeleteLabModal
+        onOpenChange={handleDeleteModal}
         open={isDeleteOpen}
-        onOpenChange={handleDelete}
         data={isSelected}
       />
     </div>
   );
 };
 
-export default CourseList;
+export default LaboratoryList;

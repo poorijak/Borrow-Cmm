@@ -1,11 +1,27 @@
-import React from 'react'
+import LabHeader from "@/feature/admin/laboratory/components/lab-header";
+import LaboratoryList from "@/feature/admin/laboratory/components/lab-list";
+import type { ActiveStatus } from "@repo/types";
+import React from "react";
 
-const page = () => {
-  return (
-    <div>
-      <h1 className='text-3xl font-bold'>จัดการห้องปฏิบัติการ</h1>
-    </div>
-  )
+interface LaboratoryPageProps {
+  searchParams: Promise<{
+    status?: string;
+    page?: string;
+    search?: string;
+  }>;
 }
 
-export default page
+const page = async ({ searchParams }: LaboratoryPageProps) => {
+  const status = (await searchParams).status as ActiveStatus;
+  const page = parseInt((await searchParams).page || "1");
+  const search = (await (await searchParams).search) || "";
+
+  return (
+    <div className="space-y-5">
+      <LabHeader />
+      <LaboratoryList status={status} page={page} search={search} />
+    </div>
+  );
+};
+
+export default page;

@@ -18,7 +18,7 @@ export class GetEquipmentsQueryDto {
   page: number = 1;
 
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: string | string[] | undefined }) => {
     if (typeof value === 'string') {
       return value.includes(',') ? value.split(',') : [value];
     }
@@ -28,7 +28,7 @@ export class GetEquipmentsQueryDto {
   subCategoryId?: string[];
 
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: string | string[] | undefined }) => {
     if (typeof value === 'string') {
       return value.includes(',') ? value.split(',') : [value];
     }
