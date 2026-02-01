@@ -57,8 +57,8 @@ export class LaboratoryService {
     return await this.prisma.laboratory.update({ where: { id }, data });
   }
 
-  async laboratoryCount() {
-    return await this.prisma.laboratory.count();
+  async laboratoryCount(where: Prisma.LaboratoryWhereInput) {
+    return await this.prisma.laboratory.count({ where });
   }
 
   async getPaginatedLab(query: GetLaboratoryQueryDto) {
@@ -81,7 +81,7 @@ export class LaboratoryService {
 
     const [labs, totalCount] = await Promise.all([
       this.findAll({ skip, limit, where }),
-      this.laboratoryCount(),
+      this.laboratoryCount(where),
     ]);
 
     return {

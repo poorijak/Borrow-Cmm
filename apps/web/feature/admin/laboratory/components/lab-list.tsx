@@ -218,7 +218,10 @@ const LaboratoryList = ({ page, status, search }: LaboratoryListProps) => {
     <div className="space-y-5">
       <TabsMenu tabItems={tabs} />
       <DataTable>
-        <DataTableSearch />
+        <DataTableSearch
+          className="w-80"
+          placeholder="เช่น ห้องปฏิบัติการ WINDOW , CB30603"
+        />
         <DataTableContent data={laboratory} columns={columns} />
         <Pagination
           page={page}

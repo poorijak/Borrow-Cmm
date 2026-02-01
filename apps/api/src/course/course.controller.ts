@@ -7,6 +7,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { CourseService } from './course.service';
 import {
@@ -18,12 +19,19 @@ import {
 import { ActiveStatus } from '@prisma/client';
 import { ZodValidationPipe } from 'src/common/pipe/zod-validator';
 import { GetCourseQueryDTO } from './dto/course.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from 'src/common/guards/role.guard';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role } from 'src/admin/role.enum';
 
 @Controller('course')
+@UseGuards(AuthGuard('jwt'), RoleGuard)
+@Roles(Role.ADMIN, Role.INSTRUCTOR)
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @Post()
+  @Roles(Role.ADMIN)
   create(@Body(new ZodValidationPipe(courseFormSchema)) body: CourseValue) {
     return this.courseService.create({
       label: body.label,
@@ -33,6 +41,7 @@ export class CourseController {
   }
 
   @Patch(':id')
+  @Roles(Role.ADMIN)
   update(
     @Body(new ZodValidationPipe(courseFormSchema)) body: CourseValue,
     @Param('id') id: string,
@@ -46,6 +55,7 @@ export class CourseController {
   }
 
   @Patch(':id/status')
+  @Roles(Role.ADMIN)
   updateStatus(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateStatusSchema)) body: UpdateStatusSchema,
@@ -54,6 +64,7 @@ export class CourseController {
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN)
   delete(@Param('id') id: string) {
     return this.courseService.deleteCourse(id);
   }

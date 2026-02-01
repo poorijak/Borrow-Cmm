@@ -63,19 +63,19 @@ const CourseList = ({ search, status, page, courseId }: CourseListProps) => {
 
   const columns: ColumnDef<Course>[] = [
     {
-      accessorKey: "lable",
-      header: () => <div className="pl-5">รายวิชา</div>,
-      size: 100,
-      cell: ({ row }) => {
-        return <div className="pl-5">{row.original.label}</div>;
-      },
-    },
-    {
       accessorKey: "code",
       header: () => <div className="text-center">รหัสวิชา</div>,
       size: 100,
       cell: ({ row }) => {
         return <div className="text-center">{row.original.code}</div>;
+      },
+    },
+    {
+      accessorKey: "lable",
+      header: () => <div className="pl-5">รายวิชา</div>,
+      size: 100,
+      cell: ({ row }) => {
+        return <div className="pl-5">{row.original.label}</div>;
       },
     },
     {

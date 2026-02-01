@@ -7,6 +7,7 @@ import {
   Param,
   Query,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { LaboratoryService } from './laboratory.service';
 import { ZodValidationPipe } from 'src/common/pipe/zod-validator';
@@ -17,12 +18,19 @@ import {
   type LaboratoryValue,
 } from '@repo/schemas';
 import { GetLaboratoryQueryDto } from './dto/labQuery.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from 'src/common/guards/role.guard';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role } from 'src/admin/role.enum';
 
 @Controller('laboratory')
+@UseGuards(AuthGuard('jwt'), RoleGuard)
+@Roles(Role.ADMIN, Role.MODERATOR)
 export class LaboratoryController {
   constructor(private readonly laboratoryService: LaboratoryService) {}
 
   @Post()
+  @Roles(Role.ADMIN)
   create(@Body(new ZodValidationPipe(laboratorySchema)) body: LaboratoryValue) {
     return this.laboratoryService.create({
       name: body.name,
@@ -34,6 +42,7 @@ export class LaboratoryController {
   }
 
   @Patch(':id')
+  @Roles(Role.ADMIN)
   update(
     @Body(new ZodValidationPipe(laboratorySchema)) body: LaboratoryValue,
     @Param('id') id: string,
@@ -47,6 +56,7 @@ export class LaboratoryController {
   }
 
   @Patch(':id/status')
+  @Roles(Role.ADMIN)
   updateStatus(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateStatusSchema)) body: UpdateStatusSchema,
@@ -60,6 +70,7 @@ export class LaboratoryController {
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN)
   delete(@Param('id') id: string) {
     return this.laboratoryService.delete(id);
   }

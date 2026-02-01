@@ -78,7 +78,7 @@ export const adminServices = [
     label: "การจัดการผู้ใช้งาน",
     items: [
       { title: "จัดการเจ้าหน้าที่", href: "/admin/staff", icon: User2 },
-      { title: "จัดการผู้ใช้ทั่วไป", href: "/admin/user", icon: UserMinus },
+      { title: "จัดการผู้ใช้ทั่วไป", href: "/admin/users", icon: UserMinus },
     ],
   },
 ];

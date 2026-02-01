@@ -7,6 +7,7 @@ import {
   Query,
   Patch,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { EquipmentService } from './equipment.service';
 import { ZodValidationPipe } from 'src/common/pipe/zod-validator';
@@ -18,12 +19,19 @@ import {
 } from '@repo/schemas';
 import { EquipmentResponse } from '@repo/types';
 import { GetEquipmentsQueryDto } from './dto/EquipmentDto';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from 'src/common/guards/role.guard';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role } from 'src/admin/role.enum';
 
 @Controller('equipment')
+@UseGuards(AuthGuard('jwt'), RoleGuard)
+@Roles(Role.ADMIN, Role.INSTRUCTOR)
 export class EquipmentController {
   constructor(private readonly equipmentService: EquipmentService) {}
 
   @Post()
+  @Roles(Role.ADMIN)
   create(@Body(new ZodValidationPipe(equipmentSchema)) body: EquipmentValue) {
     return this.equipmentService.create({
       title: body.title,
@@ -43,6 +51,7 @@ export class EquipmentController {
   }
 
   @Patch(':id')
+  @Roles(Role.ADMIN)
   udpateEquipment(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(equipmentSchema)) body: EquipmentValue,
@@ -75,6 +84,7 @@ export class EquipmentController {
   }
 
   @Patch(':id/status')
+  @Roles(Role.ADMIN)
   async updateStatus(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateStatusSchema)) data: UpdateStatusSchema,
@@ -83,6 +93,7 @@ export class EquipmentController {
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN)
   async deleteEquipment(@Param('id') id: string) {
     return this.equipmentService.deleteEquipment(id);
   }
