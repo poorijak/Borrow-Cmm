@@ -26,11 +26,9 @@ export class RoleGuard implements CanActivate {
 
     const { user }: jwtGuardPayload = context.switchToHttp().getRequest();
 
-
     if (!user) {
       throw new ForbiddenException('user not found');
     }
-
 
     const hasRole = requiredRoles.includes(user.role);
 

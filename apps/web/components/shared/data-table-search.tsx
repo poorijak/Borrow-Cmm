@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
@@ -9,9 +9,11 @@ import { cn } from "@/lib/utils";
 const DataTableSearch = ({
   placeholder,
   className,
+  pageParams = "page",
 }: {
   placeholder?: string;
   className?: string;
+  pageParams?: string;
 }) => {
   const router = useRouter();
   const pathName = usePathname();
@@ -27,11 +29,15 @@ const DataTableSearch = ({
       } else {
         params.delete("search");
       }
-      params.set("eqPage", "1");
+      params.set(pageParams, "1");
       router.push(`${pathName}?${params.toString()}`, { scroll: true });
     }, 10);
     return () => clearTimeout(timer);
   }, [value, pathName, router]);
+
+  const handleResetInput = () => {
+    setValue("");
+  };
 
   return (
     <div className="relative">
@@ -42,6 +48,12 @@ const DataTableSearch = ({
         onChange={(e) => setValue(e.target.value)}
         className={cn(className, "pl-9 placeholder:text-xs")}
       />
+      {value && (
+        <X
+          onClick={handleResetInput}
+          className="text-muted-foreground absolute top-2.5 right-3 size-4 hover:cursor-pointer"
+        />
+      )}
     </div>
   );
 };

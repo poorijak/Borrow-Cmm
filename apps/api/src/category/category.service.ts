@@ -6,7 +6,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { ActiveStatus } from '@repo/types';
 import { PrismaService } from 'prisma/prisma.service';
-import { R2Service } from 'src/cloudflare/r2.service';
+import { R2Service } from 'src/common/cloudflare/r2.service';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 
 @Injectable()
@@ -63,7 +63,7 @@ export class CategoryService {
     const cate = await this.getCategoryById(id);
 
     if (!cate) {
-      throw new BadRequestException('Category not found');
+      throw new BadRequestException('ไม่พบหมวดหมู่นี้');
     }
 
     return await this.prisma.equipmentCategory.update({

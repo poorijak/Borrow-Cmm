@@ -10,6 +10,7 @@ import {
   Param,
   Delete,
   UsePipes,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import {
@@ -22,7 +23,13 @@ import {
 } from '@repo/schemas';
 import { ActiveStatus } from '@prisma/client';
 import { ZodValidationPipe } from 'src/common/pipe/zod-validator';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from 'src/common/guards/role.guard';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role } from 'src/admin/role.enum';
 
+@UseGuards(AuthGuard('jwt'), RoleGuard)
+@Roles(Role.ADMIN, Role.MODERATOR)
 @Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
@@ -69,6 +76,7 @@ export class CategoryController {
     return this.categoryService.getPaginatedSubCategories(id, { page, limit });
   }
 
+  @Roles(Role.ADMIN)
   @Post(':mainCateId/subCategory')
   createSub(
     @Param('mainCateId') mainCateId: string,
@@ -77,6 +85,7 @@ export class CategoryController {
     return this.categoryService.upsertSubCate(data, mainCateId);
   }
 
+  @Roles(Role.ADMIN)
   @Patch(':mainCateId/subCategory/:id')
   updateSubCate(
     @Param('id') id: string,
@@ -86,6 +95,7 @@ export class CategoryController {
     return this.categoryService.upsertSubCate(data, mainCateId, id);
   }
 
+  @Roles(Role.ADMIN)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -97,16 +107,19 @@ export class CategoryController {
     });
   }
 
+  @Roles(Role.ADMIN)
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.categoryService.deleteCategory(id);
   }
 
+  @Roles(Role.ADMIN)
   @Delete('subCategory/:id')
   async deleteSub(@Param('id') id: string) {
     return this.categoryService.deleteSubCategory(id);
   }
 
+  @Roles(Role.ADMIN)
   @Patch(':id/status')
   updateStatus(
     @Param('id') id: string,

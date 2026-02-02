@@ -43,7 +43,7 @@ export class AuthService {
         profileImage: googleUser.picture || existingAccount.user.profileImage,
       });
     } else {
-      const existingUserByEmail = await this.userService.findUser({
+      const existingUserByEmail = await this.userService.findOne({
         email: googleUser.email,
       });
 

@@ -32,6 +32,7 @@ export const seedEquipment = async (prisma: PrismaClient) => {
         totalStock: equipment.totalStock,
         borrowedQty: 0,
         reservedQty: 0,
+        totalBorrowed: 0,
         status: equipment.status || ActiveStatus.active,
         subCategoryId: subCategory.id,
       },

@@ -25,6 +25,8 @@ model User {
   profileImage String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  borrowedQTY  Int      @default(0)
+  overDueQTY   Int      @default(0)
 
   role     UserRole  @default(student)
   accounts Account[]
@@ -83,9 +85,30 @@ model Equipment {
   totalStock    Int
   borrowedQty   Int
   reservedQty   Int
+  totalBorrowed Int
   status        ActiveStatus
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
   subCategoryId String
   category      EquipmentSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+}
+
+model Course {
+  id        String       @id @default(uuid())
+  code      String       @unique
+  label     String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  status    ActiveStatus
+}
+
+model Laboratory {
+  id            String       @id @default(uuid())
+  name          String
+  labCode       String       @unique
+  totalBorrowed Int
+  status        ActiveStatus
+  image         String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }

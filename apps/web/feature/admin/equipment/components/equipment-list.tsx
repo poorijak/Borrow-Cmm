@@ -374,6 +374,7 @@ const EquipmentList = ({
       <TabsMenu tabItems={tabs} />
       <DataTable>
         <DataTableToolsBar
+          pageParams="eqPage"
           filterConfig={filterConfig}
           sp={sp}
           handelFillter={handelFillter}

@@ -6,7 +6,7 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { R2Service } from 'src/cloudflare/r2.service';
+import { R2Service } from 'src/common/cloudflare/r2.service';
 
 @Controller('upload')
 export class UploadController {

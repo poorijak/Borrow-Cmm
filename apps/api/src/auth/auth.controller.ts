@@ -13,8 +13,6 @@ import { GoogleAuthGurad } from '../common/guards/google-auth.guard';
 import type { Request as ExpressRequest, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from 'src/user/user.service';
-import { Roles } from 'src/common/decorators/role.decorator';
-
 
 @Controller('auth')
 export class AuthController {
@@ -55,7 +53,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
   getMe(@Req() req) {
-    return this.userService.findUser({
+    return this.userService.findOne({
       id: req.user.userId,
     });
   }

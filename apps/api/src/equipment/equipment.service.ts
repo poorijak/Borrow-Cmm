@@ -6,7 +6,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { Equipment } from '@repo/types';
 import { PrismaService } from 'prisma/prisma.service';
-import { R2Service } from 'src/cloudflare/r2.service';
+import { R2Service } from 'src/common/cloudflare/r2.service';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 import { GetEquipmentsQueryDto } from './dto/EquipmentDto';
 
@@ -209,11 +209,13 @@ export class EquipmentService {
     const equipment = await this.prisma.equipment.findUnique({ where: { id } });
 
     if (!equipment) {
-      throw new NotFoundException('ไม่พบหมวดหมู่นี้');
+      throw new NotFoundException('ไม่อุปกรณ์นี้');
     }
 
     if (equipment.status === data.status) {
-      throw new BadRequestException('กรุณาเลือกหมวดหมู่อื่น');
+      throw new BadRequestException(
+        'คุณทำการอัพเดต สถานะเดิม กรุณาเลือกอุปกรณ์อื่น',
+      );
     }
     return await this.prisma.equipment.update({ where: { id }, data });
   }
