@@ -3,9 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, TimeSlot } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
-import { GetLaboratoryQueryDto } from './dto/labQuery.dto';
+import {
+  GetLabAvailableQueryDto,
+  GetLaboratoryQueryDto,
+} from './dto/labQuery.dto';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 import { R2Service } from 'src/common/cloudflare/r2.service';
 
@@ -41,6 +44,60 @@ export class LaboratoryService {
       where: { id: existingLab.id },
       data,
     });
+  }
+
+  async availableLabs(bookingDate?: Date, slot?: TimeSlot) {
+    if (!bookingDate || !slot) return;
+
+    const conflic = await this.prisma.labBooking.findMany({
+      where: {
+        slot,
+        bookingDate,
+        status: { in: ['in_use', 'pending', 'approved'] },
+      },
+      select: {
+        laboratoryId: true,
+      },
+    });
+
+    return conflic;
+  }
+
+  async getLaboratory() {
+    const labs = await this.prisma.laboratory.findMany({
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        status: true,
+        labCode: true,
+      },
+    });
+
+    return labs;
+  }
+
+  async getLaboratoryWithAvailable(query: GetLabAvailableQueryDto) {
+    const { bookingDate, slot } = query;
+
+    const booking = await this.availableLabs(bookingDate, slot);
+
+    const busyLabIds = new Set(booking?.map((b) => b.laboratoryId));
+
+    const labs = await this.prisma.laboratory.findMany({
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        status: true,
+        labCode: true,
+      },
+    });
+
+    return labs.map((lab) => ({
+      ...lab,
+      isAailable: !busyLabIds.has(lab.id),
+    }));
   }
 
   async updateStatus(id: string, data: Prisma.LaboratoryUpdateInput) {
