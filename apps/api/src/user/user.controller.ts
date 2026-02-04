@@ -20,7 +20,7 @@ import { RoleGuard } from 'src/common/guards/role.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { Role } from 'src/admin/role.enum';
 import { ZodValidationPipe } from 'src/common/pipe/zod-validator';
-import { updateUserRole, type UpdateUserRoleValue } from '@repo/schemas';
+import { updateUserRole } from '@repo/schemas';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'), RoleGuard)

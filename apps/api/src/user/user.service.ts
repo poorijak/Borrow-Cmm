@@ -79,7 +79,7 @@ export class UserService {
     }));
   }
 
-  async finActiveStaff(params: {
+  async findActiveStaff(params: {
     skip?: number;
     limit?: number;
     where: Prisma.UserWhereInput;
@@ -113,28 +113,22 @@ export class UserService {
   }
 
   async getPaginatedStaff(query: GetStaffQueryDto) {
-    const {
-      page = 1,
-      limit,
-      role,
-      search,
-      createdAt = 'desc',
-      updatedAt,
-    } = query;
+    const { page = 1, limit, role, search, createdAt, updatedAt } = query;
 
     const where: Prisma.UserWhereInput = { role: { not: 'student' } };
     const orderBy: Prisma.UserOrderByWithRelationInput[] = [];
 
-    if (role && role.length > 0) {
-      where.role = { in: role };
-    }
-
-    if (createdAt) {
-      orderBy.push({ createdAt: createdAt });
-    }
-
+    // ใส่ลำดับความสำคัญ: สมมติว่าถ้าส่ง updatedAt มาให้ยึดอันนั้นก่อน
     if (updatedAt) {
       orderBy.push({ updatedAt });
+    } else if (createdAt) {
+      orderBy.push({ createdAt });
+    } else {
+      orderBy.push({ createdAt: 'desc' }); // Default fallback
+    }
+
+    if (role && role.length > 0) {
+      where.role = { in: role };
     }
 
     if (search && search.length > 0) {
@@ -147,7 +141,7 @@ export class UserService {
     const skip = (page - 1) * limit;
 
     const [staffs, totalCount] = await Promise.all([
-      this.finActiveStaff({ skip, limit, where, orderBy }),
+      this.findActiveStaff({ skip, limit, where, orderBy }),
       this.getUserCount(where),
     ]);
 

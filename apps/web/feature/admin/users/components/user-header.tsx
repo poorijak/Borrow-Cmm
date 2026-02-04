@@ -1,9 +1,15 @@
 import React from "react";
 
-const UserHeader = () => {
+interface UserHeaderProps {
+  type: "User-management" | "Staff-management";
+}
+
+const UserHeader = ({ type }: UserHeaderProps) => {
   return (
     <div>
-      <h1 className="text-3xl font-bold">จัดการผู้ใช้</h1>
+      <h1 className="text-3xl font-bold">
+        {type === "User-management" ? "จัดการผู้ใช้" : "จัดการเจ้าหน้าที่"}
+      </h1>
     </div>
   );
 };

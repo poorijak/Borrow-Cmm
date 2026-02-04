@@ -14,17 +14,16 @@ interface AdminLayoutProps {
 const AdminLayout = async ({ children }: AdminLayoutProps) => {
   const user: User = await getUser();
 
-  if (!user) redirect("/auth/signin")
+  if (!user) redirect("/auth/signin");
 
-    
-  const isAdmin = hasRole(user, ROLES.ADMIN);
+  const isAdmin = hasRole(user, [ROLES.ADMIN, ROLES.MODERATOR]);
   if (!isAdmin) redirect("/");
 
   return (
     <SidebarProvider>
       <AppSidebar type="Admin" user={user} />
       <div className="flex w-full flex-col">
-        <SiteHeader user={user}  type="Admin"/>
+        <SiteHeader user={user} type="Admin" />
         <div className="p-5">
           <main>{children}</main>
         </div>
