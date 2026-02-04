@@ -1,6 +1,6 @@
 import EquipmentHeader from "@/feature/admin/equipment/components/equipement-header";
 import EquipmentList from "@/feature/admin/equipment/components/equipment-list";
-import { ActiveStatus, QuatitySortType } from "@repo/types";
+import { ActiveStatus, QuerySortType } from "@repo/types";
 import React from "react";
 
 interface EquipmentPageProps {
@@ -19,7 +19,7 @@ const page = async ({ searchParams }: EquipmentPageProps) => {
   const page = parseInt((await searchParams).eqPage || "1");
   const mainCate = await (await searchParams).mainCategory;
   const subCate = await (await searchParams).subCategory;
-  const totalStock = (await (await searchParams).totalStock) as QuatitySortType;
+  const totalStock = (await (await searchParams).totalStock) as QuerySortType;
   const search = (await (await searchParams).search) || "";
 
   return (

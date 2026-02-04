@@ -1,6 +1,6 @@
-import { OmitType, PickType } from '@nestjs/mapped-types';
-import { UserRole } from '@prisma/client';
-import { type Role, type QuatitySortType } from '@repo/types';
+import { PickType } from '@nestjs/mapped-types';
+import { Prisma, UserRole } from '@prisma/client';
+import { type Role } from '@repo/types';
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
@@ -10,6 +10,8 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+
+type SortOrder = 'asc' | 'desc';
 
 class baseQuery {
   @IsOptional()
@@ -28,17 +30,17 @@ class baseQuery {
 
   @IsOptional()
   @IsIn(['asc', 'desc'])
-  createdAt: QuatitySortType;
+  createdAt: SortOrder;
 }
 
 export class GetStudentQueryDto extends baseQuery {
   @IsOptional()
   @IsIn(['asc', 'desc'])
-  overDue?: QuatitySortType;
+  overDue?: SortOrder;
 
   @IsOptional()
   @IsIn(['asc', 'desc'])
-  borrowed?: QuatitySortType;
+  borrowed?: SortOrder;
 }
 
 export class UpdateUserRoleDto {
@@ -67,5 +69,5 @@ export class GetStaffQueryDto extends PickType(baseQuery, [
 
   @IsOptional()
   @IsIn(['asc', 'desc'])
-  updatedAt?: QuatitySortType;
+  updatedAt?: Prisma.SortOrder;
 }

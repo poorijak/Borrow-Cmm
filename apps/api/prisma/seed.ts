@@ -16,7 +16,7 @@ if (!connectionString) {
   process.exit(1);
 }
 
-console.log('✅ Connecting to:', connectionString); // เพื่อเช็คว่าอ่านค่าถูกไหม
+console.log('✅ Connecting to:', connectionString); 
 
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
