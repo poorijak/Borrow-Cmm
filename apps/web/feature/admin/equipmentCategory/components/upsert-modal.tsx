@@ -132,9 +132,7 @@ const UpsertCategory = ({
     <Modal title="เพิ่มหมวดหมู่อุปกรณ์" open={open} onOpenChange={onOpenChange}>
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(handleSubmit, (e) => {
-            console.log(e);
-          })}
+          onSubmit={form.handleSubmit(handleSubmit)}
           onChange={() => form.clearErrors()}
           className="flex flex-col gap-5"
         >

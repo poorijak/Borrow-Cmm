@@ -6,7 +6,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { ActiveStatus } from '@repo/types';
 import { PrismaService } from 'prisma/prisma.service';
-import { R2Service } from 'src/cloudflare/r2.service';
+import { R2Service } from 'src/common/cloudflare/r2.service';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 
 @Injectable()
@@ -31,6 +31,8 @@ export class CategoryService {
       where: { id: mainCateId },
     });
 
+    const code = this.generateCategoryCode();
+
     if (!existingCate) {
       throw new NotFoundException('ไม่พบหมวดหมู่นี้');
     }
@@ -44,6 +46,7 @@ export class CategoryService {
       },
       create: {
         title: data.title,
+        code,
         mainCategory: {
           connect: {
             id: existingCate.id,
@@ -60,7 +63,7 @@ export class CategoryService {
     const cate = await this.getCategoryById(id);
 
     if (!cate) {
-      throw new BadRequestException('Category not found');
+      throw new BadRequestException('ไม่พบหมวดหมู่นี้');
     }
 
     return await this.prisma.equipmentCategory.update({
@@ -282,5 +285,9 @@ export class CategoryService {
       where: { id },
       data,
     });
+  }
+
+  generateCategoryCode() {
+    return 'CUSTOM_' + Date.now().toString(36).toUpperCase();
   }
 }

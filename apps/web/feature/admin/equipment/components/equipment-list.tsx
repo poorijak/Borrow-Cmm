@@ -4,7 +4,7 @@ import TabsMenu from "@/components/shared/tabsMenu";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { useGetEquipments } from "../hooks/useEquipment";
-import { ActiveStatus, Equipment, QuatitySortType } from "@repo/types";
+import { ActiveStatus, Equipment, QuerySortType } from "@repo/types";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import {
@@ -39,8 +39,8 @@ interface EquipmentListProps {
   subCategoryId?: string;
   page: number;
   type: "equipmentWithCate" | "equipmentPage";
-  totalStock?: QuatitySortType;
-  search : string
+  totalStock?: QuerySortType;
+  search?: string;
 }
 
 interface CategoriesOptions {
@@ -55,7 +55,7 @@ const EquipmentList = ({
   subCategoryId,
   type,
   totalStock,
-  search
+  search,
 }: EquipmentListProps) => {
   // hooks
   const pathName = usePathname();
@@ -75,7 +75,7 @@ const EquipmentList = ({
     subCategoryId,
     status,
     totalStock,
-    search
+    search,
   );
   const { data: categories } = useGetCategories();
   const { data: subCategories } = useGetSubCategoryAll();
@@ -152,7 +152,7 @@ const EquipmentList = ({
   //var
   const equipments = data?.data ?? [];
 
-  const totalStockOptions: { label: string; value: QuatitySortType }[] = [
+  const totalStockOptions: { label: string; value: QuerySortType }[] = [
     { label: "น้อยไปมาก", value: "asc" },
     { label: "มากไปน้อย", value: "desc" },
   ];
@@ -374,6 +374,7 @@ const EquipmentList = ({
       <TabsMenu tabItems={tabs} />
       <DataTable>
         <DataTableToolsBar
+          pageParams="eqPage"
           filterConfig={filterConfig}
           sp={sp}
           handelFillter={handelFillter}

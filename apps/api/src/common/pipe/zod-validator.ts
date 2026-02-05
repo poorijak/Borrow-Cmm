@@ -1,25 +1,28 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
-import { ZodSchema } from 'zod';
+import { ZodTypeAny } from 'zod';
 
 @Injectable()
-export class ZodValidationPipe<T> implements PipeTransform {
-  constructor(private schema: ZodSchema<T>) {}
+export class ZodValidationPipe<T extends ZodTypeAny> implements PipeTransform {
+  constructor(private schema: T) {}
 
-  transform(value: unknown): T {
-    if (!value) {
-      throw new BadRequestException('No data provider');
+  transform(value: any): unknown {
+    if (value === undefined || value === null) {
+      throw new BadRequestException('No data provided');
     }
 
     const result = this.schema.safeParse(value);
 
     if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors;
+      const fieldErrors: Record<string, string[] | undefined> =
+        result.error.flatten().fieldErrors;
+
       throw new BadRequestException({
         statusCode: 400,
-        message: 'Validate failed',
+        message: 'Validation failed',
         errors: fieldErrors,
       });
     }
+
     return result.data;
   }
 }

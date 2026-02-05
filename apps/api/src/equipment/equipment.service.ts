@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { ActiveStatus, Equipment, QuatitySortType } from '@repo/types';
+import { Equipment } from '@repo/types';
 import { PrismaService } from 'prisma/prisma.service';
-import { R2Service } from 'src/cloudflare/r2.service';
+import { R2Service } from 'src/common/cloudflare/r2.service';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 import { GetEquipmentsQueryDto } from './dto/EquipmentDto';
 
@@ -44,8 +44,6 @@ export class EquipmentService {
     orderBy?: Prisma.EquipmentOrderByWithRelationInput;
   }): Promise<Equipment[]> {
     const { skip, limit, where, orderBy } = params;
-
-    console.log(skip);
 
     const equipments = await this.prisma.equipment.findMany({
       skip,
@@ -108,6 +106,51 @@ export class EquipmentService {
     return await this.prisma.equipment.findUnique({ where: { id } });
   }
 
+  async getEquipmentByCategoryId(
+    where: Prisma.EquipmentCategoryWhereUniqueInput,
+  ) {
+    const data = await this.prisma.equipmentCategory.findUnique({
+      where,
+      select: {
+        id: true,
+        title: true,
+        mainImage: true,
+        equipmentSubCategories: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            equipment: {
+              select: {
+                id: true,
+                title: true,
+                mainImage: true,
+                description: true,
+                totalStock: true,
+                borrowedQty: true,
+                reservedQty: true,
+                status: true,
+                subCategoryId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!data) return { category: null };
+
+    return {
+      category: {
+        ...data,
+        subCategory: data.equipmentSubCategories.map((s) => ({
+          ...s,
+          equipments: s.equipment,
+        })),
+      },
+    };
+  }
+
   async getPaginatedEquipment(query: GetEquipmentsQueryDto) {
     const {
       status,
@@ -118,12 +161,6 @@ export class EquipmentService {
       totalStock = 'desc', // กำหนด Default ตรงนี้ได้เลย
       search,
     } = query;
-
-    console.log('main', categoryId);
-
-    console.log('sub', subCategoryId);
-
-    console.log('search', search);
 
     const where: Prisma.EquipmentWhereInput = {};
     const orderBy: Prisma.EquipmentOrderByWithRelationInput = {};
@@ -172,11 +209,13 @@ export class EquipmentService {
     const equipment = await this.prisma.equipment.findUnique({ where: { id } });
 
     if (!equipment) {
-      throw new NotFoundException('ไม่พบหมวดหมู่นี้');
+      throw new NotFoundException('ไม่อุปกรณ์นี้');
     }
 
     if (equipment.status === data.status) {
-      throw new BadRequestException('กรุณาเลือกหมวดหมู่อื่น');
+      throw new BadRequestException(
+        'คุณทำการอัพเดต สถานะเดิม กรุณาเลือกอุปกรณ์อื่น',
+      );
     }
     return await this.prisma.equipment.update({ where: { id }, data });
   }

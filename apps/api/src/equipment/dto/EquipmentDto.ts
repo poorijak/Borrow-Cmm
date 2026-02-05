@@ -1,6 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import { IsArray, IsIn, IsInt, IsOptional, IsString } from 'class-validator';
-import type { QuatitySortType, ActiveStatus } from '@repo/types';
+import type { QuerySortType, ActiveStatus } from '@repo/types';
 
 export class GetEquipmentsQueryDto {
   @IsOptional()
@@ -18,7 +18,7 @@ export class GetEquipmentsQueryDto {
   page: number = 1;
 
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: string | string[] | undefined }) => {
     if (typeof value === 'string') {
       return value.includes(',') ? value.split(',') : [value];
     }
@@ -28,7 +28,7 @@ export class GetEquipmentsQueryDto {
   subCategoryId?: string[];
 
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: string | string[] | undefined }) => {
     if (typeof value === 'string') {
       return value.includes(',') ? value.split(',') : [value];
     }
@@ -39,7 +39,7 @@ export class GetEquipmentsQueryDto {
 
   @IsOptional()
   @IsIn(['asc', 'desc'])
-  totalStock?: QuatitySortType;
+  totalStock?: QuerySortType;
 
   @IsOptional()
   @IsString()

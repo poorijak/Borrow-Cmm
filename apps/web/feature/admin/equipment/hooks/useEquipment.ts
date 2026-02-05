@@ -1,13 +1,8 @@
 import { EquipmentFormValue } from "@repo/schemas";
-import {
-  useMutation,
-  useQueries,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { upsertEquipment } from "../server/equipment";
 import { toast } from "sonner";
-import { ActiveStatus, EquipmentResponse, QuatitySortType } from "@repo/types";
+import { ActiveStatus, EquipmentResponse, QuerySortType } from "@repo/types";
 import api from "@/lib/axios";
 
 export const useEquipment = () => {
@@ -31,7 +26,7 @@ export const useGetEquipments = (
   categoryId?: string,
   subCategoryId?: string,
   status?: ActiveStatus,
-  totalStock?: QuatitySortType,
+  totalStock?: QuerySortType,
   search?: string,
 ) => {
   return useQuery({
@@ -44,27 +39,18 @@ export const useGetEquipments = (
       totalStock,
       search,
     ],
-    queryFn: async ({ queryKey }) => {
-      const [_, page, status, categoryId, subCategoryId, totalStock] =
-        queryKey as [
-          "equipment",
-          number,
-          ActiveStatus,
-          string,
-          string | undefined,
-          QuatitySortType,
-          string,
-        ];
+    queryFn: async () => {
+      const params = {
+        page,
+        status,
+        search,
+        categoryId,
+        subCategoryId,
+        totalStock,
+      };
+
       const { data } = await api.get<EquipmentResponse>("/equipment", {
-        params: {
-          status,
-          page,
-          limit,
-          categoryId,
-          subCategoryId,
-          totalStock,
-          search,
-        },
+        params,
       });
       return data;
     },

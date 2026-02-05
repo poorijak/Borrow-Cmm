@@ -3,7 +3,6 @@ import { Button } from "../ui/button";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { Icon } from "@iconify/react";
 import FilterInput from "./filter-input";
-import { Input } from "../ui/input";
 import DataTableSearch from "./data-table-search";
 
 interface filterConfigType<T> {
@@ -20,6 +19,7 @@ interface DataTableToolsBarProps<T> {
   filterConfig: filterConfigType<T>[];
   handleClearAll: () => void;
   searchbarPlacehodler?: string;
+  pageParams: string;
 }
 
 const DataTableToolsBar = <T extends string | number>({
@@ -28,6 +28,7 @@ const DataTableToolsBar = <T extends string | number>({
   filterConfig,
   handleClearAll,
   searchbarPlacehodler,
+  pageParams,
 }: DataTableToolsBarProps<T>) => {
   return (
     <div>
@@ -71,7 +72,10 @@ const DataTableToolsBar = <T extends string | number>({
               })}
           </div>
           <div>
-            <DataTableSearch placeholder={searchbarPlacehodler} />
+            <DataTableSearch
+              pageParams={pageParams}
+              placeholder={searchbarPlacehodler}
+            />
           </div>
         </div>
       </div>

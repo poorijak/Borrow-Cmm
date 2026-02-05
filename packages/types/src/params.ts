@@ -1,1 +1,2 @@
-export type QuatitySortType = "asc" | "desc";
+export type QuerySortType = "asc" | "desc";
+export type LaboratorySortType = "morning" | "afternoon";

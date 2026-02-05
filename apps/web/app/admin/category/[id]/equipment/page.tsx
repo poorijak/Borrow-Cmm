@@ -31,7 +31,13 @@ const page = async ({ params, searchParams }: CategoryDetailPageProps) => {
       </div>
       <Separator />
       <EquipmentHeader type="equipmentWithCate" mainCateId={id} />
-      <EquipmentList type="equipmentWithCate" page={eqPage} status={status} categoryId={id} />
+      <EquipmentList
+        type="equipmentWithCate"
+        page={eqPage}
+        status={status}
+        categoryId={id}
+        search=""
+      />
     </div>
   );
 };

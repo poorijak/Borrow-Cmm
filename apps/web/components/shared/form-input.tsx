@@ -20,6 +20,7 @@ interface InputFormProps<T extends FieldValues> {
   required?: boolean;
   placeholder?: string;
   className?: string;
+  minValue?: number;
 }
 
 const InputForm = <T extends FieldValues>({
@@ -31,6 +32,7 @@ const InputForm = <T extends FieldValues>({
   placeholder,
   className,
   inputTypeValue = "text",
+  minValue = 1,
 }: InputFormProps<T>) => {
   return (
     <div className={cn(className)}>
@@ -52,7 +54,7 @@ const InputForm = <T extends FieldValues>({
                   placeholder={placeholder}
                   {...field}
                   type={inputTypeValue}
-                  min={1}
+                  min={minValue}
                   required={required}
                 />
               ) : (

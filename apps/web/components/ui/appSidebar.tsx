@@ -3,7 +3,6 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -12,9 +11,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Box, Building, ChevronUp, Clipboard, Home, User2 } from "lucide-react";
+import { Home } from "lucide-react";
 import Link from "next/link";
-import { Separator } from "./separator";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import SidebarMain from "../sidebar/sidebar-main";
@@ -53,7 +51,7 @@ export function AppSidebar({ type, user }: AppSidebar) {
                   className={cn(
                     currentPath === "/" || currentPath === "/admin"
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-                      : ""
+                      : "",
                   )}
                 >
                   <Link href={type === "Student" ? "/" : "/admin"}>

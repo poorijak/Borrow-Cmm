@@ -27,8 +27,8 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
   return (
     <header
       className={cn(
-        "sticky top-0 z-10 border-b w-full",
-        type === "Admin" ? " md:border-none  bg-transparent" : " bg-white"
+        "sticky top-0 z-10 w-full border-b",
+        type === "Admin" ? "bg-transparent md:border-none" : "bg-white",
       )}
     >
       <div className="flex h-16 items-center justify-between px-4">
@@ -37,7 +37,7 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
         <div className="flex items-center gap-4">
           {type === "Student" && (
             <Link href="/bag">
-              <ShoppingBag className="size-5 text-muted-foreground" />
+              <ShoppingBag className="text-muted-foreground size-5" />
             </Link>
           )}
 
@@ -53,12 +53,12 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                className="text-red-500 cursor-pointer"
+                className="cursor-pointer text-red-500"
                 onClick={() => signOut()}
               >
                 <span>Sign Out</span>
               </DropdownMenuItem>
-              {user.role === "administrater" && (
+              {(user.role === "administrater" || user.role === "moderater") && (
                 <DropdownMenuItem asChild>
                   <Link href="/admin">หลังบ้าน</Link>
                 </DropdownMenuItem>

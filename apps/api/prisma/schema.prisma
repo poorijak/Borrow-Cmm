@@ -25,6 +25,8 @@ model User {
   profileImage String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  borrowedQTY  Int      @default(0)
+  overDueQTY   Int      @default(0)
 
   role     UserRole  @default(student)
   accounts Account[]
@@ -56,6 +58,7 @@ model EquipmentCategory {
   id                     String                 @id @default(uuid())
   title                  String
   mainImage              String
+  code                   String                 @unique
   createdAt              DateTime               @default(now())
   updatedAt              DateTime               @updatedAt
   status                 ActiveStatus
@@ -65,10 +68,11 @@ model EquipmentCategory {
 model EquipmentSubCategory {
   id             String            @id @default(uuid())
   title          String
+  code           String            @unique
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
   mainCategoryId String
-  mainCategory   EquipmentCategory @relation(fields: [mainCategoryId], references: [id], onDelete: Cascade)
+  mainCategory   EquipmentCategory @relation(fields: [mainCategoryId], references: [id])
   status         ActiveStatus
   equipment      Equipment[]
 }
@@ -76,14 +80,72 @@ model EquipmentSubCategory {
 model Equipment {
   id            String               @id @default(uuid())
   mainImage     String
-  title         String
+  title         String               @unique
   description   String?
   totalStock    Int
   borrowedQty   Int
   reservedQty   Int
+  totalBorrowed Int
   status        ActiveStatus
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
   subCategoryId String
-  category      EquipmentSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  category      EquipmentSubCategory @relation(fields: [subCategoryId], references: [id])
+}
+
+model Course {
+  id        String       @id @default(uuid())
+  code      String       @unique
+  label     String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  status    ActiveStatus
+}
+
+model Laboratory {
+  id            String       @id @default(uuid())
+  name          String
+  labCode       String       @unique
+  totalBorrowed Int
+  status        ActiveStatus
+  image         String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  labBookings   LabBooking[]
+}
+
+model LabBooking {
+  id           String        @id @default(uuid())
+  laboratoryId String
+  bookingDate  DateTime
+  slot         TimeSlot
+  status       BookingStatus
+  reservedAt   DateTime      @default(now())
+  expiresAt    DateTime
+
+  approvedById   String?
+  approvedByRole UserRole?
+  approvedAt     DateTime?
+
+  rejectedById   String?
+  rejectedByRole UserRole?
+  rejectedAt     DateTime?
+
+  laboratory Laboratory @relation(fields: [laboratoryId], references: [id])
+
+  @@unique([laboratoryId, slot, bookingDate])
+}
+
+enum TimeSlot {
+  morning
+  afternoon
+}
+
+enum BookingStatus {
+  pending
+  approved
+  rejected
+  in_use
+  completed
+  cancelled
 }
