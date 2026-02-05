@@ -19,7 +19,7 @@ export const studentService = [
       },
       {
         title: "จองห้องปฏิบัติการ",
-        href: "/lab",
+        href: "/laboratory",
         icon: Building,
       },
     ],

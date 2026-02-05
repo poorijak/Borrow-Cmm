@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Icon } from "@iconify/react";
-import { ActiveStatus, Laboratory } from "@repo/types";
+import { ActiveStatus, LaboratoryAdmin } from "@repo/types";
 import { ChevronsUpDown, EllipsisVertical, Pencil, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import { useLaboratory, useUpdateStatus } from "../hooks/useLaboratory";
@@ -34,7 +34,7 @@ const LaboratoryList = ({ page, status, search }: LaboratoryListProps) => {
   const { data } = useLaboratory(status, search, page, undefined);
   const [isUpsertOpen, setIsUpsertOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [isSelected, setIsSeleted] = useState<Laboratory | undefined>(
+  const [isSelected, setIsSeleted] = useState<LaboratoryAdmin | undefined>(
     undefined,
   );
   const { mutate } = useUpdateStatus();
@@ -57,7 +57,7 @@ const LaboratoryList = ({ page, status, search }: LaboratoryListProps) => {
     }
   };
 
-  const columns: ColumnDef<Laboratory>[] = [
+  const columns: ColumnDef<LaboratoryAdmin>[] = [
     {
       accessorKey: "name",
       header: () => <div className="text-center">ชื่อห้อง</div>,
@@ -225,8 +225,8 @@ const LaboratoryList = ({ page, status, search }: LaboratoryListProps) => {
         <DataTableContent data={laboratory} columns={columns} />
         <Pagination
           page={page}
-          total={data?.meta.totalCout}
-          totalPages={data?.meta.totalCout ?? 1}
+          total={data?.meta.totalCount}
+          totalPages={data?.meta.totalCount ?? 1}
           onPageChange={handlePageChange}
         />
       </DataTable>

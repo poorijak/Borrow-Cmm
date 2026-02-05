@@ -1,19 +1,26 @@
 import { ActiveStatus } from "./status";
 
-export type Laboratory = {
+export type baseType = {
   id: string;
   name: string;
   labCode: string;
-  updatedAt: string;
   image: string;
   status: ActiveStatus;
-  totalBorrowed: number;
 };
 
+export interface Laboratory extends baseType {
+  isAvailable?: boolean;
+}
+
+export interface LaboratoryAdmin extends baseType {
+  updatedAt: string;
+  totalBorrowed: number;
+}
+
 export interface LaboratoryResponse {
-  data: Laboratory[];
+  data: LaboratoryAdmin[];
   meta: {
-    totalCout: number;
+    totalCount: number;
     page: number;
     totalPage: number;
   };

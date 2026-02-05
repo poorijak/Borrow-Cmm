@@ -30,7 +30,7 @@ const EquipmentCard = ({
         <Badge className="absolute top-3 right-3 rounded-sm px-3 py-1">
           <label className="flex items-center gap-2 text-xs text-white">
             <span className="hidden text-white/85 md:flex">จำนวนคงเหลือ</span>{" "}
-            {availableQty}/ {totalStock}
+            {availableQty}/{totalStock}
           </label>
         </Badge>
         <CardContent className="flex flex-col gap-3 px-3 md:px-6">
@@ -53,9 +53,11 @@ const EquipmentCard = ({
           <Separator />
           <Button
             className="w-full rounded-sm"
-            disabled={status === "inactive"}
+            disabled={status === "inactive" || totalStock <= 0}
           >
-            {status === "inactive" ? "ไม่พร้อมใช้งาน" : "ใส่กระเป๋า"}
+            {status === "inactive" || totalStock <= 0
+              ? "ไม่พร้อมใช้งาน"
+              : "ใส่กระเป๋า"}
           </Button>
         </CardContent>
       </Card>
