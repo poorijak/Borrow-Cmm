@@ -428,6 +428,7 @@ const UpsetEquipmentModal = ({
                         label="สต๊อกทั้งหมด"
                         control={form.control}
                         name="totalStock"
+                        minValue={0}
                         required
                       />
                       <Separator />

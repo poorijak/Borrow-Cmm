@@ -72,7 +72,7 @@ model EquipmentSubCategory {
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
   mainCategoryId String
-  mainCategory   EquipmentCategory @relation(fields: [mainCategoryId], references: [id], onDelete: Cascade)
+  mainCategory   EquipmentCategory @relation(fields: [mainCategoryId], references: [id])
   status         ActiveStatus
   equipment      Equipment[]
 }
@@ -90,7 +90,7 @@ model Equipment {
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
   subCategoryId String
-  category      EquipmentSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  category      EquipmentSubCategory @relation(fields: [subCategoryId], references: [id])
 }
 
 model Course {
@@ -111,4 +111,41 @@ model Laboratory {
   image         String
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+  labBookings   LabBooking[]
+}
+
+model LabBooking {
+  id           String        @id @default(uuid())
+  laboratoryId String
+  bookingDate  DateTime
+  slot         TimeSlot
+  status       BookingStatus
+  reservedAt   DateTime      @default(now())
+  expiresAt    DateTime
+
+  approvedById   String?
+  approvedByRole UserRole?
+  approvedAt     DateTime?
+
+  rejectedById   String?
+  rejectedByRole UserRole?
+  rejectedAt     DateTime?
+
+  laboratory Laboratory @relation(fields: [laboratoryId], references: [id])
+
+  @@unique([laboratoryId, slot, bookingDate])
+}
+
+enum TimeSlot {
+  morning
+  afternoon
+}
+
+enum BookingStatus {
+  pending
+  approved
+  rejected
+  in_use
+  completed
+  cancelled
 }

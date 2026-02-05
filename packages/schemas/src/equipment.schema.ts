@@ -13,9 +13,7 @@ const baseSchema = z.object({
       message: `คำอธิบายต้องมีความยาวอย่างน้อย ${MIN_DESCRIPTION_LENGTH} อักษร`,
     }),
   subCategoryId: z.string().min(1, { message: "กรุณาเลือกหมวดหมู่ย่อย" }),
-  totalStock: z.coerce
-    .number({ message: "สต๊อกทั้งหมดต้องเป็นตัวเลข" })
-    .min(1, { message: "จำนวนสต๊อกต้องมีมากกว่า 1" }),
+  totalStock: z.coerce.number({ message: "สต๊อกทั้งหมดต้องเป็นตัวเลข" }),
 });
 
 export const equipmentSchema = baseSchema.extend({

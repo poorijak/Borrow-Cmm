@@ -1,6 +1,7 @@
+import { TimeSlot } from '@prisma/client';
 import { type ActiveStatus } from '@repo/types';
 import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsIn, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class GetLaboratoryQueryDto {
   @IsOptional()
@@ -20,4 +21,13 @@ export class GetLaboratoryQueryDto {
   @IsOptional()
   @IsString()
   search?: string;
+}
+
+export class GetLabAvailableQueryDto {
+  @IsIn(['morning', 'afternoon'])
+  slot: TimeSlot;
+
+  @Type(() => Date)
+  @IsDate()
+  bookingDate: Date;
 }

@@ -91,7 +91,7 @@ export const useLaboratory = (
         number,
       ];
 
-      const { data } = await api.get<LaboratoryResponse>("/laboratory", {
+      const { data } = await api.get<LaboratoryResponse>("/laboratory/admin", {
         params: { status, page, limit, search },
       });
       return data;

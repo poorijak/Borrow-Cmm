@@ -17,7 +17,10 @@ import {
   updateStatusSchema,
   type LaboratoryValue,
 } from '@repo/schemas';
-import { GetLaboratoryQueryDto } from './dto/labQuery.dto';
+import {
+  GetLabAvailableQueryDto,
+  GetLaboratoryQueryDto,
+} from './dto/labQuery.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/common/guards/role.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
@@ -39,6 +42,16 @@ export class LaboratoryController {
       totalBorrowed: 0,
       image: body.imageKey,
     });
+  }
+
+  @Get()
+  getLabs() {
+    return this.laboratoryService.getLaboratory();
+  }
+
+  @Get('available')
+  getLabAvailable(@Query() query: GetLabAvailableQueryDto) {
+    return this.laboratoryService.getLaboratoryWithAvailable(query);
   }
 
   @Patch(':id')
@@ -64,7 +77,7 @@ export class LaboratoryController {
     return this.laboratoryService.updateStatus(id, body);
   }
 
-  @Get()
+  @Get('/admin')
   findAll(@Query() query: GetLaboratoryQueryDto) {
     return this.laboratoryService.getPaginatedLab(query);
   }

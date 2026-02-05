@@ -5,7 +5,7 @@ import React from "react";
 
 const EquipmentSection = () => {
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4">
       <div className="flex justify-between">
         <h1 className="w-60 text-2xl font-bold">บริการสำหรับนักศึกษา</h1>
       </div>
@@ -25,7 +25,7 @@ const EquipmentSection = () => {
           </Link>
         </div>
         <div className="group relative aspect-square h-48 w-full cursor-pointer overflow-hidden rounded-lg border md:w-[450px]">
-          <Link href="/equipment">
+          <Link href="/laboratory">
             <div className="absolute inset-0 z-0 bg-[url('/images/cmm/Lab_borrow.webp')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110" />
 
             <div className="absolute inset-0 z-10 bg-black/20 group-hover:bg-black/40" />
