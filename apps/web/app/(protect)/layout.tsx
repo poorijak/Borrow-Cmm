@@ -11,7 +11,7 @@ interface ProtectLayoutProps {
 }
 
 const ProtectLayout = async ({ children }: ProtectLayoutProps) => {
-  const user: User = await getUser();
+  const user = await getUser();
 
   if (!user) redirect("/auth/signin");
 

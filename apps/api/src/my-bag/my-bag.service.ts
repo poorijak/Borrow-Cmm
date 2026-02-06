@@ -3,6 +3,7 @@ import { AddToBagDto } from './dto/create-my-bag.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { TimeSlot } from '@prisma/client';
+import { formatDateToYYYYMMDD } from 'src/common/libs/formater/format.date';
 
 @Injectable()
 export class MyBagService {
@@ -79,17 +80,61 @@ export class MyBagService {
 
     const totalItemCount = bag.labItems.length + bag.equipmentItems.length;
 
-    return await this.prisma.borrowBag.update({
+    const updateBag = await this.prisma.borrowBag.update({
       where: { id: bagId },
       data: {
         totalQty: totalQtySum,
         itemCount: totalItemCount,
       },
       include: {
-        equipmentItems: { include: { equipment: true } },
-        labItems: { include: { laboratory: true } },
+        equipmentItems: {
+          select: {
+            id: true,
+            itemCount: true,
+            bagId: true,
+            equipmentId: true,
+            isSelected: true,
+            equipment: {
+              select: {
+                id: true,
+                mainImage: true,
+                title: true,
+                totalStock: true,
+                subCategoryId: true,
+              },
+            },
+          },
+        },
+        labItems: {
+          select: {
+            id: true,
+            bagId: true,
+            labId: true,
+            date: true,
+            slot: true,
+            isSelected: true,
+            laboratory: {
+              select: {
+                id: true,
+                name: true,
+                labCode: true,
+                image: true,
+              },
+            },
+          },
+        },
       },
     });
+
+    const formattedLabItems = updateBag.labItems.map((item) => ({
+      ...item,
+      date: formatDateToYYYYMMDD(item.date),
+    }));
+
+    return {
+      ...updateBag,
+      labItems: formattedLabItems,
+    };
   }
 
   async upsertEquipmentItem(bagId: string, equipmentId: string) {

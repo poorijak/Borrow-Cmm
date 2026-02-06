@@ -7,3 +7,4 @@ export * from "./equipment";
 export * from "./params";
 export * from "./course";
 export * from "./laboratory";
+export * from "./bag";
