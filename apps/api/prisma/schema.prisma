@@ -197,5 +197,5 @@ model BagLabItem {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  @@unique([labId, bagId])
+  @@unique([labId, bagId, date, slot])
 }

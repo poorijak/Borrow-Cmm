@@ -1,0 +1,140 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { AddToBagDto } from './dto/create-my-bag.dto';
+import { PrismaService } from 'prisma/prisma.service';
+import { UserService } from 'src/user/user.service';
+import { TimeSlot } from '@prisma/client';
+
+@Injectable()
+export class MyBagService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService,
+  ) {}
+
+  async getMyBag(userId: string) {
+    const bag = await this.prisma.borrowBag.findFirst({
+      where: { userId },
+      include: {
+        equipmentItems: { include: { equipment: true } },
+        labItems: { include: { laboratory: true } },
+      },
+    });
+
+    if (!bag) {
+      return await this.prisma.borrowBag.create({
+        data: { userId },
+        include: {
+          equipmentItems: { include: { equipment: true } },
+          labItems: { include: { laboratory: true } },
+        },
+      });
+    }
+
+    return await this.syncBagTotals(bag.id);
+  }
+
+  async addtoBag(data: AddToBagDto) {
+    const { userId, labId, equipmentId, date, slot } = data;
+    const user = await this.userService.findOne({ id: userId });
+
+    if (!user) {
+      throw new BadRequestException('ไม่พบผู้ใช้');
+    }
+    const myBag = await this.getMyBag(user.id);
+
+    if (equipmentId) {
+      await this.upsertEquipmentItem(myBag!.id, equipmentId);
+    }
+
+    if (labId) {
+      if (!slot || !date) {
+        throw new BadRequestException(
+          'กรุณาระบุวันที่และช่วงเวลาสำหรับจองห้องแล็บ',
+        );
+      }
+
+      const utcDate = new Date(date);
+      utcDate.setUTCHours(0, 0, 0, 0);
+      await this.upsertLabItem(myBag!.id, labId, utcDate, slot);
+    }
+
+    return this.getMyBag(userId);
+  }
+
+  async syncBagTotals(bagId: string) {
+    const bag = await this.prisma.borrowBag.findUnique({
+      where: { id: bagId },
+      include: {
+        equipmentItems: true,
+        labItems: true,
+      },
+    });
+
+    if (!bag) return;
+
+    const totalQtySum = bag.equipmentItems.reduce(
+      (sum, item) => sum + item.itemCount,
+      0,
+    );
+
+    const totalItemCount = bag.labItems.length + bag.equipmentItems.length;
+
+    return await this.prisma.borrowBag.update({
+      where: { id: bagId },
+      data: {
+        totalQty: totalQtySum,
+        itemCount: totalItemCount,
+      },
+      include: {
+        equipmentItems: { include: { equipment: true } },
+        labItems: { include: { laboratory: true } },
+      },
+    });
+  }
+
+  async upsertEquipmentItem(bagId: string, equipmentId: string) {
+    return await this.prisma.bagEquipmentItem.upsert({
+      where: {
+        bagId_equipmentId: {
+          bagId,
+          equipmentId,
+        },
+      },
+      update: { itemCount: { increment: 1 } },
+      create: {
+        equipmentId,
+        bagId,
+        isSelected: false,
+        itemCount: 1,
+      },
+    });
+  }
+
+  async upsertLabItem(
+    bagId: string,
+    labId: string,
+    date: Date,
+    slot: TimeSlot,
+  ) {
+    return await this.prisma.bagLabItem.upsert({
+      where: {
+        labId_bagId_date_slot: {
+          bagId,
+          labId,
+          date,
+          slot,
+        },
+      },
+      update: {
+        isSelected: false,
+      },
+      create: {
+        labId,
+        bagId,
+        date,
+        slot,
+        isSelected: false,
+      },
+    });
+  }
+}
