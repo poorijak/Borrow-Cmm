@@ -24,27 +24,35 @@ const BagItems = ({ userId }: BagItemsProps) => {
       <Card className="rounded-md p-5 shadow-none">
         <div className="space-y-3">
           <h2 className="text-primary text-lg font-bold">อุปกรณ์</h2>
-          <ScrollArea className="h-72">
-            {equipmentItems.map((item) => (
-              <div key={item.id} className="mb-5 space-y-5">
-                <BagItemCard equipmentItem={item} />
-                <Separator />
-              </div>
-            ))}
-          </ScrollArea>
+          {equipmentItems ? (
+            <ScrollArea className="h-72">
+              {equipmentItems.map((item) => (
+                <div key={item.id} className="mb-5 space-y-5">
+                  <BagItemCard equipmentItem={item} userId={userId} />
+                  <Separator />
+                </div>
+              ))}
+            </ScrollArea>
+          ) : (
+            <>ไม่มีของในตะกร้า</>
+          )}
         </div>
       </Card>
       <Card className="rounded-md p-4 shadow-none">
         <div className="space-y-3">
           <h2 className="text-primary text-lg font-bold">ห้องปฏิบัติการ</h2>
-          <ScrollArea className="h-72">
-            {labItems.map((item) => (
-              <div key={item.id} className="mb-5 space-y-5">
-                <BagItemCard labItem={item} />
-                <Separator />
-              </div>
-            ))}
-          </ScrollArea>
+          {labItems ? (
+            <ScrollArea className="h-72">
+              {labItems.map((item) => (
+                <div key={item.id} className="mb-5 space-y-5">
+                  <BagItemCard labItem={item} />
+                  <Separator />
+                </div>
+              ))}
+            </ScrollArea>
+          ) : (
+            <>ไม่มีของในตะกร้า</>
+          )}
         </div>
       </Card>
     </div>

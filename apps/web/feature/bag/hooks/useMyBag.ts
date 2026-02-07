@@ -3,14 +3,16 @@ import { BorrowBag, LaboratorySortType } from "@repo/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-type UpdateStatusValue = {
+type UpdateBagValue = {
   itemId?: string;
-  action: "inc" | "dec";
+  action?: "inc" | "dec";
+  userId?: string;
+  type?: "lab" | "equipment";
 };
 
 export const useGetMyBag = (userId?: string) => {
   return useQuery({
-    queryKey: ["bag"],
+    queryKey: ["bag", userId],
     queryFn: async () => {
       const { data } = await api.get<BorrowBag>(`/bag/${userId}`);
       return data;
@@ -38,7 +40,7 @@ export const useAddToBag = () => {
           ? "เพิ่มอุปกรณ์ลงในกระเป๋า!"
           : "เพิ่มห้องปฏิบัติการใหม่ลงในกระเป๋า!",
       );
-      queryClient.invalidateQueries({ queryKey: ["bag"] });
+      queryClient.invalidateQueries({ queryKey: ["bag", v.userId] });
     },
     onError: (err) => {
       toast.error(err.message || "เกิดข้อผิดพลาด");
@@ -52,7 +54,7 @@ export const useUpdateItemCount = () => {
   return useMutation<
     any,
     Error,
-    UpdateStatusValue,
+    UpdateBagValue,
     {
       prevBagItem: [
         queryKey: readonly unknown[],
@@ -70,10 +72,10 @@ export const useUpdateItemCount = () => {
       return data;
     },
     onMutate: async (variable, context) => {
-      await queryClient.cancelQueries({ queryKey: ["bag"] });
+      await queryClient.cancelQueries({ queryKey: ["bag", variable.userId] });
 
       const prevBagItem = queryClient.getQueriesData<BorrowBag>({
-        queryKey: ["bag"],
+        queryKey: ["bag", variable.userId],
       });
 
       queryClient.setQueryData<BorrowBag>(
@@ -101,7 +103,82 @@ export const useUpdateItemCount = () => {
     },
     onError: (err, variables, context) => {
       if (context?.prevBagItem) {
-        queryClient.setQueryData(["bag"], context.prevBagItem);
+        queryClient.setQueryData(
+          ["bag", variables.userId],
+          context.prevBagItem,
+        );
+      }
+      toast.error(err.message || "เกิดข้อผิดพลาด");
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["bag"] });
+    },
+  });
+};
+
+export const useDeleteBagItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    any,
+    Error,
+    UpdateBagValue,
+    {
+      prevBagItem: [
+        queryKey: readonly unknown[],
+        data: BorrowBag | undefined,
+      ][];
+    }
+  >({
+    mutationFn: async (param) => {
+      const { type, itemId } = param;
+
+      const { data } =
+        type === "lab"
+          ? await api.delete(`/bag/lab/${itemId}`)
+          : await api.delete(`/bag/equipment/${itemId}`);
+
+      return data;
+    },
+    onMutate: async (variables, context) => {
+      await queryClient.cancelQueries({ queryKey: ["bag", variables.userId] });
+
+      const prevBagItem = queryClient.getQueriesData<BorrowBag>({
+        queryKey: ["bag", variables.userId],
+      });
+
+      queryClient.setQueryData<BorrowBag>(
+        ["bag", variables.userId],
+        (oldData: BorrowBag | undefined) => {
+          if (!oldData) return oldData;
+
+          if (variables.type === "equipment") {
+            return {
+              ...oldData,
+              equipmentItems: oldData.equipmentItems.filter((item) => {
+                return item.id !== variables.itemId;
+              }),
+            };
+          } else {
+            return {
+              ...oldData,
+              labItems: oldData.labItems.filter((item) => {
+                return item.id !== variables.itemId;
+              }),
+            };
+          }
+        },
+      );
+
+      return { prevBagItem };
+    },
+    onError: (err, variables, context) => {
+      if (context?.prevBagItem) {
+        queryClient.setQueryData(
+          ["bag", variables.userId],
+          context.prevBagItem,
+        );
       }
       toast.error(err.message || "เกิดข้อผิดพลาด");
     },

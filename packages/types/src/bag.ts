@@ -32,7 +32,7 @@ export interface BagLabItem {
   id: string;
   bagId: string;
   labId: string;
-  date: string | Date;
+  date: string;
   slot: LaboratorySortType;
   isSelected: boolean;
   laboratory: LaboratoryInBag;
@@ -43,8 +43,8 @@ export interface BorrowBag {
   id: string;
   itemCount: number;
   totalQty: number;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  createdAt: string;
+  updatedAt: string;
   userId: string;
   equipmentItems: BagEquipmentItem[];
   labItems: BagLabItem[];
