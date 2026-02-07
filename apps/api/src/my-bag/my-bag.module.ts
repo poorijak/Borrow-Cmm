@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { MyBagService } from './my-bag.service';
 import { MyBagController } from './my-bag.controller';
 import { UserModule } from 'src/user/user.module';
+import { LaboratoryModule } from 'src/laboratory/laboratory.module';
+import { LaboratoryService } from 'src/laboratory/laboratory.service';
 
 @Module({
-  imports: [UserModule],
+  imports: [UserModule, LaboratoryModule],
   controllers: [MyBagController],
   providers: [MyBagService],
 })

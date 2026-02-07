@@ -14,6 +14,9 @@ import { User } from "@repo/types";
 import { cn } from "@/lib/utils";
 import { useSignout } from "@/feature/auth/hooks/useAuth";
 import Link from "next/link";
+import { useIsMobile } from "@/hooks/use-mobile";
+import BagItems from "@/feature/bag/components/bag-items";
+import { Separator } from "../ui/separator";
 
 interface SiteHeaderProps {
   className?: string;
@@ -23,6 +26,8 @@ interface SiteHeaderProps {
 
 const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
   const { mutate: signOut } = useSignout();
+
+  const isMobile = useIsMobile();
 
   return (
     <header
@@ -35,10 +40,28 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
         <SidebarTrigger />
 
         <div className="flex items-center gap-4">
-          {type === "Student" && (
-            <Link href="/bag">
-              <ShoppingBag className="text-muted-foreground size-5" />
-            </Link>
+          {}
+
+          {isMobile ? (
+            type === "Student" && (
+              <Link href="/bag">
+                <ShoppingBag className="text-muted-foreground size-5" />
+              </Link>
+            )
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <ShoppingBag className="text-muted-foreground size-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="h-[800px] w-[500px] space-y-5 p-5"
+              >
+                <h3 className="text-xl font-bold">กระเป๋าของฉัน</h3>
+                <Separator />
+                <BagItems userId={user.id} />
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           <DropdownMenu>

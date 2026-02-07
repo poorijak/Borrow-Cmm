@@ -2,14 +2,16 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { AddToBagDto } from './dto/create-my-bag.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
-import { TimeSlot } from '@prisma/client';
+import { Prisma, TimeSlot } from '@prisma/client';
 import { formatDateToYYYYMMDD } from 'src/common/libs/formater/format.date';
+import { LaboratoryService } from 'src/laboratory/laboratory.service';
 
 @Injectable()
 export class MyBagService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
+    private readonly labService: LaboratoryService,
   ) {}
 
   async getMyBag(userId: string) {
@@ -53,10 +55,27 @@ export class MyBagService {
           'กรุณาระบุวันที่และช่วงเวลาสำหรับจองห้องแล็บ',
         );
       }
+      try {
+        const conflic = await this.labService.checkBusyLab(labId, date, slot);
 
-      const utcDate = new Date(date);
-      utcDate.setUTCHours(0, 0, 0, 0);
-      await this.upsertLabItem(myBag!.id, labId, utcDate, slot);
+        if (conflic) {
+          throw new BadRequestException('ห้องปฏิบัติการนี้ถูกจองไปแล้ว');
+        }
+
+        const utcDate = new Date(date);
+        utcDate.setUTCHours(0, 0, 0, 0);
+
+        await this.upsertLabItem(myBag!.id, labId, utcDate, slot);
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002'
+        ) {
+          throw new BadRequestException('ห้องปฏิบัติการนี้ถูกจองไปแล้ว');
+        }
+
+        throw error;
+      }
     }
 
     return this.getMyBag(userId);
@@ -126,10 +145,20 @@ export class MyBagService {
       },
     });
 
-    const formattedLabItems = updateBag.labItems.map((item) => ({
-      ...item,
-      date: formatDateToYYYYMMDD(item.date),
-    }));
+    const formattedLabItems = await Promise.all(
+      updateBag.labItems.map(async (item) => {
+        const isBusy = await this.labService.checkBusyLab(
+          item.labId,
+          item.date,
+          item.slot,
+        );
+        return {
+          ...item,
+          date: formatDateToYYYYMMDD(item.date),
+          status: isBusy ? true : false,
+        };
+      }),
+    );
 
     return {
       ...updateBag,
@@ -180,6 +209,45 @@ export class MyBagService {
         slot,
         isSelected: false,
       },
+    });
+  }
+
+  async updateBagItem(equipmentItemId: string, action: 'inc' | 'dec') {
+    const existingItem = await this.prisma.bagEquipmentItem.findUnique({
+      where: {
+        id: equipmentItemId,
+      },
+    });
+
+    if (!existingItem) {
+      throw new Error('ไม่พบของในกระเป๋า');
+    }
+
+    if (action === 'dec' && existingItem.itemCount === 1) {
+      return await this.deleteBagItem(equipmentItemId, 'equipment');
+    }
+
+    await this.prisma.bagEquipmentItem.update({
+      where: { id: existingItem.id },
+      data: {
+        itemCount: {
+          [action === 'inc' ? 'increment' : 'decrement']: 1,
+        },
+      },
+    });
+
+    return { status: 'success' };
+  }
+
+  async deleteBagItem(itemId: string, type: 'lab' | 'equipment') {
+    if (type === 'lab') {
+      return this.prisma.bagLabItem.delete({
+        where: { id: itemId },
+      });
+    }
+
+    return this.prisma.bagEquipmentItem.delete({
+      where: { id: itemId },
     });
   }
 }

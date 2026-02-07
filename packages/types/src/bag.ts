@@ -16,6 +16,7 @@ export interface LaboratoryInBag {
   name: string;
   labCode: string;
   image: string;
+  status: boolean;
 }
 
 export interface BagEquipmentItem {

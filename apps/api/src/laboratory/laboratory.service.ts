@@ -63,6 +63,14 @@ export class LaboratoryService {
     return conflic;
   }
 
+  async checkBusyLab(labId: string, bookingDate: Date, slot: TimeSlot) {
+    const conflic = await this.prisma.labBooking.findUnique({
+      where: { id: labId, bookingDate, slot },
+    });
+
+    return conflic;
+  }
+
   async getLaboratory() {
     const labs = await this.prisma.laboratory.findMany({
       select: {

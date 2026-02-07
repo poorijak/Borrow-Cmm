@@ -7,5 +7,6 @@ import { R2Module } from 'src/common/cloudflare/r2.module';
   imports: [R2Module],
   controllers: [LaboratoryController],
   providers: [LaboratoryService],
+  exports: [LaboratoryService],
 })
 export class LaboratoryModule {}

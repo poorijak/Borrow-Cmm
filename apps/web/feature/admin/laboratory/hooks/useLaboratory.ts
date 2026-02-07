@@ -1,16 +1,11 @@
 import api from "@/lib/axios";
-import {
-  LaboratoryFormValue,
-  LaboratoryRequest,
-  LaboratoryValue,
-} from "@repo/schemas";
+import { LaboratoryFormValue, LaboratoryRequest } from "@repo/schemas";
 import {
   ActiveStatus,
   LaboratoryResponse,
   uploadImageResponse,
 } from "@repo/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Asterisk } from "lucide-react";
 import { toast } from "sonner";
 
 interface updateStatusValue {
