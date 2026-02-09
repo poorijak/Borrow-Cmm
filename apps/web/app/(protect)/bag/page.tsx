@@ -7,7 +7,7 @@ const page = async () => {
 
   return (
     <div className="mt-5">
-      <h1 className="pb-5 text-4xl font-bold">กระเป๋าของฉัน</h1>
+      <h1 className="pb-5 text-3xl font-bold">กระเป๋าของฉัน</h1>
       <BagItems userId={user?.id} />
     </div>
   );

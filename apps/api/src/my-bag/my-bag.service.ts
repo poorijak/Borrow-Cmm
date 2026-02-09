@@ -162,11 +162,34 @@ export class MyBagService {
 
     return {
       ...updateBag,
+      equipmentCount: totalQtySum,
       labItems: formattedLabItems,
     };
   }
 
   async upsertEquipmentItem(bagId: string, equipmentId: string) {
+    const totalEquipment = await this.prisma.equipment.findUnique({
+      where: { id: equipmentId },
+      select: { totalStock: true },
+    });
+
+    const currentItem = await this.prisma.bagEquipmentItem.findFirst({
+      where: {
+        bagId: bagId,
+      },
+      include: { equipment: true },
+    });
+
+    const currentCount = currentItem?.itemCount || 0;
+
+    console.log(currentCount);
+
+    if (currentCount + 1 > (totalEquipment?.totalStock || 0)) {
+      throw new BadRequestException(
+        `อุปกรณ์ในสต็อกไม่เพียงพอ (คงเหลือ ${totalEquipment?.totalStock})`,
+      );
+    }
+
     return await this.prisma.bagEquipmentItem.upsert({
       where: {
         bagId_equipmentId: {
@@ -217,17 +240,28 @@ export class MyBagService {
       where: {
         id: equipmentItemId,
       },
+      include: { equipment: true },
     });
 
     if (!existingItem) {
       throw new Error('ไม่พบของในกระเป๋า');
     }
 
+    if (action === 'inc') {
+      const currentCount = existingItem.itemCount || 0;
+
+      if (currentCount + 1 > (existingItem.equipment.totalStock || 0)) {
+        throw new BadRequestException(
+          `อุปกรณ์ในสต็อกไม่เพียงพอ (คงเหลือ ${existingItem.equipment?.totalStock})`,
+        );
+      }
+    }
+
     if (action === 'dec' && existingItem.itemCount === 1) {
       return await this.deleteBagItem(equipmentItemId, 'equipment');
     }
 
-    await this.prisma.bagEquipmentItem.update({
+    const newCountItem = await this.prisma.bagEquipmentItem.update({
       where: { id: existingItem.id },
       data: {
         itemCount: {
@@ -236,7 +270,7 @@ export class MyBagService {
       },
     });
 
-    return { status: 'success' };
+    return { status: 'success', newCountItem };
   }
 
   async deleteBagItem(itemId: string, type: 'lab' | 'equipment') {

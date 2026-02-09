@@ -102,12 +102,14 @@ const BagItemCard = ({ equipmentItem, labItem, userId }: BagItemCardProps) => {
               >
                 <Minus />
               </Button>
-              <div>{equipmentItem?.itemCount}</div>
+              <div className="text-sm">{equipmentItem?.itemCount}</div>
               <Button
                 onClick={handleIncrementCount}
                 variant="outline"
                 size="icon-xs"
-                disabled={isPending}
+                disabled={
+                  isPending || equipmentItem.itemCount >= equipment.totalStock
+                }
               >
                 <Plus />
               </Button>

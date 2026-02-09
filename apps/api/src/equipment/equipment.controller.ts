@@ -17,7 +17,7 @@ import {
   updateStatusSchema,
   type EquipmentValue,
 } from '@repo/schemas';
-import { EquipmentResponse } from '@repo/types';
+import { EquipmentResponse, ROLES } from '@repo/types';
 import { GetEquipmentsQueryDto } from './dto/EquipmentDto';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/common/guards/role.guard';
@@ -70,6 +70,7 @@ export class EquipmentController {
     });
   }
   @Get()
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
   async findAll(
     @Query() query: GetEquipmentsQueryDto,
   ): Promise<EquipmentResponse> {

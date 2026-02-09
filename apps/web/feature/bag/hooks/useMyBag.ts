@@ -79,7 +79,7 @@ export const useUpdateItemCount = () => {
       });
 
       queryClient.setQueryData<BorrowBag>(
-        ["bag"],
+        ["bag", variable.userId],
         (oldData: BorrowBag | undefined) => {
           if (!oldData) return oldData;
           return {
@@ -111,8 +111,8 @@ export const useUpdateItemCount = () => {
       toast.error(err.message || "เกิดข้อผิดพลาด");
     },
 
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["bag"] });
+    onSettled: (variable) => {
+      queryClient.invalidateQueries({ queryKey: ["bag", variable.userId] });
     },
   });
 };

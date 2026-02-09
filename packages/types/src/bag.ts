@@ -46,6 +46,7 @@ export interface BorrowBag {
   createdAt: string;
   updatedAt: string;
   userId: string;
+  equipmentCount: number;
   equipmentItems: BagEquipmentItem[];
   labItems: BagLabItem[];
 }

@@ -6,11 +6,19 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { MyBagService } from './my-bag.service';
 import { AddToBagDto } from './dto/create-my-bag.dto';
+import { UserRole } from '@prisma/client';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from 'src/common/guards/role.guard';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role } from 'src/admin/role.enum';
 
 @Controller('bag')
+@UseGuards(AuthGuard('jwt'), RoleGuard)
+@Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
 export class MyBagController {
   constructor(private readonly myBagService: MyBagService) {}
 
