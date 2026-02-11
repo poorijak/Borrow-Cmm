@@ -4,7 +4,7 @@ import { LaboratorySortType, User } from "@repo/types";
 import React from "react";
 import { useGetLaboratory } from "../hooks/useLaboratory";
 import Image from "next/image";
-import { getPublicUrl } from "@/lib/utils";
+import { cn, getPublicUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Loading from "@/components/shared/loading";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -62,9 +62,15 @@ const LabContent = ({ bookingDate, slot, user }: LabContentProps) => {
                     src={getPublicUrl(lab.image)}
                     fill
                     alt="lab preview"
-                    className="rounded-tl-md rounded-tr-md object-cover"
+                    className={cn(
+                      "rounded-tl-md rounded-tr-md object-cover",
+                      isDisabled && "grayscale-100",
+                    )}
                     loading="lazy"
                   />
+                  {isDisabled && (
+                    <div className="absolute inset-0 z-10 bg-black/40" />
+                  )}
                 </div>
                 <div className="flex flex-col gap-3 px-3 pb-5">
                   <div>
@@ -73,11 +79,7 @@ const LabContent = ({ bookingDate, slot, user }: LabContentProps) => {
                       {lab.name}
                     </label>
                   </div>
-                  <Button
-                    className="rounded-sm"
-                    disabled={isDisabled}
-                    onClick={() => handleAddToBag(lab.id)}
-                  >
+                  <Button className="rounded-sm" disabled={isDisabled}>
                     {getButtonText()}
                   </Button>
                 </div>

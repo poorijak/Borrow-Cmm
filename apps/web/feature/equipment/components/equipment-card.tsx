@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useAddToBag } from "@/feature/bag/hooks/useMyBag";
 import { getPublicUrl } from "@/lib/utils";
@@ -65,6 +65,9 @@ const EquipmentCard = ({
           </p>
 
           <Separator />
+        </CardContent>
+
+        <CardFooter>
           <Button
             className="w-full rounded-sm"
             disabled={status === "inactive" || totalStock <= 0 || isPending}
@@ -74,7 +77,7 @@ const EquipmentCard = ({
               ? "ไม่พร้อมใช้งาน"
               : "ใส่กระเป๋า"}
           </Button>
-        </CardContent>
+        </CardFooter>
       </Card>
     </div>
   );
