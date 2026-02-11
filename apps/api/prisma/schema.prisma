@@ -11,6 +11,20 @@ enum ActiveStatus {
   inactive
 }
 
+enum TimeSlot {
+  morning
+  afternoon
+}
+
+enum BookingStatus {
+  pending
+  approved
+  rejected
+  in_use
+  completed
+  cancelled
+}
+
 enum UserRole {
   administrater
   moderater
@@ -28,8 +42,9 @@ model User {
   borrowedQTY  Int      @default(0)
   overDueQTY   Int      @default(0)
 
-  role     UserRole  @default(student)
+  role     UserRole    @default(student)
   accounts Account[]
+  bags     BorrowBag[]
 }
 
 model Account {
@@ -78,19 +93,20 @@ model EquipmentSubCategory {
 }
 
 model Equipment {
-  id            String               @id @default(uuid())
-  mainImage     String
-  title         String               @unique
-  description   String?
-  totalStock    Int
-  borrowedQty   Int
-  reservedQty   Int
-  totalBorrowed Int
-  status        ActiveStatus
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  subCategoryId String
-  category      EquipmentSubCategory @relation(fields: [subCategoryId], references: [id])
+  id                String               @id @default(uuid())
+  mainImage         String
+  title             String               @unique
+  description       String?
+  totalStock        Int
+  borrowedQty       Int
+  reservedQty       Int
+  totalBorrowed     Int
+  status            ActiveStatus
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  subCategoryId     String
+  category          EquipmentSubCategory @relation(fields: [subCategoryId], references: [id])
+  bagEquipmentItems BagEquipmentItem[]
 }
 
 model Course {
@@ -112,6 +128,7 @@ model Laboratory {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   labBookings   LabBooking[]
+  bagLabItems   BagLabItem[]
 }
 
 model LabBooking {
@@ -136,16 +153,49 @@ model LabBooking {
   @@unique([laboratoryId, slot, bookingDate])
 }
 
-enum TimeSlot {
-  morning
-  afternoon
+model BorrowBag {
+  id             String             @id @default(uuid())
+  itemCount      Int                @default(0)
+  totalQty       Int                @default(0)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  userId         String
+  owner          User               @relation(fields: [userId], references: [id])
+  equipmentItems BagEquipmentItem[]
+  labItems       BagLabItem[]
 }
 
-enum BookingStatus {
-  pending
-  approved
-  rejected
-  in_use
-  completed
-  cancelled
+model BagEquipmentItem {
+  id        String @id @default(uuid())
+  itemCount Int    @default(1)
+
+  bagId String
+  bag   BorrowBag @relation(fields: [bagId], references: [id])
+
+  equipmentId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+
+  isSelected Boolean
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([bagId, equipmentId])
+}
+
+model BagLabItem {
+  id String @id @default(uuid())
+
+  bagId     String
+  borrowBag BorrowBag @relation(fields: [bagId], references: [id])
+
+  labId      String
+  laboratory Laboratory @relation(fields: [labId], references: [id])
+
+  date       DateTime
+  slot       TimeSlot
+  isSelected Boolean
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([labId, bagId, date, slot])
 }

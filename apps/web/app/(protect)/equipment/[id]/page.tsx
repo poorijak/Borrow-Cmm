@@ -1,4 +1,5 @@
 import EquipmentWrapper from "@/feature/equipment/components/equipment-wrapper";
+import { getUser } from "@/feature/users/server/user";
 import React from "react";
 
 interface equipmentPageProps {
@@ -7,8 +8,9 @@ interface equipmentPageProps {
 
 const page = async ({ params }: equipmentPageProps) => {
   const { id } = await params;
+  const user = await getUser();
 
-  return <EquipmentWrapper id={id} />;
+  return <EquipmentWrapper id={id} user={user} />;
 };
 
 export default page;

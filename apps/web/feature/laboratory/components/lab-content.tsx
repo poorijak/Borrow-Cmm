@@ -1,6 +1,6 @@
 "use client";
 
-import { LaboratorySortType } from "@repo/types";
+import { LaboratorySortType, User } from "@repo/types";
 import React from "react";
 import { useGetLaboratory } from "../hooks/useLaboratory";
 import Image from "next/image";
@@ -9,16 +9,28 @@ import { Button } from "@/components/ui/button";
 import Loading from "@/components/shared/loading";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAddToBag } from "@/feature/bag/hooks/useMyBag";
 
 interface LabContentProps {
   bookingDate?: string;
   slot?: LaboratorySortType;
+  user: User | null;
 }
 
-const LabContent = ({ bookingDate, slot }: LabContentProps) => {
+const LabContent = ({ bookingDate, slot, user }: LabContentProps) => {
   const { data } = useGetLaboratory(bookingDate, slot);
+  const { mutate, isPending } = useAddToBag();
 
   const isFilterSelected = !!bookingDate && !!slot;
+
+  const handleAddToBag = (labId: string) => {
+    mutate({
+      userId: user!.id,
+      labId,
+      date: bookingDate,
+      slot,
+    });
+  };
 
   console.log(data);
 
@@ -38,7 +50,7 @@ const LabContent = ({ bookingDate, slot }: LabContentProps) => {
             };
 
             const isDisabled =
-              isInactive || isNotAvailable || !isFilterSelected;
+              isInactive || isNotAvailable || !isFilterSelected || isPending;
 
             return (
               <div
@@ -64,6 +76,7 @@ const LabContent = ({ bookingDate, slot }: LabContentProps) => {
                   <Button
                     className="rounded-sm"
                     disabled={isDisabled}
+                    onClick={() => handleAddToBag(lab.id)}
                   >
                     {getButtonText()}
                   </Button>

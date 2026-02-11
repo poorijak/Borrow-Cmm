@@ -50,6 +50,7 @@ export class CourseController {
   }
 
   @Get()
+  @Roles(Role.ADMIN, Role.MODERATOR)
   findAll(@Query() query: GetCourseQueryDTO) {
     return this.courseService.getPaginatedCourse(query);
   }
