@@ -17,7 +17,7 @@ import {
   updateStatusSchema,
   type EquipmentValue,
 } from '@repo/schemas';
-import { EquipmentResponse, ROLES } from '@repo/types';
+import { EquipmentResponse } from '@repo/types';
 import { GetEquipmentsQueryDto } from './dto/EquipmentDto';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/common/guards/role.guard';
@@ -78,6 +78,7 @@ export class EquipmentController {
   }
 
   @Get(':categoryId')
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
   async findByCategoryId(@Param('categoryId') id: string) {
     return this.equipmentService.getEquipmentByCategoryId({
       id,

@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { MyBagService } from './my-bag.service';
 import { AddToBagDto } from './dto/create-my-bag.dto';
-import { UserRole } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/common/guards/role.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
@@ -48,5 +47,29 @@ export class MyBagController {
   @Delete('/lab/:itemId')
   deleteLabItem(@Param('itemId') itemId: string) {
     return this.myBagService.deleteBagItem(itemId, 'lab');
+  }
+
+  @Patch(':type/:itemId/select')
+  seletedEquipmentItem(
+    @Param('itemId') itemId: string,
+    @Param('type') type: 'equipment' | 'lab',
+  ) {
+    return this.myBagService.selectedBagItem(itemId, type);
+  }
+
+  @Patch(':type/:bagId/select-all')
+  selectAll(
+    @Param('bagId') bagId: string,
+    @Param('type') type: 'equipment' | 'lab',
+  ) {
+    return this.myBagService.selectAllBagItem(bagId, type);
+  }
+
+  @Patch(':type/:bagId/select-all')
+  unselectAll(
+    @Param('bagId') bagId: string,
+    @Param('type') type: 'equipment' | 'lab',
+  ) {
+    return this.myBagService.selectAllBagItem(bagId, type);
   }
 }

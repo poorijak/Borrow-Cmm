@@ -3,11 +3,18 @@ import { BorrowBag, LaboratorySortType } from "@repo/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-type UpdateBagValue = {
+type UpdateBageCount = {
   itemId?: string;
   action?: "inc" | "dec";
   userId?: string;
   type?: "lab" | "equipment";
+};
+
+type SelectedBagItems = {
+  itemId?: string;
+  bagId?: string;
+  type: "lab" | "equipment";
+  userId?: string;
 };
 
 export const useGetMyBag = (userId?: string) => {
@@ -54,7 +61,7 @@ export const useUpdateItemCount = () => {
   return useMutation<
     any,
     Error,
-    UpdateBagValue,
+    UpdateBageCount,
     {
       prevBagItem: [
         queryKey: readonly unknown[],
@@ -123,7 +130,7 @@ export const useDeleteBagItem = () => {
   return useMutation<
     any,
     Error,
-    UpdateBagValue,
+    UpdateBageCount,
     {
       prevBagItem: [
         queryKey: readonly unknown[],
@@ -187,4 +194,154 @@ export const useDeleteBagItem = () => {
       queryClient.invalidateQueries({ queryKey: ["bag"] });
     },
   });
+};
+
+export const useSelectItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<any, Error, SelectedBagItems, { prevBagItem?: BorrowBag }>(
+    {
+      mutationFn: async (params) => {
+        const { itemId, type } = params;
+
+        const { data } = await api.patch(`/bag/${type}/${itemId}/select`);
+        return data;
+      },
+      onMutate: async (variables, context) => {
+        await queryClient.cancelQueries({
+          queryKey: ["bag", variables.userId],
+        });
+
+        const prevBagItem = queryClient.getQueryData<BorrowBag>([
+          "bag",
+          variables.userId,
+        ]);
+
+        queryClient.setQueryData<BorrowBag>(
+          ["bag", variables.userId],
+          (oldData: BorrowBag | undefined) => {
+            if (!oldData) return oldData;
+
+            if (variables.type === "equipment") {
+              return {
+                ...oldData,
+                equipmentItems: oldData.equipmentItems.map((item) =>
+                  item.id === variables.itemId
+                    ? { ...item, isSelected: !item.isSelected }
+                    : item,
+                ),
+              };
+            }
+
+            if (variables.type === "lab") {
+              return {
+                ...oldData,
+                labItems: oldData.labItems.map((item) =>
+                  item.id === variables.itemId
+                    ? { ...item, isSelected: !item.isSelected }
+                    : item,
+                ),
+              };
+            }
+
+            return oldData;
+          },
+        );
+
+        return { prevBagItem };
+      },
+      onError: (err, variables, context) => {
+        if (context?.prevBagItem) {
+          queryClient.setQueryData(
+            ["bag", variables.userId],
+            context.prevBagItem,
+          );
+        }
+        toast.error(err.message || "เกิดข้อผิดพลาด");
+      },
+
+      onSettled: (variable) => {
+        queryClient.invalidateQueries({ queryKey: ["bag", variable.userId] });
+      },
+    },
+  );
+};
+
+export const useSelectAllItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<any, Error, SelectedBagItems, { prevBagItem?: BorrowBag }>(
+    {
+      mutationFn: async (params) => {
+        const { bagId, type } = params;
+
+        const { data } = await api.patch(`/bag/${type}/${bagId}/select-all`);
+        return data;
+      },
+      onMutate: async (variables, context) => {
+        await queryClient.cancelQueries({
+          queryKey: ["bag", variables.userId],
+        });
+
+        console.log(variables);
+
+        const prevBagItem = queryClient.getQueryData<BorrowBag>([
+          "bag",
+          variables.userId,
+        ]);
+
+        queryClient.setQueryData<BorrowBag>(
+          ["bag", variables.userId],
+          (oldData: BorrowBag | undefined) => {
+            if (!oldData) return oldData;
+
+            if (variables.type === "equipment") {
+              const allSelected = oldData.equipmentItems.every(
+                (item) => item.isSelected,
+              );
+
+              return {
+                ...oldData,
+                equipmentItems: oldData.equipmentItems.map((item) => ({
+                  ...item,
+                  isSelected: !allSelected,
+                })),
+              };
+            }
+
+            if (variables.type === "lab") {
+              const allSelected = oldData.labItems.every(
+                (item) => item.isSelected,
+              );
+
+              return {
+                ...oldData,
+                labItems: oldData.labItems.map((item) => ({
+                  ...item,
+                  isSelected: !allSelected,
+                })),
+              };
+            }
+
+            return oldData;
+          },
+        );
+
+        return { prevBagItem };
+      },
+      onError: (err, variables, context) => {
+        if (context?.prevBagItem) {
+          queryClient.setQueryData(
+            ["bag", variables.userId],
+            context.prevBagItem,
+          );
+        }
+        toast.error(err.message || "เกิดข้อผิดพลาด");
+      },
+
+      onSettled: (variable) => {
+        queryClient.invalidateQueries({ queryKey: ["bag", variable.userId] });
+      },
+    },
+  );
 };

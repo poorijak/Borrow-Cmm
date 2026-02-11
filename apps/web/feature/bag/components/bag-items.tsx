@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useGetMyBag } from "../hooks/useMyBag";
+import { useGetMyBag, useSelectAllItem } from "../hooks/useMyBag";
 import { Card } from "@/components/ui/card";
 import BagItemCard from "./bag-item-card";
 import { Separator } from "@/components/ui/separator";
@@ -17,19 +17,44 @@ interface BagItemsProps {
 const BagItems = ({ userId }: BagItemsProps) => {
   const { data } = useGetMyBag(userId);
 
-  console.log(data);
-
   const equipmentItems = data?.equipmentItems ?? [];
   const labItems = data?.labItems ?? [];
   const isEmpty = equipmentItems.length === 0 && labItems.length === 0;
+  const { mutate: selectedAll } = useSelectAllItem();
+
+  const handleSelectItemAll = (type: "lab" | "equipment") => {
+    selectedAll({
+      bagId: data?.id,
+      type,
+      userId,
+    });
+  };
+
+  const isAllSelected = (type: "lab" | "equipment") => {
+    if (type === "equipment") {
+      return equipmentItems.every((item) => item.isSelected);
+    } else {
+      return labItems.every((item) => item.isSelected);
+    }
+  };
+
+  const hasEquipment = equipmentItems.length > 0;
+  const hasLab = labItems.length > 0;
+  const hasBoth = hasEquipment && hasLab;
+
+  const getSelectedCount = (type: "lab" | "equipment") => {
+    const items = type === "equipment" ? equipmentItems : labItems;
+    const selected = items.filter((i) => i.isSelected).length;
+    return `${selected}/${items.length}`;
+  };
 
   return (
     <>
       {isEmpty ? (
-        <div className="md:-mt-24 mt-24 flex h-full w-full items-center justify-center overflow-hidden">
+        <div className="mt-24 flex h-full w-full items-center justify-center overflow-hidden md:-mt-24">
           <div className="flex size-40 flex-col items-center justify-center gap-2 rounded-full bg-slate-100 p-5">
             <ShoppingBag className="text-muted-foreground" size={50} />
-            <p className="text-muted-foreground text-sm font-bold">
+            <p className="text-muted-foreground text-sm font-medium">
               ไม่มีของในกระเป๋า!
             </p>
           </div>
@@ -39,22 +64,26 @@ const BagItems = ({ userId }: BagItemsProps) => {
           {equipmentItems && equipmentItems.length >= 1 && (
             <Card className="rounded-md p-5 shadow-none">
               <div className="space-y-3">
-                <h2 className="text-primary text-lg font-bold">
-                  อุปกรณ์{" "}
-                  <span className="text-muted-foreground text-base font-medium">
-                    {data?.equipmentCount}
-                  </span>
-                </h2>
-                <ScrollArea
-                  className={cn(
-                    equipmentItems && equipmentItems.length >= 1 && "h-56",
-                    equipmentItems.length >= 1 && labItems.length === 0 && "h-full",
-                  )}
-                >
-                  {equipmentItems.map((item, index) => (
+                <div className="flex items-center justify-between">
+                  <h2 className="text-primary text-lg font-bold">อุปกรณ์ </h2>
+                  <Button
+                    className={cn(
+                      isAllSelected("equipment")
+                        ? "text-primary"
+                        : "text-black",
+                    )}
+                    variant="link"
+                    size="sm"
+                    onClick={() => handleSelectItemAll("equipment")}
+                  >
+                    เลือกทั้งหมด {getSelectedCount("equipment")}
+                  </Button>
+                </div>
+                <ScrollArea className={cn(hasBoth ? "h-52" : "h-[500px]")}>
+                  {equipmentItems.map((item) => (
                     <div key={item.id} className="mb-5 space-y-5">
                       <BagItemCard equipmentItem={item} userId={userId} />
-                      {index !== equipmentItems.length - 1 && <Separator />}
+                      <Separator />
                     </div>
                   ))}
                 </ScrollArea>
@@ -64,16 +93,25 @@ const BagItems = ({ userId }: BagItemsProps) => {
           {labItems && labItems.length >= 1 && (
             <Card className="rounded-md p-4 shadow-none">
               <div className="space-y-3">
-                <h2 className="text-primary text-lg font-bold">
-                  ห้องปฏิบัติการ{" "}
-                  <span className="text-muted-foreground text-base font-medium">
-                    {labItems.length}
-                  </span>
-                </h2>
-                <ScrollArea className="h-56">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-primary text-lg font-bold">
+                    ห้องปฏิบัติการ{" "}
+                  </h2>
+                  <Button
+                    className={cn(
+                      isAllSelected("lab") ? "text-primary" : "text-black",
+                    )}
+                    variant="link"
+                    size="sm"
+                    onClick={() => handleSelectItemAll("lab")}
+                  >
+                    เลือกทั้งหมด {getSelectedCount("lab")}
+                  </Button>
+                </div>
+                <ScrollArea className={cn(hasBoth ? "h-52" : "h-[500px]")}>
                   {labItems.map((item) => (
                     <div key={item.id} className="mb-5 space-y-5">
-                      <BagItemCard labItem={item} />
+                      <BagItemCard labItem={item} userId={userId} />
                       <Separator />
                     </div>
                   ))}

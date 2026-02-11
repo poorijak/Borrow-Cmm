@@ -17,7 +17,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import BagItems from "@/feature/bag/components/bag-items";
 import { Separator } from "../ui/separator";
 import { useGetMyBag } from "@/feature/bag/hooks/useMyBag";
-import { Badge } from "../ui/badge";
 import Link from "next/link";
 import { Button } from "../ui/button";
 
@@ -31,8 +30,6 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
   const { mutate: signOut } = useSignout();
 
   const { data } = useGetMyBag(user.id);
-
-  console.log(user);
 
   const isMobile = useIsMobile();
 
@@ -74,7 +71,7 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="h-[800px] w-[500px] space-y-5 p-5"
+                    className="h-[800px] w-[550px] space-y-5 p-5"
                   >
                     <h3 className="text-xl font-bold">กระเป๋าของฉัน</h3>
                     <Separator />

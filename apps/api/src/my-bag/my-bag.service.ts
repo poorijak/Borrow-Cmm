@@ -1,10 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { AddToBagDto } from './dto/create-my-bag.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { Prisma, TimeSlot } from '@prisma/client';
 import { formatDateToYYYYMMDD } from 'src/common/libs/formater/format.date';
 import { LaboratoryService } from 'src/laboratory/laboratory.service';
+
+type BagItemType = 'equipment' | 'lab';
 
 @Injectable()
 export class MyBagService {
@@ -175,11 +181,13 @@ export class MyBagService {
 
     const currentItem = await this.prisma.bagEquipmentItem.findFirst({
       where: {
+        equipmentId,
         bagId: bagId,
       },
       include: { equipment: true },
     });
 
+    console.log(currentItem?.equipment.title);
     const currentCount = currentItem?.itemCount || 0;
 
     console.log(currentCount);
@@ -283,5 +291,87 @@ export class MyBagService {
     return this.prisma.bagEquipmentItem.delete({
       where: { id: itemId },
     });
+  }
+
+  async selectedBagItem(itemId: string, type: BagItemType) {
+    if (type === 'equipment') {
+      const item = await this.prisma.bagEquipmentItem.findUnique({
+        where: { id: itemId },
+        select: { id: true, isSelected: true },
+      });
+
+      if (!item) {
+        throw new NotFoundException('ไม่พบรายการนี้ในกระเป๋า');
+      }
+
+      return this.prisma.bagEquipmentItem.update({
+        where: { id: item.id },
+        data: { isSelected: !item.isSelected },
+      });
+    }
+
+    if (type === 'lab') {
+      const item = await this.prisma.bagLabItem.findUnique({
+        where: { id: itemId },
+        select: { id: true, isSelected: true },
+      });
+
+      if (!item) {
+        throw new NotFoundException('ไม่พบรายการนี้ในกระเป๋า');
+      }
+
+      return this.prisma.bagLabItem.update({
+        where: { id: item.id },
+        data: { isSelected: !item.isSelected },
+      });
+    }
+
+    throw new BadRequestException('ประเภทไม่ถูกต้อง');
+  }
+
+  async selectAllBagItem(bagId: string, type: BagItemType) {
+    const borrowBag = await this.prisma.borrowBag.findUnique({
+      where: { id: bagId },
+      include: { labItems: true, equipmentItems: true },
+    });
+
+    if (!borrowBag) {
+      throw new NotFoundException('ไม่พบกระเป๋านี้');
+    }
+
+    if (type === 'equipment') {
+      const items = await this.prisma.bagEquipmentItem.findMany({
+        where: { bagId },
+        select: { id: true, isSelected: true },
+      });
+
+      const allSelected = items.every((item) => item.isSelected);
+
+      await this.prisma.bagEquipmentItem.updateMany({
+        where: { bagId: borrowBag.id },
+        data: {
+          isSelected: !allSelected,
+        },
+      });
+
+      return { message: 'equipment update success' };
+    }
+    if (type === 'lab') {
+      const items = await this.prisma.bagLabItem.findMany({
+        where: { bagId },
+        select: { id: true, isSelected: true },
+      });
+
+      const allSelected = items.every((item) => item.isSelected);
+
+      await this.prisma.bagLabItem.updateMany({
+        where: { bagId: borrowBag.id },
+        data: {
+          isSelected: !allSelected,
+        },
+      });
+
+      return { message: 'lab update success' };
+    }
   }
 }

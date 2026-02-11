@@ -1,12 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { cn, getPublicUrl } from "@/lib/utils";
-import { BagEquipmentItem, BagLabItem } from "@repo/types";
+import { BagEquipmentItem, BagLabItem, BorrowBag } from "@repo/types";
 import { Calendar, Minus, Plus, Sunrise, Sunset, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { format, parseISO } from "date-fns";
 import React from "react";
 import { th } from "date-fns/locale";
-import { useDeleteBagItem, useUpdateItemCount } from "../hooks/useMyBag";
+import {
+  useDeleteBagItem,
+  useSelectAllItem,
+  useSelectItem,
+  useUpdateItemCount,
+} from "../hooks/useMyBag";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface BagItemCardProps {
   equipmentItem?: BagEquipmentItem;
@@ -20,6 +26,7 @@ const BagItemCard = ({ equipmentItem, labItem, userId }: BagItemCardProps) => {
 
   const { mutate } = useUpdateItemCount();
   const { mutate: deleteBagItem, isPending } = useDeleteBagItem();
+  const { mutate: selectedItem } = useSelectItem();
 
   const handleIncrementCount = () => {
     mutate({
@@ -32,6 +39,20 @@ const BagItemCard = ({ equipmentItem, labItem, userId }: BagItemCardProps) => {
     mutate({
       itemId: equipmentItem?.id,
       action: "dec",
+      userId,
+    });
+  };
+
+  const itemType: "lab" | "equipment" = equipmentItem ? "equipment" : "lab";
+
+  const hanleSelectedItem = (type: "lab" | "equipment") => {
+    const itemId = type === "equipment" ? equipmentItem?.id : labItem?.id;
+
+    if (!itemId) return;
+
+    selectedItem({
+      itemId,
+      type,
       userId,
     });
   };
@@ -56,7 +77,14 @@ const BagItemCard = ({ equipmentItem, labItem, userId }: BagItemCardProps) => {
   return (
     <div className="flex flex-col justify-between gap-3 pr-4">
       <div className="flex items-center justify-between">
-        <div className="flex gap-5">
+        <div className="flex items-center gap-5">
+          <Checkbox
+            className="size-5"
+            checked={
+              equipmentItem ? equipmentItem?.isSelected : labItem?.isSelected
+            }
+            onCheckedChange={() => hanleSelectedItem(itemType)}
+          />
           <div className="relative aspect-square size-12 rounded-sm bg-slate-100 md:size-16">
             <Image
               src={getPublicUrl(equipment?.mainImage || lab?.image)}
@@ -127,7 +155,7 @@ const BagItemCard = ({ equipmentItem, labItem, userId }: BagItemCardProps) => {
       </div>
 
       {labItem && (
-        <div className="flex flex-col gap-2 text-sm">
+        <div className="ml-10 flex flex-col gap-2 text-sm">
           <h3 className="font-bold">รายละเอียด</h3>
           <div className="flex items-center gap-3">
             <p className="flex items-center gap-2">
