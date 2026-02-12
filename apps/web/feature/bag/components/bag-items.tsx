@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface BagItemsProps {
   userId?: string;
@@ -119,7 +120,9 @@ const BagItems = ({ userId }: BagItemsProps) => {
               </div>
             </Card>
           )}
-          <Button className="w-full">ถัดไป</Button>
+          <Button className="w-full" asChild>
+            <Link href={"/checkout"}>ถัดไป</Link>
+          </Button>
         </div>
       )}
     </>

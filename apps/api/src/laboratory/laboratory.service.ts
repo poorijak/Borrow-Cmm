@@ -53,7 +53,9 @@ export class LaboratoryService {
       where: {
         slot,
         bookingDate,
-        status: { in: ['in_use', 'pending', 'approved'] },
+        status: {
+          in: ['used', 'pending_teacher', 'pending_staff', 'approved'],
+        },
       },
       select: {
         laboratoryId: true,

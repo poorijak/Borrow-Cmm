@@ -26,6 +26,5 @@ export const useGetLaboratory = (
         return data;
       }
     },
-    enabled: true,
   });
 };

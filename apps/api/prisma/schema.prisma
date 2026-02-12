@@ -16,20 +16,38 @@ enum TimeSlot {
   afternoon
 }
 
-enum BookingStatus {
-  pending
-  approved
-  rejected
-  in_use
-  completed
-  cancelled
-}
-
 enum UserRole {
   administrater
   moderater
   student
   instructor
+}
+
+enum RequestStatus {
+  pending
+  processing
+  approved
+  rejected
+  partially_approved
+  completed
+  canceled
+}
+
+enum LabStatus {
+  pending_teacher
+  pending_staff
+  approved
+  rejected
+  used
+  no_show
+}
+
+enum EquipmentStatus {
+  pending
+  approved
+  rejected
+  picked_up
+  returned
 }
 
 model User {
@@ -132,21 +150,24 @@ model Laboratory {
 }
 
 model LabBooking {
-  id           String        @id @default(uuid())
+  id           String    @id @default(uuid())
   laboratoryId String
+  detailId     String
   bookingDate  DateTime
   slot         TimeSlot
-  status       BookingStatus
-  reservedAt   DateTime      @default(now())
+  status       LabStatus @default(pending_teacher)
+  reservedAt   DateTime  @default(now())
   expiresAt    DateTime
 
-  approvedById   String?
-  approvedByRole UserRole?
-  approvedAt     DateTime?
+  teacherId         String?
+  teacherApprovedAt DateTime?
+  teacherRejectedAt DateTime?
 
-  rejectedById   String?
-  rejectedByRole UserRole?
-  rejectedAt     DateTime?
+  staffId         String?
+  staffApprovedAt DateTime?
+  staffRejectedAt DateTime?
+
+  detail LabBookingDetail @relation(fields: [detailId], references: [id])
 
   laboratory Laboratory @relation(fields: [laboratoryId], references: [id])
 
@@ -198,4 +219,71 @@ model BagLabItem {
   updatedAt  DateTime @updatedAt
 
   @@unique([labId, bagId, date, slot])
+}
+
+model BorrowRequest {
+  id             String        @id @default(uuid())
+  userId         String
+  fullName       String
+  studentId      String
+  phone          String
+  email          String
+  educationLevel String
+  idCardImage    String
+  status         RequestStatus @default(pending)
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  equipmentDetail   EquipmentDetail?
+  labBookingDetails LabBookingDetail?
+}
+
+model EquipmentDetail {
+  id        String        @id @default(uuid())
+  requestId String        @unique
+  request   BorrowRequest @relation(fields: [requestId], references: [id])
+
+  status EquipmentStatus @default(pending)
+
+  subjectId        String
+  teacherId        String
+  purpose          String    @db.Text
+  additionalItems  String?   @db.Text
+  borrowDate       DateTime
+  returnDate       DateTime
+  actualReturnDate DateTime?
+
+  // staff state
+  approvedById String?
+  approvedAt   DateTime?
+
+  rejectedById String?
+  rejectedAt   DateTime?
+
+  // comment
+  remark String? @db.Text
+
+  equipmentRequestItems EquipmentRequestItem[]
+}
+
+model LabBookingDetail {
+  id        String        @id @default(uuid())
+  requestId String        @unique
+  request   BorrowRequest @relation(fields: [requestId], references: [id])
+
+  status LabStatus @default(pending_teacher)
+
+  subjectId    String
+  teacherId    String
+  usageDetails String       @db.Text
+  memberNames  String       @db.Text
+  labBookings  LabBooking[]
+}
+
+model EquipmentRequestItem {
+  id          String          @id @default(uuid())
+  detailId    String
+  detail      EquipmentDetail @relation(fields: [detailId], references: [id])
+  equipmentId String
+  quantity    Int             @default(1)
 }
