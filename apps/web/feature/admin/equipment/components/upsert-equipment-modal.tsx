@@ -193,7 +193,6 @@ const UpsetEquipmentModal = ({
     setExistingRemove(true);
     form.setValue("imageKey", undefined as any, { shouldDirty: true });
   };
-  // useRef section
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const triggerFileInput = () => {

@@ -16,7 +16,7 @@ const Stepper = ({
   hasEquipment,
   hasLab,
 }: StepperProps) => {
-    
+
   const dynamicSteps = [
     { id: "user", title: "ข้อมูลผู้ยืม" },
     ...(hasEquipment ? [{ id: "equipment", title: "การยืมอุปกรณ์" }] : []),
@@ -47,7 +47,7 @@ const Stepper = ({
               <div
                 className={cn(
                   "flex size-6 items-center justify-center rounded-full text-sm text-white transition-colors duration-300",
-                  activeState >= i ? "bg-primary" : "bg-[#1c1c1c]",
+                  activeState >= i ? "bg-primary" : "bg-gray-300",
                 )}
               >
                 {getStepHeader(i)}

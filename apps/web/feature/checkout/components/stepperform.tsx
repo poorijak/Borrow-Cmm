@@ -93,37 +93,29 @@ const StepperForm = ({ user }: StepperFormProps) => {
   const handleSubmit = () => {};
 
   return (
-    <div className="space-y-7">
-      <Stepper
-        activeState={activeStep}
-        setActiveState={setActiveStep}
-        hasEquipment={hasEquipment}
-        hasLab={hasLab}
-      />
+    <div className="flex h-full flex-col justify-between">
+      <div className="space-y-7">
+        <Stepper
+          activeState={activeStep}
+          setActiveState={setActiveStep}
+          hasEquipment={hasEquipment}
+          hasLab={hasLab}
+        />
 
-      <div className="h-[500px] w-full">
-        <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
-            {getStepContent(activeStep)}
-          </form>
-        </FormProvider>
+        <div className="h-[500px] w-full">
+          <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              {getStepContent(activeStep)}
+            </form>
+          </FormProvider>
+        </div>
       </div>
 
-      <div className="flex w-full gap-10">
-        <Button
-          disabled={activeStep === 0}
-          className="w-1/12"
-          size="lg"
-          onClick={handlePrevState}
-        >
+      <div className="flex w-full justify-between gap-3">
+        <Button disabled={activeStep === 0} size="lg" onClick={handlePrevState}>
           <ArrowLeft /> ย้อนกลับ
         </Button>
-        <Button
-          disabled={activeStep === 3}
-          className="w-8/12"
-          size="lg"
-          onClick={handleNextState}
-        >
+        <Button disabled={activeStep === 3} size="lg" onClick={handleNextState}>
           <ArrowRight /> ถัดไป
         </Button>
       </div>

@@ -111,20 +111,21 @@ model EquipmentSubCategory {
 }
 
 model Equipment {
-  id                String               @id @default(uuid())
-  mainImage         String
-  title             String               @unique
-  description       String?
-  totalStock        Int
-  borrowedQty       Int
-  reservedQty       Int
-  totalBorrowed     Int
-  status            ActiveStatus
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
-  subCategoryId     String
-  category          EquipmentSubCategory @relation(fields: [subCategoryId], references: [id])
-  bagEquipmentItems BagEquipmentItem[]
+  id                    String                 @id @default(uuid())
+  mainImage             String
+  title                 String                 @unique
+  description           String?
+  totalStock            Int
+  borrowedQty           Int
+  reservedQty           Int
+  totalBorrowed         Int
+  status                ActiveStatus
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  subCategoryId         String
+  category              EquipmentSubCategory   @relation(fields: [subCategoryId], references: [id])
+  bagEquipmentItems     BagEquipmentItem[]
+  equipmentRequestItems EquipmentRequestItem[]
 }
 
 model Course {
@@ -167,7 +168,7 @@ model LabBooking {
   staffApprovedAt DateTime?
   staffRejectedAt DateTime?
 
-  detail LabBookingDetail @relation(fields: [detailId], references: [id])
+  detail LabBookingDetail @relation(fields: [detailId], references: [id], onDelete: Cascade)
 
   laboratory Laboratory @relation(fields: [laboratoryId], references: [id])
 
@@ -285,5 +286,6 @@ model EquipmentRequestItem {
   detailId    String
   detail      EquipmentDetail @relation(fields: [detailId], references: [id])
   equipmentId String
+  equipment   Equipment       @relation(fields: [equipmentId], references: [id])
   quantity    Int             @default(1)
 }

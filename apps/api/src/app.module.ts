@@ -13,12 +13,15 @@ import { EquipmentModule } from './equipment/equipment.module';
 import { CourseModule } from './course/course.module';
 import { LaboratoryModule } from './laboratory/laboratory.module';
 import { MyBagModule } from './my-bag/my-bag.module';
+import { CheckoutModule } from './checkout/checkout.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     PrismaModule,
     JwtModule.registerAsync({
@@ -37,6 +40,7 @@ import { MyBagModule } from './my-bag/my-bag.module';
     CourseModule,
     LaboratoryModule,
     MyBagModule,
+    CheckoutModule,
   ],
   controllers: [AppController],
   providers: [AppService],

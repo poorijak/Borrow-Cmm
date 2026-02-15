@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@repo/template": ["../template/dist"],
+      "@repo/template/*": ["../template/dist/*"]
+    },
+    "target": "ES2020",
+    "module": "CommonJS",
+    "lib": ["DOM", "ES2020"],
+    "jsx": "react-jsx", // ใช้ React JSX Runtime
+    "jsxImportSource": "react",
+    "declaration": true, // generate *.d.ts
+    "emitDeclarationOnly": false, // build JS + d.ts
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "strict": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}

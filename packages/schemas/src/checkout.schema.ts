@@ -6,6 +6,7 @@ const baseSchema = z.object({
   phone: z.string().min(10, "เบอร์โทรศัพท์ต้องมี 10 หลัก"),
   email: z.string().email("รูปแบบ Email ไม่ถูกต้อง"),
   educationLevel: z.string().min(1, "กรุณาเลือกระดับการศึกษา"),
+  userId: z.string(),
 });
 
 const step1UserSchema = baseSchema.extend({
@@ -23,8 +24,8 @@ const step2EquipmentSchema = z.object({
   additionalItems: z.string().optional(),
   borrowRange: z.object(
     {
-      from: z.date(),
-      to: z.date(),
+      from: z.coerce.date(),
+      to: z.coerce.date(),
     },
     { required_error: "กรุณาเลือกวันที่ยืม-คืน" },
   ),

@@ -63,13 +63,10 @@ const LabContent = ({ bookingDate, slot, user }: LabContentProps) => {
                     alt="lab preview"
                     className={cn(
                       "rounded-tl-md rounded-tr-md object-cover",
-                      isDisabled && "grayscale-100",
+                      isDisabled && "grayscale-80",
                     )}
                     loading="lazy"
                   />
-                  {isDisabled && (
-                    <div className="absolute inset-0 z-10 bg-black/40" />
-                  )}
                 </div>
                 <div className="flex flex-col gap-3 px-3 pb-5">
                   <div>
