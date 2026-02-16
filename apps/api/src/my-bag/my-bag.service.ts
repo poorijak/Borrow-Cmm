@@ -110,17 +110,19 @@ export class MyBagService {
 
     if (!bag) return;
 
-    const totalQtySum = bag.equipmentItems.reduce(
+    const equimpentItemSum = bag.equipmentItems.reduce(
       (sum, item) => sum + item.itemCount,
       0,
     );
+
+    const totalQty = equimpentItemSum + bag.labItems.length;
 
     const totalItemCount = bag.labItems.length + bag.equipmentItems.length;
 
     const updateBag = await this.prisma.borrowBag.update({
       where: { id: bagId },
       data: {
-        totalQty: totalQtySum,
+        totalQty,
         itemCount: totalItemCount,
       },
       include: {
@@ -180,7 +182,7 @@ export class MyBagService {
 
     return {
       ...updateBag,
-      equipmentCount: totalQtySum,
+      equipmentCount: equimpentItemSum,
       labItems: formattedLabItems,
     };
   }

@@ -89,20 +89,34 @@ export const useUpdateItemCount = () => {
         ["bag", variable.userId],
         (oldData: BorrowBag | undefined) => {
           if (!oldData) return oldData;
+
+          const equipmentItems = oldData.equipmentItems
+            .map((item) => {
+              if (item.id !== variable.itemId) return item;
+
+              const newCount =
+                variable.action === "inc"
+                  ? item.itemCount + 1
+                  : item.itemCount - 1;
+
+              return { ...item, itemCount: newCount };
+            })
+            .filter((Item) => Item.itemCount > 0);
+
+          const equimpentItemSum = equipmentItems.reduce(
+            (sum, item) => item.itemCount + sum,
+            0,
+          );
+
+          const totalQty = equimpentItemSum + oldData.labItems.length;
+
+          const itemCount = equipmentItems.length + oldData.labItems.length;
+
           return {
             ...oldData,
-            equipmentItems: oldData.equipmentItems
-              .map((item) => {
-                if (item.id !== variable.itemId) return item;
-
-                const newCount =
-                  variable.action === "inc"
-                    ? item.itemCount + 1
-                    : item.itemCount - 1;
-
-                return { ...item, itemCount: newCount };
-              })
-              .filter((Item) => Item.itemCount > 0),
+            equipmentItems,
+            totalQty,
+            itemCount,
           };
         },
       );
