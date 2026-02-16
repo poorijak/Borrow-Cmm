@@ -61,6 +61,18 @@ export class MyBagService {
           'กรุณาระบุวันที่และช่วงเวลาสำหรับจองห้องแล็บ',
         );
       }
+
+      const existingLab = await this.prisma.borrowBag.findUnique({
+        where: { id: myBag?.id },
+        select: {
+          labItems: { where: { labId } },
+        },
+      });
+
+      if (existingLab?.labItems.length) {
+        throw new BadRequestException('มีห้องนี้อยู่ในกระเป๋าแล้ว');
+      }
+
       try {
         const conflic = await this.labService.checkBusyLab(labId, date, slot);
 
@@ -245,9 +257,7 @@ export class MyBagService {
 
   async updateBagItem(equipmentItemId: string, action: 'inc' | 'dec') {
     const existingItem = await this.prisma.bagEquipmentItem.findUnique({
-      where: {
-        id: equipmentItemId,
-      },
+      where: { id: equipmentItemId },
       include: { equipment: true },
     });
 
@@ -266,19 +276,21 @@ export class MyBagService {
     }
 
     if (action === 'dec' && existingItem.itemCount === 1) {
-      return await this.deleteBagItem(equipmentItemId, 'equipment');
+      await this.deleteBagItem(equipmentItemId, 'equipment');
+    } else {
+      await this.prisma.bagEquipmentItem.update({
+        where: { id: existingItem.id },
+        data: {
+          itemCount: {
+            [action === 'inc' ? 'increment' : 'decrement']: 1,
+          },
+        },
+      });
     }
 
-    const newCountItem = await this.prisma.bagEquipmentItem.update({
-      where: { id: existingItem.id },
-      data: {
-        itemCount: {
-          [action === 'inc' ? 'increment' : 'decrement']: 1,
-        },
-      },
-    });
+    const updatedBag = await this.syncBagTotals(existingItem.bagId);
 
-    return { status: 'success', newCountItem };
+    return { status: 'success', bag: updatedBag };
   }
 
   async deleteBagItem(itemId: string, type: 'lab' | 'equipment') {

@@ -31,6 +31,8 @@ const SiteHeader = ({ user, type = "Student" }: SiteHeaderProps) => {
 
   const { data } = useGetMyBag(user.id);
 
+  console.log(data);
+
   const isMobile = useIsMobile();
 
   return (

@@ -107,7 +107,7 @@ export class LaboratoryService {
 
     return labs.map((lab) => ({
       ...lab,
-      isAailable: !busyLabIds.has(lab.id),
+      isAvailable: !busyLabIds.has(lab.id),
     }));
   }
 

@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { renderToBuffer } from '@react-pdf/renderer';
 import { PrismaService } from 'prisma/prisma.service';
 import { Resend } from 'resend';
-import { EquipmentRequestPdf, LabPdf } from '@repo/template';
+import {
+  generateBorrowEmailHtml,
+  generateEquipmentPdfBuffer,
+  generateLabPdfBuffer,
+} from '@repo/template';
 
 @Injectable()
 export class MailService {
@@ -22,7 +25,19 @@ export class MailService {
           include: {
             equipmentRequestItems: {
               include: {
-                equipment: true,
+                equipment: {
+                  select: {
+                    id: true,
+                    title: true,
+                    mainImage: true,
+                    description: true,
+                    totalStock: true,
+                    borrowedQty: true,
+                    reservedQty: true,
+                    status: true,
+                    subCategoryId: true,
+                  },
+                },
               },
             },
           },
@@ -35,14 +50,40 @@ export class MailService {
 
     if (!request) return;
 
-    const attachments = [];
+    const emailHtml = await generateBorrowEmailHtml({
+      fullName: request.fullName,
+      studentId: request.studentId,
+      email: request.email,
+      phone: request.phone,
+      educationLevel: request.educationLevel,
+      equipmentCount:
+        request.equipmentDetail?.equipmentRequestItems.length ?? 0,
+      labCount: request.labBookingDetails?.labBookings.length ?? 0,
+    });
+
+    const attachments: { filename: string; content: Buffer }[] = [];
 
     if (request.equipmentDetail) {
-      const element = React.createElement(EquipmentRequestPdf, {
-        data: request,
+      const buffer = await generateEquipmentPdfBuffer(request);
+      attachments.push({
+        filename: 'Equipment_Request.pdf',
+        content: buffer,
       });
-
-      const buffer = await renderToBuffer(element);
     }
+
+    if (request.labBookingDetails) {
+      const buffer = await generateLabPdfBuffer(request);
+      attachments.push({
+        filename: 'Lab_Request.pdf',
+        content: buffer,
+      });
+    }
+    await this.resend.emails.send({
+      from: this.from,
+      to: 'poorijak35@gmail.com',
+      subject: 'ยืนยันการจอง',
+      html: emailHtml,
+      attachments: attachments,
+    });
   }
 }

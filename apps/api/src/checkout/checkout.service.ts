@@ -7,6 +7,7 @@ import {
 } from '@prisma/client';
 import type { BorrowValues } from '@repo/schemas';
 import { PrismaService } from 'prisma/prisma.service';
+import { MailService } from 'src/mail/mail.service';
 
 type BorrowBagWithItems = Prisma.BorrowBagGetPayload<{
   include: {
@@ -17,9 +18,13 @@ type BorrowBagWithItems = Prisma.BorrowBagGetPayload<{
 
 @Injectable()
 export class CheckoutService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mail: MailService,
+  ) {}
 
   async checkout(data: BorrowValues) {
+    let requestId: string | null = null;
     await this.prisma.$transaction(async (tx) => {
       const userBag = await tx.borrowBag.findFirst({
         where: { userId: data.step1.userId },
@@ -36,11 +41,18 @@ export class CheckoutService {
         throw new BadRequestException('ไม่พบของในกระเป๋า');
       }
 
-      await this.createBorrowRequest(tx, data, userBag);
+      const request = await this.createBorrowRequest(tx, data, userBag);
+      requestId = request.id;
 
       await this.deleteEquipmentItems(userBag.id, tx);
       await this.deleteLabItems(userBag.id, tx);
     });
+    if (requestId) {
+      this.mail.sendBorrowRequest(requestId).catch((err) => {
+        console.error('Failed to send email:', err);
+      });
+    }
+    return { success: true, requestId };
   }
 
   async createBorrowRequest(

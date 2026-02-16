@@ -32,14 +32,14 @@ const mockData = {
 async function runTest() {
   try {
     // 2. สั่ง Render เป็นไฟล์ PDF แยกกัน 2 ฉบับ
-    await renderToFile(
-      <EquipmentRequestPdf data={mockData} />,
-      path.join(__dirname, "test-equipment.pdf"),
-    );
-    await renderToFile(
-      <LabPdf data={mockData} />,
-      path.join(__dirname, "test-lab.pdf"),
-    );
+    // await renderToFile(
+    //   <EquipmentRequestPdf data={mockData} />,
+    //   path.join(__dirname, "test-equipment.pdf"),
+    // );
+    // await renderToFile(
+    //   <LabPdf data={mockData} />,
+    //   path.join(__dirname, "test-lab.pdf"),
+    // );
 
     console.log("✅ PDF Generated successfully!");
     console.log(

@@ -7,6 +7,7 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import path from "path";
+import { borrowRequest } from "@repo/types";
 
 // ใช้ path.join และ __dirname เพื่อให้หาไฟล์เจอไม่ว่าจะรันจากโฟลเดอร์ไหน
 const getFontPath = (name: string) => path.join(__dirname, "..", "font", name);
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const LabPdf = ({ data }: { data: any }) => (
+export const LabPdf = ({ data }: { data: borrowRequest }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.header}>แบบฟอร์มคำขอเข้าใช้ห้องปฏิบัติการ</Text>
@@ -120,17 +121,19 @@ export const LabPdf = ({ data }: { data: any }) => (
       <View style={{ marginBottom: 15 }}>
         <View style={styles.row}>
           <Text style={styles.label}>รหัสวิชา:</Text>
-          <Text style={styles.value}>{data.labBookingDetails.subjectId}</Text>
+          <Text style={styles.value}>{data.labBookingDetails?.subjectId}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>วัตถุประสงค์:</Text>
           <Text style={styles.value}>
-            {data.labBookingDetails.usageDetails}
+            {data.labBookingDetails?.usageDetails}
           </Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>สมาชิกกลุ่ม:</Text>
-          <Text style={styles.value}>{data.labBookingDetails.memberNames}</Text>
+          <Text style={styles.value}>
+            {data.labBookingDetails?.memberNames}
+          </Text>
         </View>
       </View>
 
@@ -144,7 +147,7 @@ export const LabPdf = ({ data }: { data: any }) => (
             ช่วงเวลา
           </Text>
         </View>
-        {data.labBookingDetails.labBookings.map((booking: any, i: number) => (
+        {data.labBookingDetails?.labBookings.map((booking: any, i: number) => (
           <View style={styles.tableRow} key={i}>
             <Text style={styles.tableCell}>{booking.laboratory.name}</Text>
             <Text style={[styles.tableCell, { textAlign: "center" }]}>
@@ -164,7 +167,7 @@ export const LabPdf = ({ data }: { data: any }) => (
   </Document>
 );
 
-export const EquipmentRequestPdf = ({ data }: { data: any }) => (
+export const EquipmentRequestPdf = ({ data }: { data: borrowRequest }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.header}>ใบคำขอยืมอุปกรณ์ (Equipment Request)</Text>
@@ -187,11 +190,11 @@ export const EquipmentRequestPdf = ({ data }: { data: any }) => (
       <View style={{ marginBottom: 15 }}>
         <View style={styles.row}>
           <Text style={styles.label}>วิชา:</Text>
-          <Text style={styles.value}>{data.equipmentDetail.subjectId}</Text>
+          <Text style={styles.value}>{data.equipmentDetail?.subjectId}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>วัตถุประสงค์:</Text>
-          <Text style={styles.value}>{data.equipmentDetail.purpose}</Text>
+          <Text style={styles.value}>{data.equipmentDetail?.purpose}</Text>
         </View>
       </View>
 
@@ -200,7 +203,7 @@ export const EquipmentRequestPdf = ({ data }: { data: any }) => (
           <Text style={[styles.tableCell, { flex: 2 }]}>รายการอุปกรณ์</Text>
           <Text style={[styles.tableCell, { textAlign: "center" }]}>จำนวน</Text>
         </View>
-        {data.equipmentDetail.equipmentRequestItems.map(
+        {data.equipmentDetail?.equipmentRequestItems.map(
           (item: any, i: number) => (
             <View style={styles.tableRow} key={i}>
               <Text style={[styles.tableCell, { flex: 2 }]}>
