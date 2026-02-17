@@ -50,15 +50,24 @@ export class MailService {
 
     if (!request) return;
 
+    const {
+      fullName,
+      studentId,
+      educationLevel,
+      email,
+      phone,
+      equipmentDetail,
+      labBookingDetails,
+    } = request;
+
     const emailHtml = await generateBorrowEmailHtml({
-      fullName: request.fullName,
-      studentId: request.studentId,
-      email: request.email,
-      phone: request.phone,
-      educationLevel: request.educationLevel,
-      equipmentCount:
-        request.equipmentDetail?.equipmentRequestItems.length ?? 0,
-      labCount: request.labBookingDetails?.labBookings.length ?? 0,
+      fullName: fullName,
+      studentId: studentId,
+      email: email,
+      phone: phone,
+      educationLevel: educationLevel,
+      equipmentCount: equipmentDetail?.equipmentRequestItems.length ?? 0,
+      labCount: labBookingDetails?.labBookings.length ?? 0,
     });
 
     const attachments: { filename: string; content: Buffer }[] = [];
