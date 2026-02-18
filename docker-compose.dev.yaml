@@ -67,11 +67,11 @@ services:
       DATABASE_URL: "postgresql://postgres:123456@pgdb:5432/TestDb"
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      GOOGLE_CALLBACK_URL: ${CALLBACK_URL}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
       JWT_SECRET: ${JWT_SECRET}
       JWT_APPROVAL_SECRET: ${JWT_APPROVAL_SECRET}
       CHOKIDAR_USEPOLLING: "true"
-      NODE_ENV : development
+      NODE_ENV: development
       CI: "true"
       PNPM_HOME: "/pnpm-store"
     # รัน prisma generate ใน container เสมอ

@@ -48,11 +48,13 @@ export class CategoryController {
   }
 
   @Get('subCategories')
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
   async findSubCategoryAll() {
     return await this.categoryService.getSubCategoriesAll();
   }
 
   @Get()
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
   async findCategoryAll(
     @Query('status') status: ActiveStatus,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
@@ -62,12 +64,14 @@ export class CategoryController {
   }
 
   @Get(':id')
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
   async find(@Param('id') id: string) {
     const cate = this.categoryService.getCategoryById(id);
     return cate;
   }
 
   @Get(':id/subCategories')
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
   async findSubCategoriesByMainId(
     @Param('id') id: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,

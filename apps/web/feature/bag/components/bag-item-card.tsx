@@ -1,14 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { cn, getPublicUrl } from "@/lib/utils";
-import { BagEquipmentItem, BagLabItem, BorrowBag } from "@repo/types";
+import { BagEquipmentItem, BagLabItem } from "@repo/types";
 import { Calendar, Minus, Plus, Sunrise, Sunset, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import React from "react";
 import { th } from "date-fns/locale";
 import {
   useDeleteBagItem,
-  useSelectAllItem,
   useSelectItem,
   useUpdateItemCount,
 } from "../hooks/useMyBag";

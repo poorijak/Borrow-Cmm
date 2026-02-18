@@ -1,10 +1,5 @@
 import api from "@/lib/axios";
-import {
-  BorrowBag,
-  LaboratorySortType,
-  BagEquipmentItem,
-  BagLabItem,
-} from "@repo/types";
+import { BorrowBag, LaboratorySortType } from "@repo/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
