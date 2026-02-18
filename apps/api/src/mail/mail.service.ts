@@ -6,13 +6,17 @@ import {
   generateEquipmentPdfBuffer,
   generateLabPdfBuffer,
 } from '@repo/template';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class MailService {
   private readonly resend: Resend;
   private readonly from: string;
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwt: JwtService,
+  ) {
     this.resend = new Resend(process.env.RESEND_API_KEY);
     this.from = process.env.RESEND_FROM ?? 'noreply@example.com'; //
   }
@@ -50,49 +54,94 @@ export class MailService {
 
     if (!request) return;
 
-    const {
-      fullName,
-      studentId,
-      educationLevel,
-      email,
-      phone,
-      equipmentDetail,
-      labBookingDetails,
-    } = request;
+    const { equipmentDetail, labBookingDetails } = request;
+    const teacherEmails = new Map<
+      string,
+      { type: 'equipment' | 'lab' | 'both'; attachments: any[] }
+    >();
 
-    const emailHtml = await generateBorrowEmailHtml({
-      fullName: fullName,
-      studentId: studentId,
-      email: email,
-      phone: phone,
-      educationLevel: educationLevel,
-      equipmentCount: equipmentDetail?.equipmentRequestItems.length ?? 0,
-      labCount: labBookingDetails?.labBookings.length ?? 0,
-    });
-
-    const attachments: { filename: string; content: Buffer }[] = [];
-
-    if (request.equipmentDetail) {
-      const buffer = await generateEquipmentPdfBuffer(request);
-      attachments.push({
-        filename: 'Equipment_Request.pdf',
-        content: buffer,
+    if (equipmentDetail?.teacherId) {
+      const teacher = await this.prisma.user.findUnique({
+        where: { id: equipmentDetail.teacherId },
       });
+
+      if (teacher?.email) {
+        const buffer = await generateEquipmentPdfBuffer(request);
+        teacherEmails.set(teacher.email, {
+          type: 'equipment',
+          attachments: [{ filename: 'Equipment_Request.pdf', content: buffer }],
+        });
+      }
     }
 
-    if (request.labBookingDetails) {
-      const buffer = await generateLabPdfBuffer(request);
-      attachments.push({
-        filename: 'Lab_Request.pdf',
-        content: buffer,
+    if (labBookingDetails?.teacherId) {
+      const teacher = await this.prisma.user.findUnique({
+        where: { id: labBookingDetails.teacherId },
       });
+
+      if (teacher?.email) {
+        const buffer = await generateLabPdfBuffer(request);
+
+        if (teacherEmails.has(teacher.email)) {
+          const existing = teacherEmails.get(teacher.email);
+          existing?.attachments.push({
+            filename: 'Lab_Request.pdf',
+            content: buffer,
+          });
+        } else {
+          teacherEmails.set(teacher.email, {
+            type: 'lab',
+            attachments: [{ filename: 'Lab_Request.pdf', content: buffer }],
+          });
+        }
+      }
     }
-    await this.resend.emails.send({
-      from: this.from,
-      to: 'poorijak35@gmail.com',
-      subject: 'ยืนยันการจอง',
-      html: emailHtml,
-      attachments: attachments,
-    });
+
+    console.log('email is active now!');
+
+    for (const [email, data] of teacherEmails.entries()) {
+      try {
+        const token = await this.generateApprovalToken(request.id, email);
+        const approvalLink = `${process.env.FRONTEND_URL}/approve/${token}`;
+
+        console.log(token);
+
+        const emailHtml = (await generateBorrowEmailHtml({
+          approvalLink,
+          fullName: request.fullName,
+          studentId: request.studentId,
+          email: request.email,
+          phone: request.phone,
+          educationLevel: request.educationLevel,
+          equipmentCount:
+            data.type === 'lab'
+              ? 0
+              : (equipmentDetail?.equipmentRequestItems.length ?? 0),
+          labCount:
+            data.type === 'equipment'
+              ? 0
+              : (labBookingDetails?.labBookings.length ?? 0),
+        })) as unknown as string;
+
+        const response = await this.resend.emails.send({
+          from: this.from,
+          to: email,
+          subject: 'มีคำขอใหม่รอการอนุมัติ - Review Required',
+          html: emailHtml,
+          attachments: data.attachments,
+        });
+
+        console.log('Resend Response:', response);
+      } catch (error) {
+        console.error(`Failed to send email to ${email}:`, error);
+      }
+    }
+  }
+
+  async generateApprovalToken(requestId: string, teacherEmail: string) {
+    return this.jwt.signAsync(
+      { requestId, teacherEmail },
+      { secret: process.env.JWT_APPROVAL_SECRET, expiresIn: '1d' },
+    );
   }
 }

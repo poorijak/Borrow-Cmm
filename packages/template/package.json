@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json &&  cp -r src/font dist/font",
-    "dev": "tsc -p tsconfig.json -w"
+    "dev": "tsc -p tsconfig.json -w "
+    
   },
   "dependencies": {
     "@react-email/components": "^0.0.25",

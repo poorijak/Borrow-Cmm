@@ -1,10 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import {
-  BagEquipmentItem,
-  BagLabItem,
-  BorrowBag,
-  Prisma,
-} from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import type { BorrowValues } from '@repo/schemas';
 import { PrismaService } from 'prisma/prisma.service';
 import { MailService } from 'src/mail/mail.service';

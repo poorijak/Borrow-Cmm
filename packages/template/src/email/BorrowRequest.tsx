@@ -8,6 +8,7 @@ import {
   Hr,
   Row,
   Column,
+  Button,
 } from "@react-email/components";
 
 type BorrowRequestEmailProps = {
@@ -18,6 +19,7 @@ type BorrowRequestEmailProps = {
   educationLevel: string;
   equipmentCount: number;
   labCount: number;
+  approvalLink: string;
 };
 
 export const BorrowRequestEmail = ({
@@ -28,6 +30,7 @@ export const BorrowRequestEmail = ({
   educationLevel,
   equipmentCount,
   labCount,
+  approvalLink,
 }: BorrowRequestEmailProps) => {
   return (
     <Html>
@@ -74,6 +77,22 @@ export const BorrowRequestEmail = ({
               </Row>
             </Section>
 
+            <Section
+              style={{
+                textAlign: "center",
+                marginTop: "32px",
+                marginBottom: "32px",
+              }}
+            >
+              {/* ลบ pX และ pY ออก */}
+              <Button style={button} href={approvalLink}>
+                ตรวจสอบและดำเนินการอนุมัติ
+              </Button>
+              <Text style={supportText}>
+                ลิงก์นี้จะนำท่านไปยังหน้าระบบเพื่อตรวจสอบรายละเอียดและกดอนุมัติ/ปฏิเสธ
+              </Text>
+            </Section>
+
             <Hr style={hr} />
 
             <Section>
@@ -96,6 +115,26 @@ export const BorrowRequestEmail = ({
 const main = {
   backgroundColor: "#f8fafc",
   fontFamily: 'apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif',
+};
+
+const button = {
+  backgroundColor: "#6366f1",
+  borderRadius: "12px",
+  color: "#fff",
+  fontSize: "16px",
+  fontWeight: "bold",
+  textDecoration: "none",
+  textAlign: "center" as const,
+  display: "inline-block",
+  width: "auto",
+  padding: "12px 30px",
+};
+
+const supportText = {
+  fontSize: "12px",
+  color: "#94a3b8",
+  marginTop: "12px",
+  textAlign: "center" as const,
 };
 
 const container = {

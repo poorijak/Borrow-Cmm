@@ -43,6 +43,7 @@ async function preview() {
       educationLevel="ปริญญาตรี"
       equipmentCount={5} // ตัวเลขสมมติ
       labCount={2} // ตัวเลขสมมติ
+      approvalLink="fe"
     />,
   );
 

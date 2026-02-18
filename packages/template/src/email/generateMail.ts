@@ -10,6 +10,7 @@ type generateBorrowEmailHtmlProps = {
   educationLevel: string;
   equipmentCount: number;
   labCount: number;
+  approvalLink: string;
 };
 
 export const generateBorrowEmailHtml = async (
