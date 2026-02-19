@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { CheckoutService } from './checkout.service';
 import { ZodValidationPipe } from 'src/common/pipe/zod-validator';
 import { borrowSchema, type BorrowValues } from '@repo/schemas';
@@ -12,5 +12,10 @@ export class CheckoutController {
     console.log('DATA TYPE:', typeof data.equipment?.borrowRange.from);
     console.log(data.equipment?.borrowRange.from);
     return this.checkoutService.checkout(data);
+  }
+
+  @Get(':userId')
+  findRequestByUserId(@Param('userId') userId: string) {
+    return this.checkoutService.findRequest(userId);
   }
 }

@@ -57,7 +57,7 @@ export class MailService {
     const { equipmentDetail, labBookingDetails } = request;
     const teacherEmails = new Map<
       string,
-      { type: 'equipment' | 'lab' | 'both'; attachments: any[] }
+      { hasEquipment: boolean; hasLab: boolean; attachments: any[] }
     >();
 
     if (equipmentDetail?.teacherId) {
@@ -68,7 +68,8 @@ export class MailService {
       if (teacher?.email) {
         const buffer = await generateEquipmentPdfBuffer(request);
         teacherEmails.set(teacher.email, {
-          type: 'equipment',
+          hasEquipment: true,
+          hasLab: false,
           attachments: [{ filename: 'Equipment_Request.pdf', content: buffer }],
         });
       }
@@ -84,27 +85,46 @@ export class MailService {
 
         if (teacherEmails.has(teacher.email)) {
           const existing = teacherEmails.get(teacher.email);
-          existing?.attachments.push({
-            filename: 'Lab_Request.pdf',
-            content: buffer,
-          });
+          if (existing) {
+            existing.hasLab = true;
+            existing.attachments.push({
+              filename: 'Lab_Request.pdf',
+              content: buffer,
+            });
+          }
         } else {
           teacherEmails.set(teacher.email, {
-            type: 'lab',
+            hasEquipment: false,
+            hasLab: true,
             attachments: [{ filename: 'Lab_Request.pdf', content: buffer }],
           });
         }
       }
     }
 
-    console.log('email is active now!');
-
     for (const [email, data] of teacherEmails.entries()) {
       try {
-        const token = await this.generateApprovalToken(request.id, email);
+        const teacher = await this.prisma.user.findUnique({
+          where: { email },
+        });
+
+        if (!teacher) continue;
+
+        const token = await this.generateApprovalToken({
+          requestId: request.id,
+          teacherId: teacher.id,
+          equipmentDetailId:
+            equipmentDetail?.teacherId === teacher.id
+              ? equipmentDetail.id
+              : undefined,
+          labDetailId:
+            labBookingDetails?.teacherId === teacher.id
+              ? labBookingDetails.id
+              : undefined,
+        });
         const approvalLink = `${process.env.FRONTEND_URL}/approve/${token}`;
 
-        console.log(token);
+        console.log(data.hasEquipment, data.hasLab);
 
         const emailHtml = (await generateBorrowEmailHtml({
           approvalLink,
@@ -113,14 +133,12 @@ export class MailService {
           email: request.email,
           phone: request.phone,
           educationLevel: request.educationLevel,
-          equipmentCount:
-            data.type === 'lab'
-              ? 0
-              : (equipmentDetail?.equipmentRequestItems.length ?? 0),
-          labCount:
-            data.type === 'equipment'
-              ? 0
-              : (labBookingDetails?.labBookings.length ?? 0),
+          equipmentCount: data.hasEquipment
+            ? (equipmentDetail?.equipmentRequestItems.length ?? 0)
+            : 0,
+          labCount: data.hasLab
+            ? (labBookingDetails?.labBookings.length ?? 0)
+            : 0,
         })) as unknown as string;
 
         const response = await this.resend.emails.send({
@@ -138,10 +156,15 @@ export class MailService {
     }
   }
 
-  async generateApprovalToken(requestId: string, teacherEmail: string) {
-    return this.jwt.signAsync(
-      { requestId, teacherEmail },
-      { secret: process.env.JWT_APPROVAL_SECRET, expiresIn: '1d' },
-    );
+  async generateApprovalToken(data: {
+    requestId: string;
+    teacherId: string;
+    equipmentDetailId?: string;
+    labDetailId?: string;
+  }) {
+    return this.jwt.signAsync(data, {
+      secret: process.env.JWT_APPROVAL_SECRET,
+      expiresIn: '1d',
+    });
   }
 }

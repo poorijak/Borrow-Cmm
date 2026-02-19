@@ -128,4 +128,10 @@ export class CheckoutService {
       where: { bagId },
     });
   }
+
+  async findRequest(userId: string) {
+    return await this.prisma.borrowRequest.findMany({
+      where: { userId },
+    });
+  }
 }

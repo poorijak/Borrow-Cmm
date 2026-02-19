@@ -112,6 +112,12 @@ export class UserService {
     }));
   }
 
+  async findTeacher(teacherId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: teacherId },
+    });
+  }
+
   async getPaginatedStaff(query: GetStaffQueryDto) {
     const { page = 1, limit, role, search, createdAt, updatedAt } = query;
 

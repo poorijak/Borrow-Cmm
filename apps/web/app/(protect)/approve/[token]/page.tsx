@@ -1,11 +1,12 @@
-import React from 'react'
+import ApprovalHeader from "@/feature/approval/components/approval-header";
+import React from "react";
 
 const page = () => {
   return (
-    <div>
-      Approval
+    <div className="w-full">
+      <ApprovalHeader />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;
