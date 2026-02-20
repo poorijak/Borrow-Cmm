@@ -2,7 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RequestStatus } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
-import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
+import {
+  formatDateThaiFull,
+  formatDateToDDMMYY,
+} from 'src/common/libs/formater/format.date';
 import { UserService } from 'src/user/user.service';
 import { UpdateApprovalDto } from './dto/update-approval.dto';
 
@@ -54,7 +57,7 @@ export class ApprovalService {
       ? await this.prisma.equipmentDetail.findUnique({
           where: { id: equipmentDetailId, teacherId },
           select: {
-            id: true, 
+            id: true,
             subjectId: true,
             teacherId: true,
             additionalItems: true,
@@ -99,14 +102,14 @@ export class ApprovalService {
       request,
       equipmentDetail: {
         ...equipmentDetail,
-        borrowDate: formatDateToDDMMYY(equipmentDetail?.borrowDate),
-        returnDate: formatDateToDDMMYY(equipmentDetail?.returnDate),
+        borrowDate: formatDateThaiFull(equipmentDetail?.borrowDate),
+        returnDate: formatDateThaiFull(equipmentDetail?.returnDate),
       },
       labDetail: {
         ...labDetail,
         labBookings: labDetail?.labBookings.map((labBooking) => ({
           ...labBooking,
-          bookingDate: formatDateToDDMMYY(labBooking.bookingDate),
+          bookingDate: formatDateThaiFull(labBooking.bookingDate),
         })),
       },
     };
@@ -114,7 +117,7 @@ export class ApprovalService {
 
   async updateSubRequestStatus(
     token: string,
-    { type, status }: UpdateApprovalDto,
+    { type, status, remark }: UpdateApprovalDto,
   ) {
     const payload: payloadType = await this.jwt.verifyAsync(token, {
       secret: process.env.JWT_APPROVAL_SECRET,
@@ -131,6 +134,9 @@ export class ApprovalService {
           },
           data: {
             status,
+            rejectedAt: (status as string) === 'rejected' ? new Date() : null,
+            rejectedById: (status as string) === 'rejected' ? teacherId : null,
+            remark: (status as string) === 'rejected' ? remark : null,
           },
         });
       } else {
@@ -142,6 +148,7 @@ export class ApprovalService {
           data: {
             status:
               (status as string) === 'approved' ? 'pending_staff' : 'rejected',
+            remark: (status as string) === 'rejected' ? remark : null,
             labBookings: {
               updateMany: {
                 where: {},

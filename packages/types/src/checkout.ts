@@ -25,8 +25,6 @@ export const ReqStatus = {
 export type RequestStatus = (typeof ReqStatus)[keyof typeof ReqStatus];
 export type LabStatus = (typeof LabStatus)[keyof typeof LabStatus];
 
-// --- แก้ไข Interface ให้รองรับ null และข้อมูลแบบ Deep Include ---
-
 export interface borrowRequest {
   id: string;
   userId: string;
@@ -37,7 +35,6 @@ export interface borrowRequest {
   educationLevel: string;
   idCardImage: string; // แก้จาก idCatdImage
   status: RequestStatus;
-  // Prisma Relation อาจเป็น null ได้
   equipmentDetail: equipmentItemDetail | null;
   labBookingDetails: LabBookingDetail | null;
 }
@@ -48,7 +45,6 @@ export interface equipmentItemDetail {
   subjectId: string;
   teacherId: string;
   purpose: string;
-  // เปลี่ยนจาก ? เป็น | null เพื่อให้รับค่าจาก Prisma ได้
   additionalItems: string | null;
   borrowDate: string | Date;
   returnDate: string | Date;

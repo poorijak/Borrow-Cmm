@@ -276,9 +276,11 @@ model LabBookingDetail {
 
   subjectId    String
   teacherId    String
-  usageDetails String       @db.Text
-  memberNames  String       @db.Text
-  labBookings  LabBooking[]
+  usageDetails String  @db.Text
+  memberNames  String  @db.Text
+  remark       String? @db.Text
+
+  labBookings LabBooking[]
 }
 
 model EquipmentRequestItem {

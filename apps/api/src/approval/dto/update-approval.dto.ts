@@ -1,5 +1,5 @@
 // approval.dto.ts
-import { IsEnum, IsString, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export enum ApprovalAction {
   APPROVED = 'approved',
@@ -21,4 +21,8 @@ export class UpdateApprovalDto {
     message: 'ประเภทต้องเป็น equipment หรือ laboratory เท่านั้น',
   })
   type: RequestType;
+
+  @IsOptional() // ไม่บังคับส่งมา (กรณี approved)
+  @IsString({ message: 'หมายเหตุต้องเป็นข้อความ' })
+  remark?: string; // เก็บเหตุผลการปฏิเสธ
 }

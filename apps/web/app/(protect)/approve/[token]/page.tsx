@@ -1,10 +1,20 @@
+import ApprovalContent from "@/feature/approval/components/approval-content";
 import ApprovalHeader from "@/feature/approval/components/approval-header";
+import ApprovalWrapper from "@/feature/approval/components/approval-wrapper";
 import React from "react";
 
-const page = () => {
+interface ApprovalPageProps {
+  params: { token: string };
+}
+
+const page = async ({ params }: ApprovalPageProps) => {
+  const { token } = await params;
+
+  console.log("token ", token);
+
   return (
     <div className="w-full">
-      <ApprovalHeader />
+      <ApprovalWrapper token={token} />
     </div>
   );
 };

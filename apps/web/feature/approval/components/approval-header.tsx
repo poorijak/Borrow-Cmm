@@ -1,13 +1,19 @@
-import { Clipboard, ClipboardList } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import React from "react";
 
-const ApprovalHeader = () => {
+interface ApprovalHeaderProps {
+  fullName?: string;
+}
+
+const ApprovalHeader = ({ fullName }: ApprovalHeaderProps) => {
+  console.log("fullName", fullName);
+
   return (
-    <div className="flex w-full gap-3 flex-col items-center justify-center">
-      <div className="bg-primary flex size-20 items-center justify-center rounded-full p-2 text-white">
-        <ClipboardList size={40}/>
+    <div className="mt-4 flex w-full flex-col items-center justify-center gap-4">
+      <div className="bg-primary flex size-15 items-center justify-center rounded-full p-2 text-white">
+        <ClipboardList size={30} />
       </div>
-      <h1 className="text-2xl font-bold text-muted-foreground">อนุมัติคำขอของ</h1>
+      <h1 className="text-2xl font-bold">อนุมัติคำขอ</h1>
     </div>
   );
 };
