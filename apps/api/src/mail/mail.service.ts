@@ -112,7 +112,6 @@ export class MailService {
 
         const token = await this.generateApprovalToken({
           requestId: request.id,
-          teacherId: teacher.id,
           equipmentDetailId:
             equipmentDetail?.teacherId === teacher.id
               ? equipmentDetail.id
@@ -158,7 +157,6 @@ export class MailService {
 
   async generateApprovalToken(data: {
     requestId: string;
-    teacherId: string;
     equipmentDetailId?: string;
     labDetailId?: string;
   }) {

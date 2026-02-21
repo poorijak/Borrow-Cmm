@@ -118,7 +118,7 @@ const ApprovalContent = ({ request, token }: ApprovalContentProps) => {
               </div>
               <div className="flex flex-col gap-2">
                 <p className="text-muted-foreground text-xs">ยืมวันที่</p>
-                <Badge className="bg-green-200 px-2 py-1 text-green-600">
+                <Badge className="bg-[#DCFAE9] px-2 py-1 text-green-600">
                   {equipmentDetail.borrowDate}
                 </Badge>
               </div>

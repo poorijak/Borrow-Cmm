@@ -45,10 +45,4 @@ export class UserController {
   ) {
     return this.userService.updateRole(id, { role: body.role });
   }
-
-  @Delete(':id')
-  @Roles(Role.ADMIN)
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
 }

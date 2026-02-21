@@ -28,8 +28,12 @@ if (typeof window !== "undefined") {
           return Promise.reject(refreshError);
         }
       }
-      return Promise.reject(new Error(message));
-    }
+
+      const customMessage = error.response?.data?.message || "เกิดข้อผิดพลาด";
+      error.message = customMessage;
+
+      return Promise.reject(error);
+    },
   );
 }
 

@@ -1,17 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RequestStatus } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
-import {
-  formatDateThaiFull,
-  formatDateToDDMMYY,
-} from 'src/common/libs/formater/format.date';
+import { formatDateThaiFull } from 'src/common/libs/formater/format.date';
 import { UserService } from 'src/user/user.service';
 import { UpdateApprovalDto } from './dto/update-approval.dto';
+import { AuthUser } from '@repo/types';
 
 type payloadType = {
   requestId: string;
-  teacherId: string;
   equipmentDetailId?: string;
   labDetailId?: string;
 };
@@ -23,17 +25,21 @@ export class ApprovalService {
     private readonly jwt: JwtService,
     private readonly userService: UserService,
   ) {}
-  async findRequest(token: string) {
-    const payload: payloadType = await this.jwt.verifyAsync(token, {
-      secret: process.env.JWT_APPROVAL_SECRET,
-    });
+  async findRequest(token: string, currentUser: AuthUser) {
+    let payload: payloadType;
+    try {
+      payload = await this.jwt.verifyAsync<payloadType>(token, {
+        secret: process.env.JWT_APPROVAL_SECRET,
+      });
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Invalid token';
+      throw new UnauthorizedException(errorMessage);
+    }
+    const { requestId, equipmentDetailId, labDetailId } = payload;
 
-    const { requestId, teacherId, equipmentDetailId, labDetailId } = payload;
-
-    const teacher = await this.userService.findTeacher(teacherId);
-
-    if (!teacher) {
-      throw new NotFoundException('ไม่พบอาจารย์');
+    if (!currentUser) {
+      throw new UnauthorizedException('ไม่พบข้อมูลผู้ใช้จาก Session');
     }
 
     const request = await this.prisma.borrowRequest.findUnique({
@@ -50,12 +56,33 @@ export class ApprovalService {
         educationLevel: true,
         idCardImage: true,
         status: true,
+        equipmentDetail: true,
+        labBookingDetails: true,
       },
     });
 
+    if (!request) throw new NotFoundException('ไม่พบคำขอนี้');
+
+    const isEquipmentOwner =
+      request.equipmentDetail?.teacherId === currentUser.userId;
+
+    const isLabOwner =
+      request.labBookingDetails?.teacherId === currentUser.userId;
+
+    const isModerater = await this.userService.checkIfModerater(
+      currentUser.userId,
+    );
+
+    const canAccessEquipment = equipmentDetailId && isEquipmentOwner;
+    const canAccessLab = labDetailId && isLabOwner;
+
+    if (!canAccessEquipment && !canAccessLab && !isModerater) {
+      throw new ForbiddenException('คุณไม่มีสิทธิ์เข้าถึงข้อมูลของคำขอนี้');
+    }
+
     const equipmentDetail = equipmentDetailId
       ? await this.prisma.equipmentDetail.findUnique({
-          where: { id: equipmentDetailId, teacherId },
+          where: { id: equipmentDetailId },
           select: {
             id: true,
             subjectId: true,
@@ -76,7 +103,7 @@ export class ApprovalService {
 
     const labDetail = labDetailId
       ? await this.prisma.labBookingDetail.findUnique({
-          where: { id: labDetailId, teacherId },
+          where: { id: labDetailId },
           select: {
             id: true,
             subjectId: true,
@@ -100,50 +127,84 @@ export class ApprovalService {
 
     return {
       request,
-      equipmentDetail: {
-        ...equipmentDetail,
-        borrowDate: formatDateThaiFull(equipmentDetail?.borrowDate),
-        returnDate: formatDateThaiFull(equipmentDetail?.returnDate),
-      },
-      labDetail: {
-        ...labDetail,
-        labBookings: labDetail?.labBookings.map((labBooking) => ({
-          ...labBooking,
-          bookingDate: formatDateThaiFull(labBooking.bookingDate),
-        })),
-      },
+      equipmentDetail: equipmentDetail
+        ? {
+            ...equipmentDetail,
+            borrowDate: formatDateThaiFull(equipmentDetail?.borrowDate),
+            returnDate: formatDateThaiFull(equipmentDetail?.returnDate),
+          }
+        : null,
+      labDetail: labDetail
+        ? {
+            ...labDetail,
+            labBookings: labDetail?.labBookings.map((labBooking) => ({
+              ...labBooking,
+              bookingDate: formatDateThaiFull(labBooking.bookingDate),
+            })),
+          }
+        : null,
     };
   }
 
   async updateSubRequestStatus(
     token: string,
+    currentUser: AuthUser,
     { type, status, remark }: UpdateApprovalDto,
   ) {
     const payload: payloadType = await this.jwt.verifyAsync(token, {
       secret: process.env.JWT_APPROVAL_SECRET,
     });
 
-    const { requestId, teacherId } = payload;
+    const { requestId } = payload;
 
     return await this.prisma.$transaction(async (tx) => {
       if ((type as string) === 'equipment') {
+        const request = await this.prisma.equipmentDetail.findUnique({
+          where: { requestId },
+        });
+
+        if (!request) throw new NotFoundException('ไม่พบคำขอนี้');
+
+        const isOwner = request.teacherId === currentUser.userId;
+        const isModerater = await this.userService.checkIfModerater(
+          currentUser.userId,
+        );
+
+        if (!isOwner && !isModerater) {
+          throw new ForbiddenException('คุณไม่มีสิทธิ์จัดการคำขอนี้');
+        }
+
         await tx.equipmentDetail.update({
           where: {
             requestId,
-            teacherId,
           },
           data: {
             status,
             rejectedAt: (status as string) === 'rejected' ? new Date() : null,
-            rejectedById: (status as string) === 'rejected' ? teacherId : null,
+            rejectedById:
+              (status as string) === 'rejected' ? currentUser.userId : null,
             remark: (status as string) === 'rejected' ? remark : null,
           },
         });
       } else {
+        const request = await this.prisma.equipmentDetail.findUnique({
+          where: { requestId },
+        });
+
+        if (!request) throw new NotFoundException('ไม่พบคำขอนี้');
+
+        const isOwner = request.teacherId === currentUser.userId;
+        const isModerater = await this.userService.checkIfModerater(
+          currentUser.userId,
+        );
+
+        if (!isOwner && !isModerater) {
+          throw new ForbiddenException('คุณไม่มีสิทธิ์จัดการคำขอนี้');
+        }
+
         await tx.labBookingDetail.update({
           where: {
             requestId,
-            teacherId,
           },
           data: {
             status:

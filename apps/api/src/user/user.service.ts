@@ -227,7 +227,13 @@ export class UserService {
     return await this.prisma.user.update({ where: { id }, data });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async checkIfModerater(userId: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) return false;
+
+    return user.role === 'administrater' || user.role === 'moderater';
   }
 }

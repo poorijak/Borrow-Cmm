@@ -77,7 +77,7 @@ export class CheckoutService {
               create: {
                 subjectId: equipment?.subjectId,
                 teacherId: equipment?.teacherId,
-                purpose: equipment?.teacherId,
+                purpose: equipment?.purpose,
                 additionalItems: equipment?.additionalItems,
                 borrowDate: new Date(equipment?.borrowRange.from),
                 returnDate: new Date(equipment.borrowRange.to),

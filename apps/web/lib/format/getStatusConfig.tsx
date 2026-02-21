@@ -15,7 +15,12 @@ export const getStatusConfig = (status: string) => {
     case "pending_staff":
     case "processing":
       return {
-        label: "รออนุมัติ",
+        label:
+          status === "pending_teacher"
+            ? "รออาจารย์อนุมัติ"
+            : status === "pending_staff"
+              ? "รอเจ้าหน้าที่อนุมัติ"
+              : "รออนุมัติ",
         color: "bg-[#FFF4E3] text-[#FFA100] border-[#FFA100]/20",
         icon: <Clock size={14} className="text-[#FFA100]" />,
       };
