@@ -6,7 +6,6 @@ const baseSchema = z.object({
   phone: z.string().min(10, "เบอร์โทรศัพท์ต้องมี 10 หลัก"),
   email: z.string().email("รูปแบบ Email ไม่ถูกต้อง"),
   educationLevel: z.string().min(1, "กรุณาเลือกระดับการศึกษา"),
-  userId: z.string(),
 });
 
 const step1UserSchema = baseSchema.extend({

@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import type { BorrowValues } from '@repo/schemas';
+import { AuthUser } from '@repo/types';
 import { PrismaService } from 'prisma/prisma.service';
 import { MailService } from 'src/mail/mail.service';
 
@@ -18,11 +19,11 @@ export class CheckoutService {
     private readonly mail: MailService,
   ) {}
 
-  async checkout(data: BorrowValues) {
+  async checkout(data: BorrowValues, currentUser: AuthUser) {
     let requestId: string | null = null;
     await this.prisma.$transaction(async (tx) => {
       const userBag = await tx.borrowBag.findFirst({
-        where: { userId: data.step1.userId },
+        where: { userId: currentUser.userId },
         include: {
           labItems: true,
           equipmentItems: true,
@@ -36,7 +37,12 @@ export class CheckoutService {
         throw new BadRequestException('ไม่พบของในกระเป๋า');
       }
 
-      const request = await this.createBorrowRequest(tx, data, userBag);
+      const request = await this.createBorrowRequest(
+        tx,
+        data,
+        userBag,
+        currentUser.userId,
+      );
       requestId = request.id;
 
       await this.deleteEquipmentItems(userBag.id, tx);
@@ -54,6 +60,7 @@ export class CheckoutService {
     tx: Prisma.TransactionClient,
     data: BorrowValues,
     userBag: BorrowBagWithItems,
+    userId: string,
   ) {
     const userInfo = data.step1;
     const equipment = data.equipment;
@@ -64,7 +71,7 @@ export class CheckoutService {
 
     return await tx.borrowRequest.create({
       data: {
-        userId: userInfo.userId,
+        userId: userId,
         fullName: userInfo.fullName,
         email: userInfo.email,
         studentId: userInfo.studentId,

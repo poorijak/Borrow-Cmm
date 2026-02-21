@@ -14,14 +14,12 @@ interface ApprovalWrapperProps {
   token: string;
 }
 
-// approval-wrapper.tsx
 const ApprovalWrapper = ({ token }: ApprovalWrapperProps) => {
-  // 1. ดึง isLoading ออกมาใช้
   const { data, isLoading, error } = useGetRequest(token);
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[80vh] w-full items-center justify-center">
+      <div className="flex min-h-[65vh] w-full items-center justify-center">
         <Loading />
       </div>
     );
@@ -33,14 +31,14 @@ const ApprovalWrapper = ({ token }: ApprovalWrapperProps) => {
 
     if (statusCode === 403)
       return (
-        <div className="flex min-h-[80vh] w-full items-center justify-center">
+        <div className="flex min-h-[65vh] w-full items-center justify-center">
           <ForbiddenErrorPage />
         </div>
       );
     if (statusCode === 404)
       return (
         <div>
-          <div className="flex min-h-[80vh] w-full items-center justify-center"></div>
+          <div className="flex min-h-[65vh] w-full items-center justify-center"></div>
           <NotFoundErrorPage />;
         </div>
       );
@@ -55,7 +53,7 @@ const ApprovalWrapper = ({ token }: ApprovalWrapperProps) => {
   if (!data?.request)
     return (
       <div>
-        <div className="flex min-h-[80vh] w-full items-center justify-center"></div>
+        <div className="flex min-h-[65vh] w-full items-center justify-center"></div>
         <NotFoundErrorPage />;
       </div>
     );

@@ -1,17 +1,22 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
 import { CheckoutService } from './checkout.service';
 import { ZodValidationPipe } from 'src/common/pipe/zod-validator';
 import { borrowSchema, type BorrowValues } from '@repo/schemas';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { GetUser } from 'src/common/guards/getUser';
+import type { AuthUser } from '@repo/types';
 
 @Controller('checkout')
 export class CheckoutController {
   constructor(private readonly checkoutService: CheckoutService) {}
 
   @Post()
-  create(@Body(new ZodValidationPipe(borrowSchema)) data: BorrowValues) {
-    console.log('DATA TYPE:', typeof data.equipment?.borrowRange.from);
-    console.log(data.equipment?.borrowRange.from);
-    return this.checkoutService.checkout(data);
+  @UseGuards(JwtAuthGuard)
+  create(
+    @Body(new ZodValidationPipe(borrowSchema)) data: BorrowValues,
+    @GetUser() currentUser: AuthUser,
+  ) {
+    return this.checkoutService.checkout(data, currentUser);
   }
 
   @Get(':userId')
