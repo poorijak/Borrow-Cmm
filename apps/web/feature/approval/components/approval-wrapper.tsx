@@ -15,7 +15,7 @@ const ApprovalWrapper = ({ token }: ApprovalWrapperProps) => {
   return (
     <div>
       {data ? (
-        <div className="flex flex-col gap-4 px-5 md:px-24">
+        <div className="flex flex-col gap-4 md:px-24">
           <ApprovalHeader fullName={data.request.fullName} />
           <ApprovalContent token={token} request={data} />
         </div>

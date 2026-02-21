@@ -23,6 +23,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react";
 import { ApprovalModal } from "./approval-modal";
+import { formatEqupmentStatus } from "@/lib/format/format";
+import { StatusBadge } from "@/components/shared/status-badge";
 
 interface ApprovalContentProps {
   token: string;
@@ -68,9 +70,9 @@ const ApprovalContent = ({ request, token }: ApprovalContentProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-8 gap-10">
+    <div className="grid grid-cols-4 gap-10 md:grid-cols-8">
       {/* ส่วนข้อมูลนักศึกษา */}
-      <div className="col-span-8">
+      <div className="col-span-4 md:col-span-8">
         <div className="bg-primary w-fit rounded-tl-lg rounded-tr-lg px-5 py-2 font-bold text-white">
           ข้อมูลนักศึกษา
         </div>
@@ -79,14 +81,14 @@ const ApprovalContent = ({ request, token }: ApprovalContentProps) => {
             {requestDetail.fullName}
             <Badge className="text-xs">{requestDetail.educationLevel}</Badge>
           </p>
+          <Separator />
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
             {requestDetailList.map((item, i) => (
               <div className="flex flex-col gap-2" key={i}>
-                <p className="text-muted-foreground flex items-center gap-2 text-sm">
-                  <span className="text-slate-400"> {item.icon}</span>{" "}
+                <p className="text-muted-foreground flex items-center gap-2 text-xs">
                   {item.lable}
                 </p>
-                <p className="font-bold">{item.value}</p>
+                <p className="text-sm font-bold">{item.value}</p>
               </div>
             ))}
           </div>
@@ -102,7 +104,6 @@ const ApprovalContent = ({ request, token }: ApprovalContentProps) => {
             </span>
             ข้อมูลการยืมอุปกรณ์
           </div>
-          {equipmentDetail.status}
           <div className="border-border flex w-full flex-col gap-4 rounded-tr-md rounded-b-md border p-6">
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-2">
@@ -127,12 +128,16 @@ const ApprovalContent = ({ request, token }: ApprovalContentProps) => {
                   {equipmentDetail.returnDate}
                 </Badge>
               </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-muted-foreground text-xs">สถานะ</p>
+                <StatusBadge status={equipmentDetail.status} />
+              </div>
             </div>
 
             <Separator />
 
             <h2 className="text-primary text-xl font-bold">อุปกรณ์</h2>
-            <ScrollArea className="h-80">
+            <ScrollArea className="h-80 px-4">
               <div className="mb-5 flex flex-col gap-6">
                 {equipmentDetail.equipmentRequestItems.map((item) => (
                   <div key={item.equipment.id} className="flex flex-col gap-3">
@@ -212,9 +217,12 @@ const ApprovalContent = ({ request, token }: ApprovalContentProps) => {
                 </p>
                 <p className="text-sm">{labDetail.memberNames || "ไม่มี"}</p>
               </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-muted-foreground text-xs">สถานะ</p>
+                <StatusBadge status={labDetail.status} />
+              </div>
             </div>
             <Separator />
-            {labDetail.status}
             <h2 className="text-primary text-xl font-bold">ห้องปฏิบัติการ</h2>
             <ScrollArea className="h-80">
               <div className="flex flex-col gap-5">
