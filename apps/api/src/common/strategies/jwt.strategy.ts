@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { AuthUser, jwtPayload } from '@repo/types';
 import type { Request } from 'express';
 import { ExtractJwt, JwtFromRequestFunction, Strategy } from 'passport-jwt';
 
@@ -26,12 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any): Promise<{
-    userId: string;
-    role: string;
-    email: string;
-  }> {
-    // This payload will be the decrypted token payload you provided when signing the token
+  validate(payload: jwtPayload): AuthUser {
     return { userId: payload.sub, role: payload.role, email: payload.email };
   }
 }

@@ -112,6 +112,18 @@ export class UserService {
     }));
   }
 
+  async findTeacher(teacherId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: teacherId },
+    });
+  }
+
+  async findInstrutorMany() {
+    return await this.prisma.user.findMany({
+      where: { role: 'instructor' },
+    });
+  }
+
   async getPaginatedStaff(query: GetStaffQueryDto) {
     const { page = 1, limit, role, search, createdAt, updatedAt } = query;
 
@@ -221,7 +233,13 @@ export class UserService {
     return await this.prisma.user.update({ where: { id }, data });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async checkIfModerater(userId: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) return false;
+
+    return user.role === 'administrater' || user.role === 'moderater';
   }
 }

@@ -193,7 +193,6 @@ const UpsetEquipmentModal = ({
     setExistingRemove(true);
     form.setValue("imageKey", undefined as any, { shouldDirty: true });
   };
-  // useRef section
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const triggerFileInput = () => {
@@ -297,6 +296,7 @@ const UpsetEquipmentModal = ({
                         render={({ field, fieldState }) => (
                           <div className="col-span-1">
                             <SelectedInput
+                              error={fieldState.error}
                               data={categoriesData?.data}
                               selected={categoriesData?.data.find(
                                 (c) => c.id === field.value,
@@ -337,6 +337,7 @@ const UpsetEquipmentModal = ({
                           return (
                             <div>
                               <SelectedInput
+                                error={fieldState.error}
                                 data={subCategoryData?.data}
                                 selected={currentObject}
                                 onSelected={(item) => field.onChange(item.id)}

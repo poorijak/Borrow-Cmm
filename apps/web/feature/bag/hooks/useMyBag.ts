@@ -17,6 +17,21 @@ type SelectedBagItems = {
   userId?: string;
 };
 
+const recalcTotal = (
+  equipmentItems: BorrowBag["equipmentItems"],
+  labItems: BorrowBag["labItems"],
+) => {
+  const equipmentSum = equipmentItems.reduce(
+    (sum, item) => sum + item.itemCount,
+    0,
+  );
+
+  return {
+    totalQty: equipmentSum + labItems.length,
+    itemCount: equipmentItems.length + labItems.length,
+  };
+};
+
 export const useGetMyBag = (userId?: string) => {
   return useQuery({
     queryKey: ["bag", userId],
@@ -89,20 +104,26 @@ export const useUpdateItemCount = () => {
         ["bag", variable.userId],
         (oldData: BorrowBag | undefined) => {
           if (!oldData) return oldData;
+
+          const equipmentItems = oldData.equipmentItems
+            .map((item) => {
+              if (item.id !== variable.itemId) return item;
+
+              const newCount =
+                variable.action === "inc"
+                  ? item.itemCount + 1
+                  : item.itemCount - 1;
+
+              return { ...item, itemCount: newCount };
+            })
+            .filter((Item) => Item.itemCount > 0);
+
+          const totals = recalcTotal(equipmentItems, oldData.labItems);
+
           return {
             ...oldData,
-            equipmentItems: oldData.equipmentItems
-              .map((item) => {
-                if (item.id !== variable.itemId) return item;
-
-                const newCount =
-                  variable.action === "inc"
-                    ? item.itemCount + 1
-                    : item.itemCount - 1;
-
-                return { ...item, itemCount: newCount };
-              })
-              .filter((Item) => Item.itemCount > 0),
+            equipmentItems,
+            ...totals,
           };
         },
       );
@@ -161,18 +182,28 @@ export const useDeleteBagItem = () => {
           if (!oldData) return oldData;
 
           if (variables.type === "equipment") {
+            const equipmentItems = oldData.equipmentItems.filter((item) => {
+              return item.id !== variables.itemId;
+            });
+
+            const totals = recalcTotal(equipmentItems, oldData.labItems);
+
             return {
               ...oldData,
-              equipmentItems: oldData.equipmentItems.filter((item) => {
-                return item.id !== variables.itemId;
-              }),
+              equipmentItems,
+              ...totals,
             };
           } else {
+            const labItems = oldData.labItems.filter((item) => {
+              return item.id !== variables.itemId;
+            });
+
+            const totals = recalcTotal(oldData.equipmentItems, labItems);
+
             return {
               ...oldData,
-              labItems: oldData.labItems.filter((item) => {
-                return item.id !== variables.itemId;
-              }),
+              labItems,
+              ...totals,
             };
           }
         },

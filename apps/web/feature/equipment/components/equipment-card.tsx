@@ -38,6 +38,8 @@ const EquipmentCard = ({
     });
   };
 
+  const disable = status === "inactive" || totalStock <= 0 || isPending;
+
   return (
     <div>
       <Card className="relative rounded-lg">
@@ -70,7 +72,7 @@ const EquipmentCard = ({
         <CardFooter>
           <Button
             className="w-full rounded-sm"
-            disabled={status === "inactive" || totalStock <= 0 || isPending}
+            disabled={disable}
             onClick={handleAddToBag}
           >
             {status === "inactive" || totalStock <= 0

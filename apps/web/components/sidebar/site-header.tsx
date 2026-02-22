@@ -18,7 +18,6 @@ import BagItems from "@/feature/bag/components/bag-items";
 import { Separator } from "../ui/separator";
 import { useGetMyBag } from "@/feature/bag/hooks/useMyBag";
 import Link from "next/link";
-import { Button } from "../ui/button";
 
 interface SiteHeaderProps {
   className?: string;
