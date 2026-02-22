@@ -8,7 +8,6 @@ import { AxiosError } from "axios";
 import ForbiddenErrorPage from "@/components/error/components/403-error";
 import NotFoundErrorPage from "@/components/error/components/404-error";
 import Loading from "@/components/shared/loading";
-import { Divide } from "lucide-react";
 
 interface ApprovalWrapperProps {
   token: string;

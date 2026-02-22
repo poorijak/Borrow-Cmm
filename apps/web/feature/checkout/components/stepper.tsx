@@ -16,12 +16,10 @@ const Stepper = ({
   hasEquipment,
   hasLab,
 }: StepperProps) => {
-
   const dynamicSteps = [
     { id: "user", title: "ข้อมูลผู้ยืม" },
-    ...(hasEquipment ? [{ id: "equipment", title: "การยืมอุปกรณ์" }] : []),
-    ...(hasLab ? [{ id: "lab", title: "การจองห้องปฏิบัติการ" }] : []),
-    { id: "summary", title: "ส่งคำขอ" },
+    ...(hasEquipment ? [{ id: "equipment", title: "ยืมอุปกรณ์" }] : []),
+    ...(hasLab ? [{ id: "lab", title: "จองห้องปฏิบัติการ" }] : []),
   ];
 
   const getStepHeader = (index: number) => {
@@ -36,25 +34,27 @@ const Stepper = ({
     return <span>{index + 1}</span>;
   };
   return (
-    <div className="w-full p-5 md:p-15">
-      <div className="flex w-full items-center">
+    <div className="w-full px-1 pt-5 md:p-15">
+      <div className="flex w-full items-start">
         {dynamicSteps.map((item, i) => (
           <React.Fragment key={i}>
             <div
-              className="relative z-10 flex flex-col items-center hover:cursor-pointer"
+              className="z-10 flex w-20 flex-col items-center gap-2 text-center hover:cursor-pointer md:w-28"
               onClick={() => setActiveState(i)}
             >
               <div
                 className={cn(
-                  "flex size-6 items-center justify-center rounded-full text-sm text-white transition-colors duration-300",
+                  "flex size-6 shrink-0 items-center justify-center rounded-full text-sm text-white transition-colors duration-300",
                   activeState >= i ? "bg-primary" : "bg-gray-300",
                 )}
               >
                 {getStepHeader(i)}
               </div>
+
+              {/* 2. เอา absolute และ -bottom-7 ออก เพื่อให้มันอยู่ใน Flow ปกติ */}
               <span
                 className={cn(
-                  "absolute -bottom-7 w-max text-xs font-medium transition-colors",
+                  "text-xs leading-tight font-medium wrap-break-word transition-colors", // เพิ่ม break-words
                   activeState >= i ? "text-primary" : "text-gray-400",
                 )}
               >
@@ -62,8 +62,11 @@ const Stepper = ({
               </span>
             </div>
 
+            {/* เส้นเชื่อม (Separator) */}
             {i < dynamicSteps.length - 1 && (
-              <div className="relative mx-4 h-[2px] flex-1 bg-gray-200">
+              <div className="relative mt-3 h-0.5 flex-1 bg-gray-200">
+                {" "}
+                {/* เพิ่ม mt ให้บาลานซ์กับวงกลม */}
                 <div
                   className={cn(
                     "bg-primary absolute top-0 left-0 h-full transition-all duration-500",

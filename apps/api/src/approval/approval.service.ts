@@ -11,6 +11,7 @@ import { formatDateThaiFull } from 'src/common/libs/formater/format.date';
 import { UserService } from 'src/user/user.service';
 import { UpdateApprovalDto } from './dto/update-approval.dto';
 import { AuthUser } from '@repo/types';
+import { CourseService } from 'src/course/course.service';
 
 type payloadType = {
   requestId: string;
@@ -24,6 +25,7 @@ export class ApprovalService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly userService: UserService,
+    private readonly courseService: CourseService,
   ) {}
   async findRequest(token: string, currentUser: AuthUser) {
     let payload: payloadType;
@@ -86,6 +88,7 @@ export class ApprovalService {
           select: {
             id: true,
             subjectId: true,
+            purpose: true,
             teacherId: true,
             additionalItems: true,
             borrowDate: true,
@@ -125,11 +128,19 @@ export class ApprovalService {
         })
       : null;
 
+    const getSubjectLabel = async (id: string) => {
+      const course = await this.courseService.findById(id);
+      return course
+        ? { code: course.code, label: course.label }
+        : 'ไม่พบข้อมูลรายวิชา';
+    };
+
     return {
       request,
       equipmentDetail: equipmentDetail
         ? {
             ...equipmentDetail,
+            subjectDetail: await getSubjectLabel(equipmentDetail.subjectId),
             borrowDate: formatDateThaiFull(equipmentDetail?.borrowDate),
             returnDate: formatDateThaiFull(equipmentDetail?.returnDate),
           }
@@ -137,6 +148,7 @@ export class ApprovalService {
       labDetail: labDetail
         ? {
             ...labDetail,
+            subjectDetail: await getSubjectLabel(labDetail.subjectId),
             labBookings: labDetail?.labBookings.map((labBooking) => ({
               ...labBooking,
               bookingDate: formatDateThaiFull(labBooking.bookingDate),

@@ -8,7 +8,7 @@ export const StatusBadge = ({ status }: { status: string }) => {
   return (
     <Badge
       variant="outline"
-      className={`flex w-fit items-center gap-2 rounded-full border px-4 py-1.5 font-medium transition-all ${config.color} `}
+      className={`flex w-fit items-center gap-2 rounded-full border px-4 py-1 font-medium transition-all ${config.color} `}
     >
       {config.icon}
       <span>{config.label}</span>

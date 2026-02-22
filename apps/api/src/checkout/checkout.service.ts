@@ -69,6 +69,10 @@ export class CheckoutService {
     const expiresDate = new Date();
     expiresDate.setDate(expiresDate.getDate() + 2);
 
+    const hasSelectedEquipment = userBag.equipmentItems.some(
+      (item) => item.itemCount > 0,
+    );
+
     return await tx.borrowRequest.create({
       data: {
         userId: userId,
@@ -79,6 +83,7 @@ export class CheckoutService {
         educationLevel: userInfo.educationLevel,
         idCardImage: userInfo.idCardImageKey,
         ...(userBag.equipmentItems.length > 0 &&
+          hasSelectedEquipment &&
           equipment && {
             equipmentDetail: {
               create: {
@@ -90,10 +95,15 @@ export class CheckoutService {
                 returnDate: new Date(equipment.borrowRange.to),
                 equipmentRequestItems: {
                   createMany: {
-                    data: userBag.equipmentItems.map((item) => ({
-                      equipmentId: item.equipmentId,
-                      quantity: item.itemCount,
-                    })),
+                    data: userBag.equipmentItems
+                      .filter(
+                        (item) =>
+                          item.isSelected === true && item.itemCount > 0,
+                      )
+                      .map((item) => ({
+                        equipmentId: item.equipmentId,
+                        quantity: item.itemCount,
+                      })),
                   },
                 },
               },

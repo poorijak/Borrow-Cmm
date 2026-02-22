@@ -118,6 +118,12 @@ export class UserService {
     });
   }
 
+  async findInstrutorMany() {
+    return await this.prisma.user.findMany({
+      where: { role: 'instructor' },
+    });
+  }
+
   async getPaginatedStaff(query: GetStaffQueryDto) {
     const { page = 1, limit, role, search, createdAt, updatedAt } = query;
 

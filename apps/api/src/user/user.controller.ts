@@ -37,6 +37,11 @@ export class UserController {
     return this.userService.getPaginatedStaff(query);
   }
 
+  @Get('/instrutor')
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.STUDENT, Role.INSTRUCTOR)
+  findInStrutors() {
+    return this.userService.findInstrutorMany();
+  }
   @Patch(':id')
   @Roles(Role.ADMIN)
   updateUserRole(

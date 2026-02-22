@@ -45,10 +45,7 @@ const LabFilterBtn = () => {
     if (selectedDate) {
       const newParams = new URLSearchParams(sp);
 
-      newParams.set(
-        "bookingDate",
-        format(selectedDate, "yyyy-MM-dd"), // ปลอดภัยกว่า toISOString
-      );
+      newParams.set("bookingDate", format(selectedDate, "yyyy-MM-dd"));
 
       router.push(`${pathName}?${newParams.toString()}`);
     }

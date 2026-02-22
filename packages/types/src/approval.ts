@@ -32,10 +32,17 @@ export interface BorrowRequestApproval {
   status: RequestStatus;
 }
 
+type subjectDetailType = {
+  code: string;
+  label: string;
+};
+
 // รายละเอียดอุปกรณ์
 export interface EquipmentDetailApproval {
   id: string;
+  subjectDetail: subjectDetailType;
   subjectId: string;
+  purpose: string;
   teacherId: string;
   additionalItems: string;
   borrowDate: string;
@@ -52,6 +59,7 @@ export interface EquipmentRequestItemApproval {
 // รายละเอียดห้องแล็บ
 export interface LabDetailApproval {
   id: string;
+  subjectDetail: subjectDetailType;
   subjectId: string;
   teacherId: string;
   usageDetails: string;

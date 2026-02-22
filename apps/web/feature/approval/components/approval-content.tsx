@@ -23,7 +23,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react";
 import { ApprovalModal } from "./approval-modal";
-import { formatEqupmentStatus } from "@/lib/format/format";
 import { StatusBadge } from "@/components/shared/status-badge";
 
 interface ApprovalContentProps {
@@ -108,7 +107,12 @@ const ApprovalContent = ({ request, token }: ApprovalContentProps) => {
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-2">
                 <p className="text-muted-foreground text-xs">ใช้ในวิชา</p>
-                <p className="text-sm">{equipmentDetail.subjectId}</p>
+                <div className="flex items-start gap-3">
+                  <Badge>{equipmentDetail.subjectDetail.code}</Badge>
+                  <p className="hidden text-sm md:block">
+                    {equipmentDetail.subjectDetail.label}
+                  </p>
+                </div>
               </div>
               <div className="flex flex-col gap-2">
                 <p className="text-muted-foreground text-xs">อุปกรณ์อื่นๆ</p>
@@ -117,20 +121,23 @@ const ApprovalContent = ({ request, token }: ApprovalContentProps) => {
                 </p>
               </div>
               <div className="flex flex-col gap-2">
-                <p className="text-muted-foreground text-xs">ยืมวันที่</p>
-                <Badge className="bg-[#DCFAE9] px-2 py-1 text-green-600">
-                  {equipmentDetail.borrowDate}
-                </Badge>
-              </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-muted-foreground text-xs">คืนวันที่</p>
-                <Badge className="bg-red-100 px-2 py-1 text-red-600">
-                  {equipmentDetail.returnDate}
-                </Badge>
+                <p className="text-muted-foreground text-xs">อุปกรณ์อื่นๆ</p>
+                <p className="text-sm">{equipmentDetail.purpose || "ไม่มี"}</p>
               </div>
               <div className="flex flex-col gap-2">
                 <p className="text-muted-foreground text-xs">สถานะ</p>
                 <StatusBadge status={equipmentDetail.status} />
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-muted-foreground text-xs">ยืมวันที่</p>
+                <p className="text-sm">{equipmentDetail.borrowDate}</p>
+
+                {/* <Badge className="bg-[#DCFAE9] px-2 py-1 text-green-600"></Badge> */}
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-muted-foreground text-xs">คืนวันที่</p>
+                <p className="text-sm">{equipmentDetail.returnDate}</p>
+                {/* <Badge className="bg-red-100 px-2 py-1 text-red-600"></Badge> */}
               </div>
             </div>
 
@@ -203,7 +210,12 @@ const ApprovalContent = ({ request, token }: ApprovalContentProps) => {
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-2">
                 <p className="text-muted-foreground text-xs">ใช้ในวิชา</p>
-                <p className="text-sm">{labDetail.subjectId}</p>
+                <div className="flex items-start gap-3">
+                  <Badge>{labDetail.subjectDetail.code}</Badge>
+                  <p className="hidden text-sm md:block">
+                    {labDetail.subjectDetail.label}
+                  </p>
+                </div>
               </div>
 
               <div className="flex flex-col gap-2">
