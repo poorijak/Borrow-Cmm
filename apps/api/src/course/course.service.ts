@@ -72,6 +72,22 @@ export class CourseService {
     });
   }
 
+  async findList() {
+    const courses = await this.prisma.course.findMany({
+      where: {
+        status: 'active',
+      },
+      orderBy: {
+        code: 'asc',
+      },
+    });
+
+    return courses.map((course) => ({
+      ...course,
+      displayName: `${course.code} || ${course.label}`,
+    }));
+  }
+
   async findById(id: string) {
     return await this.prisma.course.findUnique({ where: { id } });
   }

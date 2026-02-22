@@ -9,9 +9,6 @@ export const useGetLaboratory = (
   return useQuery({
     queryKey: ["laboratory", bookingDate, slot],
     queryFn: async () => {
-      console.log(bookingDate);
-      console.log(slot);
-
       if (bookingDate && slot) {
         const { data } = await api.get<Laboratory[]>("/laboratory/available", {
           params: {
@@ -26,6 +23,5 @@ export const useGetLaboratory = (
         return data;
       }
     },
-    enabled: true,
   });
 };

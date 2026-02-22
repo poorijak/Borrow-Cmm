@@ -23,6 +23,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/common/guards/role.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { Role } from 'src/admin/role.enum';
+import { ROLES } from '@repo/types';
 
 @Controller('course')
 @UseGuards(AuthGuard('jwt'), RoleGuard)
@@ -50,6 +51,7 @@ export class CourseController {
   }
 
   @Get()
+  @Roles(Role.ADMIN, Role.MODERATOR)
   findAll(@Query() query: GetCourseQueryDTO) {
     return this.courseService.getPaginatedCourse(query);
   }
@@ -61,6 +63,12 @@ export class CourseController {
     @Body(new ZodValidationPipe(updateStatusSchema)) body: UpdateStatusSchema,
   ) {
     return this.courseService.updateStatus(id, body);
+  }
+
+  @Get('/list')
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
+  findCourseList() {
+    return this.courseService.findList();
   }
 
   @Delete(':id')

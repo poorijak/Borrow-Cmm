@@ -13,7 +13,6 @@ import React, { useState } from "react";
 import { th } from "date-fns/locale";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { StringToBoolean } from "class-variance-authority/types";
 import { Icon } from "@iconify/react";
 
 const LabFilterBtn = () => {
@@ -46,10 +45,7 @@ const LabFilterBtn = () => {
     if (selectedDate) {
       const newParams = new URLSearchParams(sp);
 
-      newParams.set(
-        "bookingDate",
-        format(selectedDate, "yyyy-MM-dd"), // ปลอดภัยกว่า toISOString
-      );
+      newParams.set("bookingDate", format(selectedDate, "yyyy-MM-dd"));
 
       router.push(`${pathName}?${newParams.toString()}`);
     }

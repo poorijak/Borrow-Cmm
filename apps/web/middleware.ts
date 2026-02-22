@@ -4,7 +4,8 @@ import { decodeJwt } from "jose";
 import { jwtPayload, ROLES } from "@repo/types";
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
+  const callBackUrl = encodeURIComponent(`${pathname}${search}`);
 
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
@@ -16,7 +17,9 @@ export async function middleware(request: NextRequest) {
     if (isAuthPage) {
       return NextResponse.next();
     }
-    return NextResponse.redirect(new URL("/auth/signin", request.url));
+    return NextResponse.redirect(
+      new URL(`/auth/signin?callBackUrl=${callBackUrl}`, request.url),
+    );
   }
 
   if (!accessToken && refreshToken) {
@@ -26,7 +29,7 @@ export async function middleware(request: NextRequest) {
         {
           method: "GET",
           headers: { Cookie: `refreshToken=${refreshToken}` },
-        }
+        },
       );
 
       if (response.ok) {
@@ -38,10 +41,14 @@ export async function middleware(request: NextRequest) {
 
         return nextResponse;
       } else {
-        return NextResponse.redirect(new URL("/auth/signin", request.url));
+        return NextResponse.redirect(
+          new URL(`/auth/signin?callBackUrl=${callBackUrl}`, request.url),
+        );
       }
     } catch (error) {
-      return NextResponse.redirect(new URL("/auth/signin", request.url));
+      return NextResponse.redirect(
+        new URL(`/auth/signin?callBackUrl=${callBackUrl}`, request.url),
+      );
     }
   }
 
@@ -54,13 +61,17 @@ export async function middleware(request: NextRequest) {
 
       const now = Math.floor(Date.now() / 1000);
       if (payload.exp && payload.exp < now) {
-        return NextResponse.redirect(new URL("/auth/signin", request.url));
+        return NextResponse.redirect(
+          new URL(`/auth/signin?callBackUrl=${callBackUrl}`, request.url),
+        );
       }
 
       if (payload.role !== ROLES.ADMIN && payload.role !== ROLES.MODERATOR)
         return NextResponse.redirect(new URL("/", request.url));
     } catch (error) {
-      return NextResponse.redirect(new URL("/auth/signin", request.url));
+      return NextResponse.redirect(
+        new URL(`/auth/signin?callBackUrl=${callBackUrl}`, request.url),
+      );
     }
   }
 

@@ -13,6 +13,11 @@ import { GoogleAuthGurad } from '../common/guards/google-auth.guard';
 import type { Request as ExpressRequest, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from 'src/user/user.service';
+import { googleUser } from './types/auth';
+
+type GoogleRequest = ExpressRequest & {
+  user: googleUser;
+};
 
 @Controller('auth')
 export class AuthController {
@@ -23,14 +28,11 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(GoogleAuthGurad)
-  async googleLogin(@Request() req) {}
+  async googleLogin(@Request() req: ExpressRequest, @Res() res: Response) {}
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGurad)
-  async googleCallback(
-    @Req() req: any,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async googleCallback(@Req() req: GoogleRequest, @Res() res: Response) {
     const { accessToken, refreshToken } =
       await this.authService.loginWithGoogle(req.user);
 
@@ -47,7 +49,12 @@ export class AuthController {
     );
 
     const redirectUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    return res.redirect(`${redirectUrl}`);
+    const savedCallbackUrl = req.cookies?.['return_to'] || '/';
+
+    res.clearCookie('return_to');
+
+    console.log('Redirecting to:', `${redirectUrl}${savedCallbackUrl}`);
+    return res.redirect(`${redirectUrl}${savedCallbackUrl}`);
   }
 
   @Get('me')

@@ -13,13 +13,20 @@ export class ZodValidationPipe<T extends ZodTypeAny> implements PipeTransform {
     const result = this.schema.safeParse(value);
 
     if (!result.success) {
-      const fieldErrors: Record<string, string[] | undefined> =
-        result.error.flatten().fieldErrors;
+      const errors: Record<string, string[]> = {};
+
+      result.error.issues.forEach((issue) => {
+        const path = issue.path.join('.');
+        if (!errors[path]) {
+          errors[path] = [];
+        }
+        errors[path].push(issue.message);
+      });
 
       throw new BadRequestException({
         statusCode: 400,
         message: 'Validation failed',
-        errors: fieldErrors,
+        errors: errors,
       });
     }
 

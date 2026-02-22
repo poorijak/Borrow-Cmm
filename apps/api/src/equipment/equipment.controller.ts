@@ -70,6 +70,7 @@ export class EquipmentController {
     });
   }
   @Get()
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
   async findAll(
     @Query() query: GetEquipmentsQueryDto,
   ): Promise<EquipmentResponse> {
@@ -77,6 +78,7 @@ export class EquipmentController {
   }
 
   @Get(':categoryId')
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
   async findByCategoryId(@Param('categoryId') id: string) {
     return this.equipmentService.getEquipmentByCategoryId({
       id,

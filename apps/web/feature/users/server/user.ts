@@ -1,5 +1,6 @@
 // feature/users/server/user.ts
 import api from "@/lib/axios";
+import { User } from "@repo/types";
 import { cookies } from "next/headers";
 
 export async function getUser() {
@@ -9,7 +10,7 @@ export async function getUser() {
 
     if (!allCookie) return null;
 
-    const { data } = await api.get("/auth/me", {
+    const { data } = await api.get<User>("/auth/me", {
       headers: {
         Cookie: allCookie,
       },

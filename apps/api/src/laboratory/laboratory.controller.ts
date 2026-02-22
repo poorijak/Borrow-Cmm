@@ -45,11 +45,13 @@ export class LaboratoryController {
   }
 
   @Get()
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
   getLabs() {
     return this.laboratoryService.getLaboratory();
   }
 
   @Get('available')
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.MODERATOR, Role.STUDENT)
   getLabAvailable(@Query() query: GetLabAvailableQueryDto) {
     return this.laboratoryService.getLaboratoryWithAvailable(query);
   }

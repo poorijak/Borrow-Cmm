@@ -5,9 +5,10 @@ import SwiperWrapper from "@/components/shared/swiper-wrapper";
 
 interface EquipmentContentProps {
   data: CategoryDetailResponse | undefined;
+  userId: string;
 }
 
-const EquipmentContent = ({ data }: EquipmentContentProps) => {
+const EquipmentContent = ({ data, userId }: EquipmentContentProps) => {
   const subCategory = data?.category?.subCategory ?? [];
 
   return (
@@ -28,6 +29,8 @@ const EquipmentContent = ({ data }: EquipmentContentProps) => {
                     return (
                       <div key={e.id} className="col-span-1 md:col-span-2">
                         <EquipmentCard
+                          userId={userId}
+                          id={e.id}
                           title={e.title}
                           totalStock={e.totalStock}
                           image={e.mainImage}

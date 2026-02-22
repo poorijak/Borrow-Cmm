@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
@@ -38,6 +37,11 @@ export class UserController {
     return this.userService.getPaginatedStaff(query);
   }
 
+  @Get('/instrutor')
+  @Roles(Role.ADMIN, Role.MODERATOR, Role.STUDENT, Role.INSTRUCTOR)
+  findInStrutors() {
+    return this.userService.findInstrutorMany();
+  }
   @Patch(':id')
   @Roles(Role.ADMIN)
   updateUserRole(
@@ -45,10 +49,5 @@ export class UserController {
     @Body(new ZodValidationPipe(updateUserRole)) body: UpdateUserRoleDto,
   ) {
     return this.userService.updateRole(id, { role: body.role });
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
   }
 }

@@ -5,4 +5,6 @@ import localizedFormat from 'dayjs/plugin/localizedFormat';
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
+dayjs.locale('th');
+
 export default dayjs;

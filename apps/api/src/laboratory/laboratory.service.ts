@@ -11,6 +11,7 @@ import {
 } from './dto/labQuery.dto';
 import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 import { R2Service } from 'src/common/cloudflare/r2.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class LaboratoryService {
@@ -53,11 +54,21 @@ export class LaboratoryService {
       where: {
         slot,
         bookingDate,
-        status: { in: ['in_use', 'pending', 'approved'] },
+        status: {
+          in: ['used', 'pending_teacher', 'pending_staff', 'approved'],
+        },
       },
       select: {
         laboratoryId: true,
       },
+    });
+
+    return conflic;
+  }
+
+  async checkBusyLab(labId: string, bookingDate: Date, slot: TimeSlot) {
+    const conflic = await this.prisma.labBooking.findUnique({
+      where: { id: labId, bookingDate, slot },
     });
 
     return conflic;
@@ -96,7 +107,7 @@ export class LaboratoryService {
 
     return labs.map((lab) => ({
       ...lab,
-      isAailable: !busyLabIds.has(lab.id),
+      isAvailable: !busyLabIds.has(lab.id),
     }));
   }
 
@@ -196,5 +207,17 @@ export class LaboratoryService {
       await this.r2.deleteImage(existingLaboratory.image);
     }
     return await this.prisma.laboratory.delete({ where: { id } });
+  }
+  @Cron(CronExpression.EVERY_HOUR)
+  async handleCleanupLab() {
+    return await this.prisma.labBooking.deleteMany({
+      where: {
+        expiresAt: {
+          lt: new Date(),
+        },
+        // แนะนำเพิ่มเติม:
+        status: 'pending_teacher', // หรือสถานะอื่นๆ ที่ถือว่า "ยังไม่สำเร็จแล้วปล่อยให้หลุด"
+      },
+    });
   }
 }

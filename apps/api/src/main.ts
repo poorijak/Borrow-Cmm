@@ -12,7 +12,7 @@ async function bootstrap() {
   });
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true, // <--- ตัวนี้สำคัญที่สุด ต้องเป็น true
+      transform: true,
       transformOptions: {
         enableImplicitConversion: true,
       },

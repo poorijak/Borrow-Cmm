@@ -5,3 +5,9 @@ export type jwtPayload = {
   iat: number;
   exp: number;
 };
+
+export type AuthUser = {
+  userId: string;
+  role: string;
+  email: string;
+};

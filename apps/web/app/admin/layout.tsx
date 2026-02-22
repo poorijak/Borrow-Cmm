@@ -1,9 +1,9 @@
 import SiteHeader from "@/components/sidebar/site-header";
 import { AppSidebar } from "@/components/ui/appSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { hasRole } from "@/feature/users/permission/user";
 import { getUser } from "@/feature/users/server/user";
-import { ROLES, User } from "@repo/types";
+import { ROLES } from "@repo/types";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -12,7 +12,7 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout = async ({ children }: AdminLayoutProps) => {
-  const user: User = await getUser();
+  const user = await getUser();
 
   if (!user) redirect("/auth/signin");
 

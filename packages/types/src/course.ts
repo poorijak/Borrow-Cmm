@@ -8,6 +8,10 @@ export interface Course {
   updatedAt: string;
 }
 
+export interface CourseList extends Course {
+  displayName: string;
+}
+
 export interface CourseResponse {
   data: Course[];
   meta: {
