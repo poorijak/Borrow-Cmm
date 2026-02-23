@@ -10,6 +10,7 @@ export const LabStatus = {
   REJECTED: "rejected",
   USED: "used", //
   NO_SHOW: "no_show",
+  EXPIRED: "expired",
 } as const;
 
 export const ReqStatus = {

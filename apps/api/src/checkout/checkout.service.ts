@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import type { BorrowValues } from '@repo/schemas';
 import { AuthUser } from '@repo/types';
 import { PrismaService } from 'prisma/prisma.service';
+import { formatDateToDDMMYY } from 'src/common/libs/formater/format.date';
 import { MailService } from 'src/mail/mail.service';
 
 type BorrowBagWithItems = Prisma.BorrowBagGetPayload<{
@@ -66,7 +67,8 @@ export class CheckoutService {
     const equipment = data.equipment;
     const lab = data.lab;
 
-    const expiresDate = new Date();
+    const now = new Date();
+    const expiresDate = new Date(now);
     expiresDate.setDate(expiresDate.getDate() + 2);
 
     const hasSelectedEquipment = userBag.equipmentItems.some(
