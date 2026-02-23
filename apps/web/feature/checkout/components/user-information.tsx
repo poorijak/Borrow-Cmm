@@ -2,6 +2,7 @@ import InputForm from "@/components/shared/form-input";
 import SelectedInput from "@/components/shared/selected-input";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import { BorrowFormValues } from "@repo/schemas";
 import { Upload, X } from "lucide-react";
 import Image from "next/image";
@@ -71,39 +72,26 @@ const UserInformation = () => {
     {
       id: 101,
       label: "ปริญญาตรี ชั้นปีที่ 1",
-      value: "ug_year_1",
-      group: "Undergraduate",
     },
     {
       id: 102,
       label: "ปริญญาตรี ชั้นปีที่ 2",
-      value: "ug_year_2",
-      group: "Undergraduate",
     },
     {
       id: 103,
       label: "ปริญญาตรี ชั้นปีที่ 3",
-      value: "ug_year_3",
-      group: "Undergraduate",
     },
     {
       id: 104,
       label: "ปริญญาตรี ชั้นปีที่ 4",
-      value: "ug_year_4",
-      group: "Undergraduate",
     },
     {
       id: 105,
       label: "ปริญญาตรี (ปีอื่นๆ)",
-      value: "ug_others",
-      group: "Undergraduate",
     },
-    { id: 201, label: "ปริญญาโท", value: "master_degree", group: "Graduate" },
     {
       id: 202,
       label: "ปริญญาเอก",
-      value: "doctoral_degree",
-      group: "Graduate",
     },
   ];
   return (
@@ -149,18 +137,20 @@ const UserInformation = () => {
           name="step1.educationLevel"
           render={({ field, fieldState }) => {
             const currentValue = educationLevels.find(
-              (item) => item.value === field.value,
+              (item) => item.label === field.value,
             );
+
+            console.log(currentValue);
 
             return (
               <div>
                 <SelectedInput
-                  error={fieldState.error}
                   data={educationLevels}
                   placeholder="เลือกชั้นปี"
                   renderLabel={(item) => item.label}
                   getUniqueKey={(item) => item.label}
                   label="ชั้นปี"
+                  error={fieldState.error}
                   selected={currentValue}
                   onSelected={(item) => field.onChange(item.label)}
                 />
@@ -206,7 +196,9 @@ const UserInformation = () => {
               />
               <div
                 onClick={triggerInputRef}
-                className="text-primary border-border flex w-24 items-center justify-center gap-2 rounded-sm border p-2 text-sm hover:cursor-pointer"
+                className={cn(
+                  "text-primary border-border flex w-24 items-center justify-center gap-2 rounded-sm border p-2 text-sm hover:cursor-pointer" , errors.step1?.idCardImageFile?.message && "border-destructive text-destructive"
+                )}
               >
                 <Upload size={14} />
                 <span>เพิ่มไฟล์</span>
@@ -215,8 +207,8 @@ const UserInformation = () => {
           )}
 
           {errors.step1?.idCardImageFile && (
-            <p className="text-destructive text-[12px] font-medium">
-              {String(errors.step1.idCardImageFile.message)}
+            <p className="text-destructive text-[11px] font-medium">
+              *{String(errors.step1.idCardImageFile.message)}
             </p>
           )}
         </div>

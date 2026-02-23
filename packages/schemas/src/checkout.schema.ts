@@ -9,7 +9,7 @@ const baseSchema = z.object({
 });
 
 const step1UserSchema = baseSchema.extend({
-  idCardImageFile: z.instanceof(File),
+  idCardImageFile: z.instanceof(File, { message: "กรุณาแนบรูปบัตรนักศึกษา" }),
 });
 
 const step1UserSchemaRequest = baseSchema.extend({
@@ -52,4 +52,3 @@ export const borrowSchema = z.object({
 export type BorrowFormValues = z.infer<typeof borrowFormSchema>;
 
 export type BorrowValues = z.infer<typeof borrowSchema>;
- 

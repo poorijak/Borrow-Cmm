@@ -43,6 +43,14 @@ const BagItems = ({ userId }: BagItemsProps) => {
   const hasLab = labItems.length > 0;
   const hasBoth = hasEquipment && hasLab;
 
+  const hasSelectedEquipment = equipmentItems.filter((item) => item.isSelected);
+  const hasSelectedLab = labItems.filter((item) => item.isSelected);
+
+
+  const canNext = hasSelectedEquipment.length > 0 || hasSelectedLab.length > 0;
+
+  console.log(canNext);
+
   const getSelectedCount = (type: "lab" | "equipment") => {
     const items = type === "equipment" ? equipmentItems : labItems;
     const selected = items.filter((i) => i.isSelected).length;
@@ -120,9 +128,15 @@ const BagItems = ({ userId }: BagItemsProps) => {
               </div>
             </Card>
           )}
-          <Button className="w-full" asChild>
-            <Link href={"/checkout"}>ถัดไป</Link>
-          </Button>
+          {canNext ? (
+            <Button className="w-full" asChild>
+              <Link href="/checkout">ถัดไป</Link>
+            </Button>
+          ) : (
+            <Button className="w-full" disabled>
+              ถัดไป
+            </Button>
+          )}
         </div>
       )}
     </>

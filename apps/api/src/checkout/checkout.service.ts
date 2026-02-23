@@ -32,7 +32,7 @@ export class CheckoutService {
 
       if (
         !userBag ||
-        (userBag.labItems.length === 0 && userBag.equipmentItems.length)
+        (userBag.labItems.length === 0 && userBag.equipmentItems.length === 0)
       ) {
         throw new BadRequestException('ไม่พบของในกระเป๋า');
       }
@@ -120,12 +120,14 @@ export class CheckoutService {
                 memberNames: lab.memberNames,
                 labBookings: {
                   createMany: {
-                    data: userBag.labItems.map((item) => ({
-                      laboratoryId: item.labId,
-                      bookingDate: item.date,
-                      slot: item.slot,
-                      expiresAt: expiresDate,
-                    })),
+                    data: userBag.labItems
+                      .filter((lab) => lab.isSelected)
+                      .map((item) => ({
+                        laboratoryId: item.labId,
+                        bookingDate: item.date,
+                        slot: item.slot,
+                        expiresAt: expiresDate,
+                      })),
                   },
                 },
               },

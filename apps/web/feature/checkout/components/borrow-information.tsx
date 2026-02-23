@@ -205,7 +205,7 @@ const BorrowInformation = ({
                       <PopoverTrigger
                         asChild
                         className={cn(
-                          "w-auto",
+                          "w-fit",
                           fieldState.error &&
                             "border-destructive focus:ring-destructive",
                         )}
