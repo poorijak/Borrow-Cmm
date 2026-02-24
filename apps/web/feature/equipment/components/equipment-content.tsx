@@ -24,7 +24,7 @@ const EquipmentContent = ({ data, userId }: EquipmentContentProps) => {
                 <SwiperWrapper>
                   {s.equipments.map((e) => {
                     const availableQty =
-                      e.totalStock - (e.borrowedQty - e.reservedQty);
+                      e.totalStock - (e.borrowedQty + e.reservedQty);
 
                     return (
                       <div key={e.id} className="col-span-1 md:col-span-2">

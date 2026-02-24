@@ -46,9 +46,25 @@ export class CheckoutService {
       );
       requestId = request.id;
 
+      const selectedEquipment = userBag.equipmentItems.filter(
+        (item) => item.isSelected && item.itemCount > 0,
+      );
+
+      for (const item of selectedEquipment) {
+        await tx.equipment.update({
+          where: {
+            id: item.equipmentId,
+          },
+          data: {
+            reservedQty: { increment: item.itemCount },
+          },
+        });
+      }
+
       await this.deleteEquipmentItems(userBag.id, tx);
       await this.deleteLabItems(userBag.id, tx);
     });
+
     if (requestId) {
       this.mail.sendBorrowRequest(requestId).catch((err) => {
         console.error('Failed to send email:', err);
@@ -141,12 +157,12 @@ export class CheckoutService {
 
   async deleteEquipmentItems(bagId: string, tx: Prisma.TransactionClient) {
     return await tx.bagEquipmentItem.deleteMany({
-      where: { bagId },
+      where: { bagId, isSelected: true },
     });
   }
   async deleteLabItems(bagId: string, tx: Prisma.TransactionClient) {
     return await tx.bagLabItem.deleteMany({
-      where: { bagId },
+      where: { bagId, isSelected: true },
     });
   }
 

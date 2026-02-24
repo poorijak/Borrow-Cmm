@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RequestStatus } from '@prisma/client';
+import { Prisma, RequestStatus } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { formatDateThaiFull } from 'src/common/libs/formater/format.date';
 import { UserService } from 'src/user/user.service';
@@ -173,6 +173,7 @@ export class ApprovalService {
       if ((type as string) === 'equipment') {
         const request = await this.prisma.equipmentDetail.findUnique({
           where: { requestId },
+          include: { equipmentRequestItems: true },
         });
 
         if (!request) throw new NotFoundException('ไม่พบคำขอนี้');
@@ -186,17 +187,28 @@ export class ApprovalService {
           throw new ForbiddenException('คุณไม่มีสิทธิ์จัดการคำขอนี้');
         }
 
+        const updateData: Prisma.EquipmentDetailUpdateInput = { status };
+
+        if ((status as string) === 'rejected') {
+          for (const item of request.equipmentRequestItems) {
+            await tx.equipment.update({
+              where: {
+                id: item.equipmentId,
+              },
+              data: {
+                reservedQty: { decrement: item.quantity },
+              },
+            });
+          }
+
+          updateData.rejectedAt = new Date();
+          updateData.rejectedById = currentUser.userId;
+          updateData.remark = request.remark;
+        }
+
         await tx.equipmentDetail.update({
-          where: {
-            requestId,
-          },
-          data: {
-            status,
-            rejectedAt: (status as string) === 'rejected' ? new Date() : null,
-            rejectedById:
-              (status as string) === 'rejected' ? currentUser.userId : null,
-            remark: (status as string) === 'rejected' ? remark : null,
-          },
+          where: { requestId },
+          data: updateData,
         });
       } else {
         const request = await this.prisma.equipmentDetail.findUnique({
