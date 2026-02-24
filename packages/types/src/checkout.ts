@@ -10,6 +10,7 @@ export const LabStatus = {
   REJECTED: "rejected",
   USED: "used", //
   NO_SHOW: "no_show",
+  EXPIRED: "expired",
 } as const;
 
 export const ReqStatus = {
@@ -33,7 +34,7 @@ export interface borrowRequest {
   phone: string;
   email: string;
   educationLevel: string;
-  idCardImage: string; // แก้จาก idCatdImage
+  idCardImage: string;
   status: RequestStatus;
   equipmentDetail: equipmentItemDetail | null;
   labBookingDetails: LabBookingDetail | null;
@@ -41,7 +42,7 @@ export interface borrowRequest {
 
 export interface equipmentItemDetail {
   id: string;
-  status: string; // อ้างอิงจาก EquipmentStatus ใน Schema
+  status: string;
   subjectId: string;
   teacherId: string;
   purpose: string;

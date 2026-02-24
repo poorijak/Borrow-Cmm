@@ -1,5 +1,4 @@
-"use client"
-
+"use client";
 
 import api from "@/lib/axios";
 import { CategoryDetailResponse } from "@repo/types";

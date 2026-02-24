@@ -8,6 +8,7 @@ import {
   User,
 } from "@repo/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export const useGetInstrutor = () => {
@@ -32,6 +33,7 @@ export const useGetCourse = () => {
 
 export const useMutateCheckout = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: async (data: BorrowFormValues) => {
@@ -75,6 +77,7 @@ export const useMutateCheckout = () => {
     onSuccess: () => {
       toast.success("ส่งคำขอสำเร็จ");
       queryClient.invalidateQueries({ queryKey: ["request"] });
+      router.push("/");
     },
     onError: (err) => {
       toast.error(err.message || "เกิดข้อผิดพลาด");

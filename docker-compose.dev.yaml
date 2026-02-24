@@ -38,7 +38,6 @@ services:
       - root_node_modules:/repo/node_modules
       - api_node_modules:/repo/apps/api/node_modules
       - web_node_modules:/repo/apps/web/node_modules
-    # ใช้ --unsafe-perm ถ้าเจอปัญหาเรื่องสิทธิ์ตอนติดตั้งบน Linux
     command: pnpm install --no-frozen-lockfile
     restart: "no"
     networks:
@@ -74,7 +73,6 @@ services:
       NODE_ENV: development
       CI: "true"
       PNPM_HOME: "/pnpm-store"
-    # รัน prisma generate ใน container เสมอ
     command: >
       sh -c "
         cd apps/api &&

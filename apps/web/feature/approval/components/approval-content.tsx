@@ -146,10 +146,11 @@ const ApprovalContent = ({ request, token }: ApprovalContentProps) => {
             <h2 className="text-primary text-xl font-bold">อุปกรณ์</h2>
             <ScrollArea className="h-80 px-4">
               <div className="mb-5 flex flex-col gap-6">
-                {equipmentDetail.equipmentRequestItems.map((item) => (
+                {equipmentDetail.equipmentRequestItems.map((item, i) => (
                   <div key={item.equipment.id} className="flex flex-col gap-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-5">
+                        <p>{i + 1}</p>
                         <div className="relative aspect-square size-12 rounded-sm bg-slate-100 md:size-12">
                           <Image
                             src={getPublicUrl(item.equipment?.mainImage)}

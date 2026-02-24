@@ -51,7 +51,6 @@ const Stepper = ({
                 {getStepHeader(i)}
               </div>
 
-              {/* 2. เอา absolute และ -bottom-7 ออก เพื่อให้มันอยู่ใน Flow ปกติ */}
               <span
                 className={cn(
                   "text-xs leading-tight font-medium wrap-break-word transition-colors", // เพิ่ม break-words
@@ -62,11 +61,8 @@ const Stepper = ({
               </span>
             </div>
 
-            {/* เส้นเชื่อม (Separator) */}
             {i < dynamicSteps.length - 1 && (
               <div className="relative mt-3 h-0.5 flex-1 bg-gray-200">
-                {" "}
-                {/* เพิ่ม mt ให้บาลานซ์กับวงกลม */}
                 <div
                   className={cn(
                     "bg-primary absolute top-0 left-0 h-full transition-all duration-500",

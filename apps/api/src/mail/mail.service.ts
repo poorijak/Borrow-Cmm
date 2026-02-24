@@ -123,8 +123,6 @@ export class MailService {
         });
         const approvalLink = `${process.env.FRONTEND_URL}/approve/${token}`;
 
-        console.log(data.hasEquipment, data.hasLab);
-
         const emailHtml = (await generateBorrowEmailHtml({
           approvalLink,
           fullName: request.fullName,
@@ -149,6 +147,7 @@ export class MailService {
         });
 
         console.log('Resend Response:', response);
+        return { token: approvalLink };
       } catch (error) {
         console.error(`Failed to send email to ${email}:`, error);
       }
