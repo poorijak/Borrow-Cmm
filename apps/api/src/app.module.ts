@@ -16,6 +16,7 @@ import { MyBagModule } from './my-bag/my-bag.module';
 import { CheckoutModule } from './checkout/checkout.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ApprovalModule } from './approval/approval.module';
+import { RequestModule } from './request/request.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ApprovalModule } from './approval/approval.module';
     MyBagModule,
     CheckoutModule,
     ApprovalModule,
+    RequestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

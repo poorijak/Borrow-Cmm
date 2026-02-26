@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import 'dayjs/locale/th'; 
+import 'dayjs/locale/th';
 
 export const formatDateToDDMMYY = (date: Date | undefined | null) => {
   if (!date) {

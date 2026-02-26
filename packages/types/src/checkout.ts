@@ -23,8 +23,17 @@ export const ReqStatus = {
   CANCELED: "canceled",
 } as const;
 
+export const EqStatus = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+  PICKED_UP: "picked_up",
+  RETURNED: "returned",
+} as const;
+
 export type RequestStatus = (typeof ReqStatus)[keyof typeof ReqStatus];
 export type LabStatus = (typeof LabStatus)[keyof typeof LabStatus];
+export type EquipmentStatus = (typeof EqStatus)[keyof typeof EqStatus];
 
 export interface borrowRequest {
   id: string;
@@ -42,7 +51,7 @@ export interface borrowRequest {
 
 export interface equipmentItemDetail {
   id: string;
-  status: string;
+  status: EquipmentStatus;
   subjectId: string;
   teacherId: string;
   purpose: string;

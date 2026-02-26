@@ -3,7 +3,7 @@ import { ApprovalService } from './approval.service';
 import { UpdateApprovalDto } from './dto/update-approval.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { GetUser } from 'src/common/guards/getUser';
-import type { AuthUser, User } from '@repo/types';
+import type { AuthUser } from '@repo/types';
 
 @Controller('approval')
 export class ApprovalController {

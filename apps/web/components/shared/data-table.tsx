@@ -96,7 +96,7 @@ export default function DataTableContent<TData, TValue>({
           </DropdownMenu>
         )}
       </div>
-      <div className={cn("overflow-hidden rounded-lg border", className)}>
+      <div className={cn("overflow-x-auto rounded-lg border", className)}>
         <Table>
           <TableHeader className="bg-muted sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (

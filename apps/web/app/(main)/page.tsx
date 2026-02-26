@@ -3,11 +3,22 @@ import OrderTable from "@/feature/home/components/order-table";
 import SugestionSection from "@/feature/home/components/sugestion-section";
 import React from "react";
 
-const page = async () => {
+interface PageProps {
+  searchParams: Promise<{
+    page?: string;
+    status?: string;
+  }>;
+}
+
+const page = async ({ searchParams }: PageProps) => {
+  const params = await searchParams;
+  const page = parseInt(params.page || "1");
+  const status = params.status || "all";
+
   return (
     <div>
       <EquipmentSection />
-      <OrderTable />
+      <OrderTable page={page} status={status} />
       <SugestionSection />
     </div>
   );
