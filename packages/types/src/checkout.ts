@@ -10,6 +10,7 @@ export const LabStatus = {
   REJECTED: "rejected",
   USED: "used", //
   NO_SHOW: "no_show",
+  EXPIRED: "expired",
 } as const;
 
 export const ReqStatus = {
@@ -22,8 +23,17 @@ export const ReqStatus = {
   CANCELED: "canceled",
 } as const;
 
+export const EqStatus = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+  PICKED_UP: "picked_up",
+  RETURNED: "returned",
+} as const;
+
 export type RequestStatus = (typeof ReqStatus)[keyof typeof ReqStatus];
 export type LabStatus = (typeof LabStatus)[keyof typeof LabStatus];
+export type EquipmentStatus = (typeof EqStatus)[keyof typeof EqStatus];
 
 export interface borrowRequest {
   id: string;
@@ -33,7 +43,7 @@ export interface borrowRequest {
   phone: string;
   email: string;
   educationLevel: string;
-  idCardImage: string; // แก้จาก idCatdImage
+  idCardImage: string;
   status: RequestStatus;
   equipmentDetail: equipmentItemDetail | null;
   labBookingDetails: LabBookingDetail | null;
@@ -41,7 +51,7 @@ export interface borrowRequest {
 
 export interface equipmentItemDetail {
   id: string;
-  status: string; // อ้างอิงจาก EquipmentStatus ใน Schema
+  status: EquipmentStatus;
   subjectId: string;
   teacherId: string;
   purpose: string;

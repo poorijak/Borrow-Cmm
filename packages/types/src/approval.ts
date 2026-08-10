@@ -1,17 +1,8 @@
-import { LabStatus, RequestStatus } from "./checkout";
+import { EqStatus, EquipmentStatus, LabStatus, RequestStatus } from "./checkout";
 import { EquipmentItem } from "./equipment";
 import { Laboratory } from "./laboratory";
 import { LaboratorySortType } from "./params";
 
-export const EqStatus = {
-  PENDING: "pending",
-  APPROVED: "approved",
-  REJECTED: "rejected",
-  PICKED_UP: "picked_up",
-  RETURNED: "returned",
-} as const;
-
-export type EquipmentStatus = (typeof EqStatus)[keyof typeof EqStatus];
 
 export interface FindRequestApprovalResponse {
   request: BorrowRequestApproval;

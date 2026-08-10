@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma, TimeSlot } from '@prisma/client';
@@ -15,6 +16,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class LaboratoryService {
+  private readonly logger = new Logger(LaboratoryService.name);
   constructor(
     private readonly prisma: PrismaService,
     private readonly r2: R2Service,
@@ -208,16 +210,22 @@ export class LaboratoryService {
     }
     return await this.prisma.laboratory.delete({ where: { id } });
   }
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_MINUTE)
   async handleCleanupLab() {
-    return await this.prisma.labBooking.deleteMany({
+    this.logger.log('Starting cleanup process...');
+    const result = await this.prisma.labBooking.updateMany({
       where: {
         expiresAt: {
           lt: new Date(),
         },
-        // แนะนำเพิ่มเติม:
-        status: 'pending_teacher', // หรือสถานะอื่นๆ ที่ถือว่า "ยังไม่สำเร็จแล้วปล่อยให้หลุด"
+        status: 'pending_teacher',
+      },
+      data: {
+        status: 'expired',
       },
     });
+    this.logger.log(
+      `Cleanup finished. Removed ${result.count} expired bookings.`,
+    );
   }
 }

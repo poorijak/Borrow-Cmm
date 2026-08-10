@@ -14,9 +14,14 @@ import type { Request as ExpressRequest, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from 'src/user/user.service';
 import { googleUser } from './types/auth';
+import { AuthUser } from '@repo/types';
 
 type GoogleRequest = ExpressRequest & {
   user: googleUser;
+};
+
+type ValidateUser = ExpressRequest & {
+  user: AuthUser;
 };
 
 @Controller('auth')
@@ -59,7 +64,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
-  getMe(@Req() req) {
+  getMe(@Req() req: ValidateUser) {
     return this.userService.findOne({
       id: req.user.userId,
     });

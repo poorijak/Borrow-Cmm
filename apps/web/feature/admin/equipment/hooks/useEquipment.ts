@@ -4,6 +4,7 @@ import { upsertEquipment } from "../server/equipment";
 import { toast } from "sonner";
 import { ActiveStatus, EquipmentResponse, QuerySortType } from "@repo/types";
 import api from "@/lib/axios";
+import { useRouter } from "next/navigation";
 
 export const useEquipment = () => {
   const queryClient = useQueryClient();
@@ -59,6 +60,7 @@ export const useGetEquipments = (
 
 export const useDeleteEquipment = () => {
   const queryClient = useQueryClient();
+
 
   return useMutation({
     mutationFn: async (id: string | undefined) => {

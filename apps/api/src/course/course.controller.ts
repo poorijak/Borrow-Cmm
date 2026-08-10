@@ -23,7 +23,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/common/guards/role.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { Role } from 'src/admin/role.enum';
-import { ROLES } from '@repo/types';
 
 @Controller('course')
 @UseGuards(AuthGuard('jwt'), RoleGuard)

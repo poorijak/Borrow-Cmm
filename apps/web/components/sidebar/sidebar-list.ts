@@ -32,7 +32,7 @@ export const adminServices = [
     items: [
       {
         title: "การยืม/คืน/จอง",
-        href: "/admin/order",
+        href: "/admin/requests",
         icon: Clipboard,
       },
       {

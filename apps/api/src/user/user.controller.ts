@@ -4,7 +4,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -42,6 +41,7 @@ export class UserController {
   findInStrutors() {
     return this.userService.findInstrutorMany();
   }
+  
   @Patch(':id')
   @Roles(Role.ADMIN)
   updateUserRole(

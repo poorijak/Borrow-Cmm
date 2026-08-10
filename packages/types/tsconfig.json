@@ -3,8 +3,10 @@
     "rootDir": "src",
     "outDir": "dist",
 
+    "module": "CommonJS",
+    "moduleResolution": "node",
+
     "declaration": true,
-    "emitDeclarationOnly": true,
     "declarationMap": true,
 
     "stripInternal": true,
@@ -12,3 +14,4 @@
   },
   "include": ["src"]
 }
+

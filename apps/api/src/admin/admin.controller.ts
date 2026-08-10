@@ -27,11 +27,6 @@ export class AdminController {
     return { message: 'hello' };
   }
 
-  @Post()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.create(createAdminDto);
-  }
-
   @Get('/findAll')
   findAll() {
     return this.adminService.findAll();
@@ -40,11 +35,6 @@ export class AdminController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.adminService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
   }
 
   @Delete(':id')

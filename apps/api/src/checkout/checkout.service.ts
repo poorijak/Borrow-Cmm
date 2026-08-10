@@ -32,7 +32,7 @@ export class CheckoutService {
 
       if (
         !userBag ||
-        (userBag.labItems.length === 0 && userBag.equipmentItems.length)
+        (userBag.labItems.length === 0 && userBag.equipmentItems.length === 0)
       ) {
         throw new BadRequestException('ไม่พบของในกระเป๋า');
       }
@@ -45,9 +45,25 @@ export class CheckoutService {
       );
       requestId = request.id;
 
+      const selectedEquipment = userBag.equipmentItems.filter(
+        (item) => item.isSelected && item.itemCount > 0,
+      );
+
+      for (const item of selectedEquipment) {
+        await tx.equipment.update({
+          where: {
+            id: item.equipmentId,
+          },
+          data: {
+            reservedQty: { increment: item.itemCount },
+          },
+        });
+      }
+
       await this.deleteEquipmentItems(userBag.id, tx);
       await this.deleteLabItems(userBag.id, tx);
     });
+
     if (requestId) {
       this.mail.sendBorrowRequest(requestId).catch((err) => {
         console.error('Failed to send email:', err);
@@ -66,7 +82,8 @@ export class CheckoutService {
     const equipment = data.equipment;
     const lab = data.lab;
 
-    const expiresDate = new Date();
+    const now = new Date();
+    const expiresDate = new Date(now);
     expiresDate.setDate(expiresDate.getDate() + 2);
 
     const hasSelectedEquipment = userBag.equipmentItems.some(
@@ -120,12 +137,14 @@ export class CheckoutService {
                 memberNames: lab.memberNames,
                 labBookings: {
                   createMany: {
-                    data: userBag.labItems.map((item) => ({
-                      laboratoryId: item.labId,
-                      bookingDate: item.date,
-                      slot: item.slot,
-                      expiresAt: expiresDate,
-                    })),
+                    data: userBag.labItems
+                      .filter((lab) => lab.isSelected)
+                      .map((item) => ({
+                        laboratoryId: item.labId,
+                        bookingDate: item.date,
+                        slot: item.slot,
+                        expiresAt: expiresDate,
+                      })),
                   },
                 },
               },
@@ -137,12 +156,12 @@ export class CheckoutService {
 
   async deleteEquipmentItems(bagId: string, tx: Prisma.TransactionClient) {
     return await tx.bagEquipmentItem.deleteMany({
-      where: { bagId },
+      where: { bagId, isSelected: true },
     });
   }
   async deleteLabItems(bagId: string, tx: Prisma.TransactionClient) {
     return await tx.bagLabItem.deleteMany({
-      where: { bagId },
+      where: { bagId, isSelected: true },
     });
   }
 
